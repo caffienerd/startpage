@@ -2,7 +2,7 @@
 
 A fast, keyboard-driven browser start page. Terminal-style search with bookmark management, system tools, and syntax highlighting.
 
-Live at `http://localhost:6174/`
+Live at http://localhost:6174/
 
 ---
 
@@ -16,8 +16,7 @@ startup/
     ├── index.html
     ├── style.css
     ├── version/
-    │   ├── version.js       ← edit this to change version
-    │   └── version.ini      
+    │   └── version.js   ← edit this to change version    
     └── script/
         ├── bookmarks.js
         ├── commands.js
