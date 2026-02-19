@@ -9,6 +9,8 @@ function openConfig() {
   document.getElementById('gemini-api-key').value       = getStoredGeminiApiKey();
   document.getElementById('gemini-model').value         = getStoredGeminiModel();
   document.getElementById('gemini-system-prompt').value = getStoredGeminiSystemPrompt();
+  document.getElementById('ai-mode-enabled').checked    = getStoredAiModeEnabled();
+  document.getElementById('ai-route-badge-mode').value  = getStoredAiRouteBadgeMode();
   document.getElementById('config-modal').classList.add('active');
 }
 
@@ -24,6 +26,8 @@ function saveConfig() {
   const geminiKeyInput = document.getElementById('gemini-api-key');
   const geminiModelInput = document.getElementById('gemini-model');
   const geminiSystemPromptInput = document.getElementById('gemini-system-prompt');
+  const aiModeEnabledInput = document.getElementById('ai-mode-enabled');
+  const aiRouteBadgeModeInput = document.getElementById('ai-route-badge-mode');
 
   let bookmarks = null;
   let bookmarkError = false;
@@ -49,10 +53,13 @@ function saveConfig() {
   saveGeminiApiKey(geminiKeyInput.value);
   saveGeminiModel(geminiModelInput.value.trim() || DEFAULT_GEMINI_MODEL);
   saveGeminiSystemPrompt(geminiSystemPromptInput.value);
+  saveAiModeEnabled(!!aiModeEnabledInput.checked);
+  saveAiRouteBadgeMode(aiRouteBadgeModeInput.value);
 
   generateBookmarks();
   updateWeather();
   closeConfig();
+  if (typeof hideAiRouteBadge === 'function') hideAiRouteBadge();
   initializeTerminal();
 
   if (bookmarkError) {

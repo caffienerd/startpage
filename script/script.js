@@ -3,7 +3,17 @@
 // ========================================
 
 function loadTheme() {
-  if (getStoredTheme() === 'dark') document.body.classList.add('dark-mode');
+  const theme = getStoredTheme();
+  document.body.classList.remove('dark-mode', 'black-mode');
+  document.documentElement.classList.remove('dark-mode', 'black-mode');
+
+  if (theme === 'dark') {
+    document.body.classList.add('dark-mode');
+    document.documentElement.classList.add('dark-mode');
+  } else if (theme === 'black') {
+    document.body.classList.add('black-mode');
+    document.documentElement.classList.add('black-mode');
+  }
 }
 
 // ---- Init ----

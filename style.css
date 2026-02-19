@@ -23,6 +23,17 @@ html.dark-mode body, body.dark-mode {
   --shadow-color: rgba(0, 0, 0, 0.3);
 }
 
+/* Full Black Theme */
+html.black-mode body, body.black-mode {
+  --background-color: #000000;
+  --text-color: #f4f5f6;
+  --card-background: rgba(8, 8, 8, 0.94);
+  --card-border: rgba(255, 255, 255, 0.11);
+  --terminal-bg: rgba(7, 7, 7, 0.96);
+  --terminal-text: #f4f5f6;
+  --shadow-color: rgba(0, 0, 0, 0.55);
+}
+
 /* Global Styles */
 * {
   margin: 0;
@@ -131,18 +142,24 @@ html.dark-mode body::after, body.dark-mode::after {
   z-index: 10;
 }
 
+html.black-mode body .bookmark-section, body.black-mode .bookmark-section {
+  background: #050505;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+
 /* Light mode bookmark sections */
-body:not(.dark-mode) .bookmark-section {
+body:not(.dark-mode):not(.black-mode) .bookmark-section {
   background: #d5d9db;
   border: 1px solid rgba(0, 0, 0, 0.1);
 }
 
-body:not(.dark-mode) .bookmark-section:hover {
+body:not(.dark-mode):not(.black-mode) .bookmark-section:hover {
   background: #d5d9db;
   border-color: rgba(0, 0, 0, 0.15);
 }
 
-html.dark-mode body .bookmark-section:hover, body.dark-mode .bookmark-section:hover {
+html.dark-mode body .bookmark-section:hover, body.dark-mode .bookmark-section:hover,
+html.black-mode body .bookmark-section:hover, body.black-mode .bookmark-section:hover {
   background: #363d3f;
   border-color: rgba(255, 255, 255, 0.2);
 }
@@ -176,19 +193,27 @@ ul li a {
   z-index: 10;
 }
 
+html.black-mode body ul li a, body.black-mode ul li a {
+  background: #0b0b0b;
+}
+
 /* Light mode link backgrounds */
-body:not(.dark-mode) ul li a {
+body:not(.dark-mode):not(.black-mode) ul li a {
   background: #cfd3d5;
   opacity: 1;
 }
 
-body:not(.dark-mode) ul li a:hover {
+body:not(.dark-mode):not(.black-mode) ul li a:hover {
   background: #c5c9cb;
 }
 
 ul li a:hover {
   background: #454d50;
   transform: translateX(3px);
+}
+
+html.black-mode body ul li a:hover, body.black-mode ul li a:hover {
+  background: #141414;
 }
 
 ul li a img {
@@ -206,6 +231,7 @@ ul li a span {
 .terminal-section {
   display: flex;
   flex-direction: row;
+  flex-wrap: wrap;
   align-items: center;
   justify-content: center;
   gap: 16px;
@@ -240,6 +266,54 @@ ul li a span {
   position: relative;
   flex: 1;
   display: flex;
+}
+
+.ai-route-badge {
+  display: none;
+  padding: 0 10px;
+  border-color: transparent;
+  opacity: 0;
+  transform: translateY(-8px) scale(0.985);
+  transition: opacity 0.18s ease, transform 0.18s ease, border-color 0.16s ease, background 0.16s ease;
+  border-radius: 7px;
+  border: 1px solid transparent;
+  background: linear-gradient(135deg, rgba(243, 156, 18, 0.17), rgba(243, 156, 18, 0.07));
+  color: var(--terminal-text);
+  font-family: var(--monospace-font-family);
+  font-size: 13px;
+  line-height: 1.45;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  overflow: auto;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.18);
+  will-change: transform, opacity;
+  pointer-events: none;
+}
+
+.ai-route-badge.show {
+  display: block;
+  flex: 1 1 100%;
+  opacity: 1;
+  transform: translateY(0) scale(1);
+  margin-top: 2px;
+  max-height: 110px;
+  padding: 8px 10px;
+  border-color: rgba(243, 156, 18, 0.45);
+}
+
+.ai-route-badge.preview {
+  border-color: rgba(102, 126, 234, 0.52);
+  background: linear-gradient(135deg, rgba(102, 126, 234, 0.18), rgba(102, 126, 234, 0.07));
+}
+
+.ai-route-badge.bump {
+  animation: aiBadgeBump 170ms ease;
+}
+
+@keyframes aiBadgeBump {
+  0% { transform: translateY(-8px) scale(0.985); }
+  100% { transform: translateY(0) scale(1); }
 }
 
 #terminal-input {
@@ -354,7 +428,8 @@ ul li a span {
 }
 
 .config-content textarea,
-.config-content input {
+.config-content input,
+.config-content select {
   width: 100%;
   background: var(--terminal-bg);
   border: 1px solid var(--card-border);
@@ -368,7 +443,8 @@ ul li a span {
 }
 
 .config-content textarea:focus,
-.config-content input:focus {
+.config-content input:focus,
+.config-content select:focus {
   outline: none;
   border-color: #667eea;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
@@ -377,6 +453,27 @@ ul li a span {
 .config-content textarea {
   min-height: 200px;
   line-height: 1.6;
+}
+
+.config-inline-toggle {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-size: 14px;
+  font-weight: 500;
+}
+
+.config-inline-toggle input[type="checkbox"] {
+  width: 18px;
+  height: 18px;
+}
+
+.config-code {
+  font-family: var(--monospace-font-family);
+  background: rgba(102, 126, 234, 0.15);
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: #667eea;
 }
 
 .config-buttons {

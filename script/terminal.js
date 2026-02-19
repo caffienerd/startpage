@@ -56,9 +56,13 @@ function updateSyntaxHighlight(value) {
     'sp':  'spell:',
     ':c':  ':config',
     ':d':  ':dark',
+    ':b':  ':black',
+    ':am': ':amoled',
     ':i':  ':ipconfig',
     ':l':  ':light',
     ':h':  ':help',
+    ':ha': ':help_ai_router',
+    ':aim': ':aimode',
     ':ge': ':gemini',
     ':n':  ':netspeed',
     ':w':  ':weather',
@@ -66,7 +70,7 @@ function updateSyntaxHighlight(value) {
     ':ve': ':version'
   };
 
-  const knownCommands = [':help',':ipconfig',':ip',':netspeed',':speed',':config',':weather',':time',':dark',':light',':gemini'];
+  const knownCommands = [':help',':help_ai_router',':aimode',':ipconfig',':ip',':netspeed',':speed',':config',':weather',':time',':dark',':black',':amoled',':light',':gemini'];
   const versionCommands = [':version',':ver'];
   const knownSearch   = /^(r|yt|alt|def|ddg|imdb|the|syn|quote|maps|cws|spell|gem|gemini|ai):/;
 
@@ -114,12 +118,46 @@ function escapeHTML(str) {
   return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
+function getBookmarkTitle(anchor) {
+  const label = anchor.querySelector('span');
+  return (label ? label.textContent : anchor.textContent || '').trim() || 'Bookmark';
+}
+
+function findFirstBookmarkMatch(elements, rawValue) {
+  const value = (rawValue || '').trim().toLowerCase();
+  if (!value) return null;
+
+  for (const el of elements) {
+    if (el.textContent.toLowerCase().includes(value)) {
+      return {
+        href: el.href,
+        title: getBookmarkTitle(el),
+      };
+    }
+  }
+  return null;
+}
+
 // ---- Input handler (bookmark filtering) ----
 function handleInput(input, elements) {
   input.addEventListener("input", () => {
     const rawValue = input.value;
     const value = rawValue.toLowerCase();
     updateSyntaxHighlight(value);
+
+    if (/^ai\s*:/i.test(rawValue)) {
+      const aiQuery = rawValue.replace(/^ai\s*:/i, "").trim();
+      previewAiRoute(aiQuery);
+    } else if (getStoredAiModeEnabled() && rawValue.trim() && !rawValue.startsWith(':') && !value.match(/^(r|yt|alt|ddg|imdb|def|the|syn|quote|maps|cws|spell|gem|gemini):/)) {
+      const bookmarkMatch = findFirstBookmarkMatch(elements, rawValue);
+      if (bookmarkMatch) {
+        showAiRouteBadge(bookmarkMatch.title, rawValue.trim(), 0, 'preview');
+      } else {
+        previewAiRoute(rawValue.trim());
+      }
+    } else {
+      hideAiRouteBadge();
+    }
 
     if (value === "" || value.match(/^(r|yt|alt|ddg|imdb|def|the|syn|quote|maps|cws|spell|gem|gemini|ai):/)) {
       resetStyles(elements);
@@ -164,6 +202,7 @@ function handleKeyboardEvents(input, elements) {
       input.value = "";
       resetStyles(elements);
       updateSyntaxHighlight("");
+      hideAiRouteBadge();
       return;
     }
 
@@ -195,15 +234,24 @@ function handleEnterKey(rawValue, value, elements, history) {
   }
 
   // Try bookmark first
+  const bookmarkMatch = findFirstBookmarkMatch(elements, rawValue);
   let matched = false;
-  elements.forEach(el => {
-    if (value && el.textContent.toLowerCase().includes(value)) {
-      window.location.href = el.href;
-      matched = true;
+  if (bookmarkMatch) {
+    matched = true;
+    if (getStoredAiModeEnabled()) {
+      showAiRouteBadge(bookmarkMatch.title, rawValue.trim(), AI_ROUTE_BADGE_NAV_DELAY_MS).then(() => {
+        window.location.href = bookmarkMatch.href;
+      });
+    } else {
+      window.location.href = bookmarkMatch.href;
     }
-  });
+  }
 
-  if (!matched) handleSpecialCommands(rawValue.trim());
+  if (!matched && getStoredAiModeEnabled() && rawValue.trim()) {
+    routeSemanticIntent(rawValue.trim());
+  } else if (!matched) {
+    handleSpecialCommands(rawValue.trim());
+  }
   if (rawValue.trim()) history.push(rawValue.trim());
 }
 
@@ -214,10 +262,12 @@ function initializeTerminal() {
     "search anything...",
     ":help → commands",
     ":config → settings",
+    "ai:directions to home → maps",
+    ":aimode → toggle no-prefix AI routing",
     "yt:query → youtube",
     "maps:location → google maps",
   ];
-  const elements = document.querySelectorAll("a");
+  const elements = document.querySelectorAll("#bookmarks a");
 
   initializeBrowserInfo();
   typePlaceholder(input, examples);

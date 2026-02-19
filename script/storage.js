@@ -29,6 +29,8 @@ const DEFAULT_WEATHER_LOCATION = "Gurgaon";
 const DEFAULT_TIMEZONE        = "UTC+5:30";
 const DEFAULT_GEMINI_MODEL    = "gemini-2.5-flash-lite";
 const DEFAULT_GEMINI_SYSTEM_PROMPT = "";
+const DEFAULT_AI_MODE_ENABLED = false;
+const DEFAULT_AI_ROUTE_BADGE_MODE = "live";
 
 // ========================================
 // Bookmarks
@@ -106,4 +108,24 @@ function getStoredGeminiSystemPrompt() {
 }
 function saveGeminiSystemPrompt(prompt) {
   localStorage.setItem('geminiSystemPrompt', String(prompt || '').trim());
+}
+
+// ========================================
+// AI Router
+// ========================================
+function getStoredAiModeEnabled() {
+  const stored = localStorage.getItem('aiModeEnabled');
+  if (stored === null) return DEFAULT_AI_MODE_ENABLED;
+  return stored === 'true';
+}
+function saveAiModeEnabled(enabled) {
+  localStorage.setItem('aiModeEnabled', enabled ? 'true' : 'false');
+}
+function getStoredAiRouteBadgeMode() {
+  const mode = (localStorage.getItem('aiRouteBadgeMode') || DEFAULT_AI_ROUTE_BADGE_MODE).toLowerCase();
+  return ['live', 'route', 'off'].includes(mode) ? mode : DEFAULT_AI_ROUTE_BADGE_MODE;
+}
+function saveAiRouteBadgeMode(mode) {
+  const normalized = String(mode || '').toLowerCase();
+  localStorage.setItem('aiRouteBadgeMode', ['live', 'route', 'off'].includes(normalized) ? normalized : DEFAULT_AI_ROUTE_BADGE_MODE);
 }

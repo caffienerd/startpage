@@ -4,7 +4,9 @@
   <meta charset="UTF-8" />
   <script>
     // Apply theme instantly before render to prevent flash
-    if (localStorage.getItem('theme') === 'dark') document.documentElement.classList.add('dark-mode');
+    const initialTheme = localStorage.getItem('theme');
+    if (initialTheme === 'dark') document.documentElement.classList.add('dark-mode');
+    if (initialTheme === 'black') document.documentElement.classList.add('black-mode');
   </script>
   <meta name="viewport" content="width=device-width" />
   <title>Start Page</title>
@@ -38,6 +40,7 @@
         <div class="command-hint" id="command-hint"></div>
         <input id="terminal-input" type="text" autocomplete="off" />
       </div>
+      <div class="ai-route-badge" id="ai-route-badge" aria-live="polite"></div>
     </section>
   </div>
 
@@ -75,6 +78,23 @@
         <h3>Gemini System Prompt</h3>
         <textarea id="gemini-system-prompt" placeholder="Optional. Example: You are a concise assistant. Reply in bullet points."></textarea>
       </div>
+
+      <div class="config-section">
+        <h3>AI Router Mode</h3>
+        <label class="config-inline-toggle">
+          <input type="checkbox" id="ai-mode-enabled" />
+          Enable AI mode (no need to type <span class="config-code">ai:</span>)
+        </label>
+      </div>
+
+      <div class="config-section">
+        <h3>AI Route Badge</h3>
+        <select id="ai-route-badge-mode">
+          <option value="live">Live preview + routed</option>
+          <option value="route">Routed only (previous behavior)</option>
+          <option value="off">Disabled</option>
+        </select>
+      </div>
       
       <div class="config-section">
         <h3>Bookmarks (JSON)</h3>
@@ -103,7 +123,8 @@
           <div class="help-cmd"><span>:gemini</span> → Open Gemini website</div>
           <div class="help-cmd"><span>:ipconfig</span> → Show network information</div>
           <div class="help-cmd"><span>:netspeed</span> → Test network speed</div>
-          <div class="help-cmd"><span>:dark / :light</span> → Toggle theme</div>
+          <div class="help-cmd"><span>:aimode</span> → Toggle AI mode (no `ai:` prefix needed)</div>
+          <div class="help-cmd"><span>:dark / :black / :light</span> → Toggle theme</div>
           <div class="help-cmd"><span>:version</span> → Show app version</div>
           <div class="help-cmd"><span>:help</span> → Show this help</div>
         </div>
@@ -130,9 +151,10 @@
       <div class="help-section">
         <h3>AI</h3>
         <div class="help-commands">
-          <div class="help-cmd"><span>gem:prompt</span> → Ask Gemini AI</div>
-          <div class="help-cmd"><span>gemini:prompt</span> → Ask Gemini AI (alias)</div>
-          <div class="help-cmd"><span>ai:prompt</span> → Ask Gemini AI (alias)</div>
+          <div class="help-cmd"><span>gem:prompt</span> → Ask Gemini directly</div>
+          <div class="help-cmd"><span>gemini:prompt</span> → Ask Gemini directly (alias)</div>
+          <div class="help-cmd"><span>ai:intent</span> → Route to the best site/tool for your intent</div>
+          <div class="help-cmd"><span>:help_ai_router</span> → Mini guide for how `ai:` routing works</div>
           <div class="help-cmd"><span>:gemini</span> → Open Gemini website</div>
         </div>
       </div>
