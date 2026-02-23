@@ -77,7 +77,7 @@ function generateBookmarks() {
 // ========================================
 function resetStyles(elements) {
   elements.forEach(el => {
-    el.classList.remove("bookmark-match", "bookmark-nomatch");
+    el.classList.remove("bookmark-match", "bookmark-nomatch", "primary-match");
     el.style.mixBlendMode = "";
   });
 }

@@ -2,6 +2,16 @@
 // Terminal — input, autocomplete, keyboard
 // ========================================
 
+// ========================================
+// Reset bookmark highlight styles
+// ========================================
+function resetStyles(elements) {
+  elements.forEach(el => {
+    el.classList.remove("bookmark-match", "bookmark-nomatch", "primary-match");
+    el.style.mixBlendMode = "";
+  });
+}
+
 function initializeBrowserInfo() {
   document.getElementById("username").textContent = getStoredUsername();
   document.getElementById("browser-info").textContent = getBrowser();
@@ -128,15 +138,31 @@ function findFirstBookmarkMatch(elements, rawValue) {
   const value = (rawValue || '').trim().toLowerCase();
   if (!value) return null;
 
+  let bestMatch = null;
+
   for (const el of elements) {
-    if (el.textContent.toLowerCase().includes(value)) {
+    const title = getBookmarkTitle(el).toLowerCase();
+
+    // Priority 1: Exact/Prefix match
+    if (title.startsWith(value)) {
       return {
         href: el.href,
         title: getBookmarkTitle(el),
+        element: el
+      };
+    }
+
+    // Priority 2: Contains match (save the first one found as fallback)
+    if (!bestMatch && title.includes(value)) {
+      bestMatch = {
+        href: el.href,
+        title: getBookmarkTitle(el),
+        element: el
       };
     }
   }
-  return null;
+
+  return bestMatch;
 }
 
 // ---- Input handler (bookmark filtering) ----
@@ -146,29 +172,36 @@ function handleInput(input, elements) {
     const value = rawValue.toLowerCase();
     updateSyntaxHighlight(value);
 
+    // 1. Determine the best bookmark match
+    const bookmarkMatch = findFirstBookmarkMatch(elements, rawValue);
+
+    // 2. Update AI badge / route preview
     if (/^ai\s*:/i.test(rawValue)) {
       const aiQuery = rawValue.replace(/^ai\s*:/i, "").trim();
       previewAiRoute(aiQuery);
-    } else if (getStoredAiModeEnabled() && rawValue.trim() && !rawValue.startsWith(':') && !value.match(/^(r|yt|alt|ddg|imdb|def|the|syn|quote|maps|cws|spell|gem|gemini):/)) {
-      const bookmarkMatch = findFirstBookmarkMatch(elements, rawValue);
-      if (bookmarkMatch) {
+    } else if (bookmarkMatch) {
+      if (getStoredAiModeEnabled()) {
         showAiRouteBadge(bookmarkMatch.title, rawValue.trim(), 0, 'preview');
-      } else {
-        previewAiRoute(rawValue.trim());
       }
+    } else if (getStoredAiModeEnabled() && rawValue.trim() && !rawValue.startsWith(':') && !value.match(/^(r|yt|alt|ddg|imdb|def|the|syn|quote|maps|cws|spell|gem|gemini):/)) {
+      previewAiRoute(rawValue.trim());
     } else {
       hideAiRouteBadge();
     }
 
+    // 3. Reset styles if input is empty or a special search
     if (value === "" || value.match(/^(r|yt|alt|ddg|imdb|def|the|syn|quote|maps|cws|spell|gem|gemini|ai):/)) {
       resetStyles(elements);
       return;
     }
 
+    // 4. Update bookmark visibility and highlighting
     elements.forEach(el => {
       const isMatch = el.textContent.toLowerCase().includes(value.replace(/^:/, ""));
       el.classList.toggle("bookmark-match", isMatch);
       el.classList.toggle("bookmark-nomatch", !isMatch);
+      // Mark the primary match (the one that Enter will trigger)
+      el.classList.toggle("primary-match", bookmarkMatch && el === bookmarkMatch.element);
     });
   });
 
