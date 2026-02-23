@@ -1,38 +1,101 @@
-# Semantic Intent Router + Gemini Setup
+# 🚀 Professional Terminal Start Page
 
-## What was added
-- `ai:your request` command in the terminal to route intent to the best site/tool.
-- `gem:your prompt` / `gemini:your prompt` to query Gemini directly.
-- `:gemini` shortcut to open Gemini website quickly.
-- Gemini response modal in-app.
-- Gemini API key + model fields in config.
+A sleek, fast, and feature-rich browser start page driven by an interactive terminal. Boost your productivity with semantic AI routing, direct Gemini integration, and a suite of built-in utility tools—all wrapped in a premium, modern aesthetic.
 
-## How to enable Gemini
-1. Create an API key in Google AI Studio: https://aistudio.google.com/app/apikey
-2. Run this project through a local server (recommended), for example:
-   ```powershell
-   cd A:\Second_Mind\Coding\Projects\RishitShit\Idk_StartPage_Ig\src
-   python -m http.server 8080
-   ```
-3. Open `http://localhost:8080` in your browser.
-4. In the app, run `:config` (or `:gemini`).
-5. Set:
-   - `Gemini API Key` = your key (`AIza...`)
-   - `Gemini Model` = `gemini-2.0-flash` (default, good for speed/cost)
-6. Save config.
-7. Use Gemini from terminal:
-   - `gem:write a 3 line summary of TCP vs UDP`
+---
 
-## Using `ai:` semantic intent routing
-`ai:` is a navigation decision engine, not a Q&A assistant.
+## ✨ Features
 
-Examples:
-- `ai:find me rust async tutorials` -> routes to YouTube
-- `ai:directions to jfk airport` -> routes to Google Maps
-- `ai:best alternative to notion` -> routes to AlternativeTo
-- `ai:how do you spell accommodation` -> routes to spell check
+- **⌨️ Interactive Terminal**: Command-driven interface with autocomplete (`Tab`), syntax highlighting, and command history (`Up`/`Down`).
+- **🧠 Semantic AI Router**: Use the `ai:` prefix to navigate based on intent. It intelligently routes you to YouTube, Maps, Reddit, or search.
+- **♊ Gemini Integration**: Direct AI prompting via `gem:` or `gemini:`. View responses in a beautiful, non-intrusive modal.
+- **🌓 Rich Aesthetics**: Premium design with support for **Dark**, **AMOLED (Black)**, and **Light** themes.
+- **📊 Live Dashboard**: Instant access to local time and real-time weather updates.
+- **🛠️ Utility Suite**:
+  - **IP Info**: Detailed network information via `:ipconfig`.
+  - **Speed Test**: Integrated network performance testing via `:netspeed`.
+  - **Spell Check**: Smart spelling suggestions via `spell:`.
+- **🔖 Bookmark Management**: Fully customizable bookmark categories managed via JSON.
 
-## Notes
-- The API key is stored in `localStorage` on this browser profile.
-- If you rotate/delete your key, update it in `:config`.
-- If a model name is invalid, Gemini will return an error in the modal.
+---
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+You need a way to serve the static files locally. While you can open `index.html` directly, some features (like API requests) work better when served.
+
+#### Option 1: Python (Quickest)
+```bash
+python -m http.server 8080
+```
+
+#### Option 2: Caddy (Recommended for production)
+```bash
+caddy run --config Caddyfile
+```
+
+Visit `http://localhost:8080` in your browser.
+
+---
+
+## ⚙️ Configuration
+
+Run `:config` in the terminal to open the settings modal.
+
+1.  **Identity**: Customize your terminal `username`.
+2.  **Weather**: Set your location (e.g., `New York, US`).
+3.  **Gemini AI**:
+    *   **API Key**: Get one from [Google AI Studio](https://aistudio.google.com/app/apikey).
+    *   **Model**: Default is `gemini-2.0-flash`.
+    *   **System Prompt**: Optional personality for your AI assistant.
+4.  **AI Mode**: Toggle between explicit (`ai:`) and automatic intent routing.
+
+---
+
+## ⌨️ Command Reference
+
+| Prefix | Usage | Destination |
+| :--- | :--- | :--- |
+| `gem:` | `gem: explain quantum entanglement` | Gemini Direct Prompt |
+| `ai:` | `ai: directions to central park` | Semantic Router |
+| `yt:` | `yt: lofi hip hop` | YouTube Search |
+| `r:` | `r: webdev` | Reddit Search |
+| `maps:` | `maps: cafes near me` | Google Maps |
+| `spell:` | `spell: accomodation` | Built-in Spell Checker |
+| `def:` | `def: ephemeral` | Dictionary (OneLook) |
+| `ddg:` | `ddg: privacy` | DuckDuckGo |
+
+### System Commands
+
+- `:help` → Show all commands.
+- `:config` → Open settings.
+- `:dark` | `:black` | `:light` → Change theme.
+- `:ipconfig` → Show network info.
+- `:netspeed` → Run speed test.
+- `:aimode` → Toggle automatic AI routing.
+
+---
+
+## 🎨 Customization
+
+### Bookmarks
+
+You can edit your bookmarks in two ways:
+1.  **GUI**: Open `:config` and edit the `Bookmarks (JSON)` field.
+2.  **Code**: Edit `script/bookmarks.js` directly to modify the default structure.
+
+---
+
+## ⌨️ Keyboard Shortcuts
+
+- `Tab` or `Right Arrow`: Accept autocomplete suggestions.
+- `Enter`: Execute command.
+- `Up` / `Down Arrow`: Navigate command history.
+- `Ctrl + C`: Clear current input.
+
+---
+
+## 🛡️ Privacy
+
+All settings, including your **Gemini API Key**, are stored locally in your browser's `localStorage`. No data is sent to external servers except for the necessary API calls to Google Gemini and Open-Meteo (Weather).
