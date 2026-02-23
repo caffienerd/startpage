@@ -406,6 +406,20 @@ ul li a span {
   display: flex;
 }
 
+#bookmarks-modal .config-content {
+  max-width: 1000px !important;
+  width: 95vw;
+  max-height: 90vh;
+  display: flex;
+  flex-direction: column;
+}
+
+#bookmarks-modal .bookmarks-grid-editor {
+  overflow-y: auto;
+  flex: 1;
+  padding-right: 10px;
+}
+
 @keyframes fadeIn {
   from {
     opacity: 0;

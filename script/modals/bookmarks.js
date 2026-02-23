@@ -18,6 +18,19 @@ function openBookmarksModal() {
     renderGridEditor(bookmarks);
     document.getElementById('bookmarks-modal').classList.add('active');
 
+    // Focus the first input or the modal to capture keyboard events
+    const firstInput = document.querySelector('#bookmarks-grid-editor input');
+    if (firstInput) firstInput.focus();
+
+    // Handle Esc key specifically for this modal
+    const handleEsc = (e) => {
+        if (e.key === 'Escape') {
+            saveBookmarksFromModal();
+            document.removeEventListener('keydown', handleEsc);
+        }
+    };
+    document.addEventListener('keydown', handleEsc);
+
     // If config modal is open, close it (or keep it under)
     // closeConfig(); 
 }

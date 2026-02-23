@@ -191,6 +191,35 @@ function handleKeyboardEvents(input, elements) {
     const rawValue = input.value;
     const value = rawValue.toLowerCase();
 
+    // Handle keyboard scrolling for active modals
+    const activeModal = document.querySelector('.config-modal.active');
+    if (activeModal) {
+      const content = activeModal.querySelector('.config-content') || activeModal;
+      const scrollAmount = 40;
+      const pageAmount = 300;
+
+      if (e.key === 'ArrowUp') {
+        content.scrollTop -= scrollAmount;
+        e.preventDefault();
+        return;
+      }
+      if (e.key === 'ArrowDown') {
+        content.scrollTop += scrollAmount;
+        e.preventDefault();
+        return;
+      }
+      if (e.key === 'PageUp') {
+        content.scrollTop -= pageAmount;
+        e.preventDefault();
+        return;
+      }
+      if (e.key === 'PageDown') {
+        content.scrollTop += pageAmount;
+        e.preventDefault();
+        return;
+      }
+    }
+
     // Tab / → accepts autocomplete suggestion
     if ((e.key === "Tab" || e.key === "ArrowRight") && input.hasAttribute('data-suggestion')) {
       e.preventDefault();
