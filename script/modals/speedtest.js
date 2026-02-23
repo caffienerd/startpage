@@ -3,12 +3,12 @@
 // ========================================
 function openSpeedTest() {
   document.getElementById('speed-modal').classList.add('active');
-  document.getElementById('speed-download').textContent      = '--';
-  document.getElementById('speed-upload').textContent        = '--';
-  document.getElementById('speed-ping').textContent          = '--';
-  document.getElementById('speed-signal').textContent        = '--';
-  document.getElementById('speed-progress-bar').style.width  = '0%';
-  document.getElementById('speed-status').textContent        = 'Starting test...';
+  document.getElementById('speed-download').textContent = '--';
+  document.getElementById('speed-upload').textContent = '--';
+  document.getElementById('speed-ping').textContent = '--';
+  document.getElementById('speed-signal').textContent = '--';
+  document.getElementById('speed-progress-bar').style.width = '0%';
+  document.getElementById('speed-status').textContent = 'Starting test...';
   setTimeout(() => runSpeedTest(), 500);
 }
 
@@ -29,95 +29,162 @@ function generateRandomData(size) {
 }
 
 async function runSpeedTest() {
-  const statusEl   = document.getElementById('speed-status');
+  const statusEl = document.getElementById('speed-status');
   const progressEl = document.getElementById('speed-progress-bar');
-  const dlEl       = document.getElementById('speed-download');
-  const ulEl       = document.getElementById('speed-upload');
-  const pingEl     = document.getElementById('speed-ping');
-  const signalEl   = document.getElementById('speed-signal');
-  const timerEl    = document.getElementById('speed-timer');
+  const dlEl = document.getElementById('speed-download');
+  const ulEl = document.getElementById('speed-upload');
+  const pingEl = document.getElementById('speed-ping');
+  const signalEl = document.getElementById('speed-signal');
+  const timerEl = document.getElementById('speed-timer');
+
+  const updateProgress = (pct) => progressEl.style.width = pct + '%';
+  const setStatus = (txt) => statusEl.textContent = txt;
+
+  // Measurement State
+  let totalBytes = 0;
+  let startTime = 0;
+  let currentMbps = 0;
+  let isActive = true;
 
   // Timer
   const timerStart = Date.now();
   const timerInterval = setInterval(() => {
     const s = Math.floor((Date.now() - timerStart) / 1000);
-    timerEl.textContent = `${String(Math.floor(s / 60)).padStart(2,'0')}:${String(s % 60).padStart(2,'0')}`;
+    timerEl.textContent = `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
   }, 100);
-  const stopTimer = () => clearInterval(timerInterval);
+  const stopTimer = () => {
+    clearInterval(timerInterval);
+    isActive = false;
+  };
 
-  // Jitter ? signal strength
   const signalStrength = (pings) => {
     if (pings.length < 2) return 'N/A';
     const avg = pings.reduce((a, b) => a + b, 0) / pings.length;
     const jitter = Math.sqrt(pings.reduce((s, p) => s + (p - avg) ** 2, 0) / pings.length);
-    if (jitter < 5)  return 'Excellent';
-    if (jitter < 10) return 'Very Good';
-    if (jitter < 20) return 'Good';
-    if (jitter < 40) return 'Fair';
+    if (jitter < 5) return 'Excellent';
+    if (jitter < 15) return 'Very Good';
+    if (jitter < 30) return 'Good';
+    if (jitter < 50) return 'Fair';
     return 'Poor';
   };
 
+  /**
+   * Core measurement engine: Professional sustained throughput
+   * @param {string} type 'download' or 'upload'
+   * @param {number} durationMs total time to run
+   * @param {number} streams number of parallel streams
+   */
+  async function performTest(type, durationMs, streams) {
+    totalBytes = 0;
+    startTime = performance.now();
+    const endTime = startTime + durationMs;
+
+    const displayUpdateInterval = 150; // ms
+    let lastDisplayUpdate = startTime;
+
+    // Adaptive chunk size
+    let chunkSize = type === 'download' ? 5 * 1024 * 1024 : 1 * 1024 * 1024;
+
+    async function worker() {
+      while (performance.now() < endTime && isActive) {
+        try {
+          const streamStart = performance.now();
+          if (type === 'download') {
+            const res = await fetch(`https://speed.cloudflare.com/__down?bytes=${chunkSize}`, { cache: 'no-store' });
+            const reader = res.body.getReader();
+            while (true) {
+              const { done, value } = await reader.read();
+              if (done) break;
+              totalBytes += value.length;
+              updateVisuals();
+            }
+          } else {
+            const data = generateRandomData(chunkSize);
+            await fetch('https://speed.cloudflare.com/__up', { method: 'POST', body: data, cache: 'no-store' });
+            totalBytes += chunkSize;
+            updateVisuals();
+          }
+
+          // Adaptive chunking: if it took less than 200ms, double it (up to 25MB)
+          const streamDuration = performance.now() - streamStart;
+          if (streamDuration < 200 && chunkSize < 25 * 1024 * 1024) {
+            chunkSize *= 1.5;
+          }
+        } catch (e) {
+          console.warn('Stream failed, retrying...', e);
+          await new Promise(r => setTimeout(r, 500));
+        }
+      }
+    }
+
+    function updateVisuals() {
+      const now = performance.now();
+      if (now - lastDisplayUpdate < displayUpdateInterval) return;
+
+      const elapsed = (now - startTime) / 1000;
+      const mbps = (totalBytes * 8) / elapsed / 1e6;
+
+      // Professional smoothing
+      currentMbps = currentMbps === 0 ? mbps : currentMbps * 0.8 + mbps * 0.2;
+
+      if (type === 'download') dlEl.textContent = currentMbps.toFixed(2);
+      else ulEl.textContent = currentMbps.toFixed(2);
+
+      lastDisplayUpdate = now;
+    }
+
+    // Launch worker pool
+    const workers = Array.from({ length: streams }, () => worker());
+
+    // Wait for the duration to pass
+    while (performance.now() < endTime && isActive) {
+      const progressBase = type === 'download' ? 10 : 55;
+      const progressScale = 45;
+      const elapsedPct = (performance.now() - startTime) / durationMs;
+      updateProgress(progressBase + (elapsedPct * progressScale));
+      await new Promise(r => setTimeout(r, 100));
+    }
+
+    await Promise.all(workers);
+    return currentMbps;
+  }
+
   try {
-    // PING
-    statusEl.textContent = 'Testing ping...';
-    progressEl.style.width = '5%';
+    // 1. PING & WARMUP
+    setStatus('Stabilizing... (TCP Warmup)');
+    updateProgress(5);
     const pings = [];
-    for (let i = 0; i < 5; i++) {
+    // 5s Warmup/Ping phase
+    const pingStart = performance.now();
+    while (performance.now() - pingStart < 3000) {
       const t = performance.now();
-      await fetch('https://www.cloudflare.com/cdn-cgi/trace', { mode: 'no-cors', cache: 'no-store' }).catch(() => {});
+      await fetch('https://www.cloudflare.com/cdn-cgi/trace', { mode: 'no-cors', cache: 'no-store' }).catch(() => { });
       pings.push(Math.round(performance.now() - t));
+      updateProgress(5 + ((performance.now() - pingStart) / 3000) * 5);
+      await new Promise(r => setTimeout(r, 100));
     }
-    pingEl.textContent   = Math.round(pings.reduce((a, b) => a + b, 0) / pings.length);
+    pingEl.textContent = Math.round(pings.reduce((a, b) => a + b, 0) / pings.length);
     signalEl.textContent = signalStrength(pings);
-    progressEl.style.width = '10%';
 
-    // DOWNLOAD (6 × 2.5 MB)
-    statusEl.textContent = 'Testing download speed...';
-    progressEl.style.width = '15%';
-    const dlSpeeds = [];
-    for (let i = 0; i < 6; i++) {
-      try {
-        const t   = performance.now();
-        const res = await fetch(`https://speed.cloudflare.com/__down?bytes=2621440`, { cache: 'no-store', priority: 'high' });
-        const buf = await res.arrayBuffer();
-        const spd = (buf.byteLength * 8) / ((performance.now() - t) / 1000) / 1e6;
-        dlSpeeds.push(spd);
-        dlEl.textContent = spd.toFixed(2);
-        progressEl.style.width = (15 + (i + 1) * 7.5) + '%';
-      } catch { /* skip failed chunk */ }
-    }
-    dlEl.textContent = dlSpeeds.length
-      ? (dlSpeeds.reduce((a, b) => a + b, 0) / dlSpeeds.length).toFixed(2)
-      : '0.00';
-    progressEl.style.width = '60%';
+    // 2. DOWNLOAD (15 Seconds / 5 Streams)
+    setStatus('Testing Download (Sustaining...)');
+    currentMbps = 0;
+    const finalDl = await performTest('download', 15000, 5);
+    dlEl.textContent = finalDl.toFixed(2);
 
-    // UPLOAD (4 × 2 MB)
-    statusEl.textContent = 'Testing upload speed...';
-    progressEl.style.width = '65%';
-    const ulSpeeds = [];
-    for (let i = 0; i < 4; i++) {
-      try {
-        const SIZE = 2097152;
-        const t   = performance.now();
-        const res = await fetch('https://speed.cloudflare.com/__up', { method: 'POST', body: generateRandomData(SIZE), cache: 'no-store', priority: 'high' });
-        await res.text();
-        const spd = (SIZE * 8) / ((performance.now() - t) / 1000) / 1e6;
-        ulSpeeds.push(spd);
-        ulEl.textContent = spd.toFixed(2);
-        progressEl.style.width = (65 + (i + 1) * 8.75) + '%';
-      } catch { /* skip failed chunk */ }
-    }
-    ulEl.textContent = ulSpeeds.length
-      ? (ulSpeeds.reduce((a, b) => a + b, 0) / ulSpeeds.length).toFixed(2)
-      : '0.00';
+    // 3. UPLOAD (12 Seconds / 4 Streams)
+    setStatus('Testing Upload (Sustaining...)');
+    currentMbps = 0;
+    const finalUl = await performTest('upload', 12000, 4);
+    ulEl.textContent = finalUl.toFixed(2);
 
-    progressEl.style.width = '100%';
-    statusEl.textContent = 'Test complete!';
+    updateProgress(100);
+    setStatus('Test Complete');
     stopTimer();
 
   } catch (error) {
     console.error('Speed test error:', error);
-    statusEl.textContent = 'Test failed: ' + error.message;
+    setStatus('Test failed: Check connection');
     stopTimer();
   }
 }
