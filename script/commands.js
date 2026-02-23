@@ -62,52 +62,70 @@ function handleSpecialCommands(value) {
   // ---- Theme ----
   if (normalized === ":dark") {
     document.body.classList.add('dark-mode');
-    document.body.classList.remove('black-mode');
+    document.body.classList.remove('black-mode', 'nord-mode', 'newspaper-mode', 'coffee-mode', 'root-mode', 'neon-mode');
     document.documentElement.classList.add('dark-mode');
-    document.documentElement.classList.remove('black-mode');
+    document.documentElement.classList.remove('black-mode', 'nord-mode', 'newspaper-mode', 'coffee-mode', 'root-mode', 'neon-mode');
     saveTheme('dark');
     clear();
     return;
   }
   if (normalized === ":black" || normalized === ":amoled") {
     document.body.classList.add('black-mode');
-    document.body.classList.remove('dark-mode');
+    document.body.classList.remove('dark-mode', 'nord-mode', 'newspaper-mode', 'coffee-mode', 'root-mode', 'neon-mode');
     document.documentElement.classList.add('black-mode');
-    document.documentElement.classList.remove('dark-mode');
+    document.documentElement.classList.remove('dark-mode', 'nord-mode', 'newspaper-mode', 'coffee-mode', 'root-mode', 'neon-mode');
     saveTheme('black');
     clear();
     return;
   }
   if (normalized === ":nord") {
     document.body.classList.add('nord-mode');
-    document.body.classList.remove('dark-mode', 'black-mode', 'newspaper-mode');
+    document.body.classList.remove('dark-mode', 'black-mode', 'newspaper-mode', 'coffee-mode', 'root-mode', 'neon-mode');
     document.documentElement.classList.add('nord-mode');
-    document.documentElement.classList.remove('dark-mode', 'black-mode', 'newspaper-mode');
+    document.documentElement.classList.remove('dark-mode', 'black-mode', 'newspaper-mode', 'coffee-mode', 'root-mode', 'neon-mode');
     saveTheme('nord');
     clear();
     return;
   }
   if (normalized === ":newspaper") {
     document.body.classList.add('newspaper-mode');
-    document.body.classList.remove('dark-mode', 'black-mode', 'nord-mode');
+    document.body.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'coffee-mode', 'root-mode', 'neon-mode');
     document.documentElement.classList.add('newspaper-mode');
-    document.documentElement.classList.remove('dark-mode', 'black-mode', 'nord-mode');
+    document.documentElement.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'coffee-mode', 'root-mode', 'neon-mode');
     saveTheme('newspaper');
     clear();
     return;
   }
   if (normalized === ":coffee") {
     document.body.classList.add('coffee-mode');
-    document.body.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'newspaper-mode');
+    document.body.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'newspaper-mode', 'root-mode', 'neon-mode');
     document.documentElement.classList.add('coffee-mode');
-    document.documentElement.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'newspaper-mode');
+    document.documentElement.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'newspaper-mode', 'root-mode', 'neon-mode');
     saveTheme('coffee');
     clear();
     return;
   }
+  if (normalized === ":root" || normalized === ":hacker") {
+    document.body.classList.add('root-mode');
+    document.body.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'newspaper-mode', 'coffee-mode', 'neon-mode');
+    document.documentElement.classList.add('root-mode');
+    document.documentElement.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'newspaper-mode', 'coffee-mode', 'neon-mode');
+    saveTheme('root');
+    clear();
+    return;
+  }
+  if (normalized === ":neon" || normalized === ":cyberpunk") {
+    document.body.classList.add('neon-mode');
+    document.body.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'newspaper-mode', 'coffee-mode', 'root-mode');
+    document.documentElement.classList.add('neon-mode');
+    document.documentElement.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'newspaper-mode', 'coffee-mode', 'root-mode');
+    saveTheme('neon');
+    clear();
+    return;
+  }
   if (normalized === ":light") {
-    document.body.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'newspaper-mode');
-    document.documentElement.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'newspaper-mode');
+    document.body.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'newspaper-mode', 'coffee-mode', 'root-mode', 'neon-mode');
+    document.documentElement.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'newspaper-mode', 'coffee-mode', 'root-mode', 'neon-mode');
     saveTheme('light');
     clear();
     return;

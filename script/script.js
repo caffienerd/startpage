@@ -4,8 +4,8 @@
 
 function loadTheme() {
   const theme = getStoredTheme();
-  document.body.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'newspaper-mode', 'coffee-mode');
-  document.documentElement.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'newspaper-mode', 'coffee-mode');
+  document.body.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'newspaper-mode', 'coffee-mode', 'root-mode', 'neon-mode');
+  document.documentElement.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'newspaper-mode', 'coffee-mode', 'root-mode', 'neon-mode');
 
   if (theme === 'dark') {
     document.body.classList.add('dark-mode');
@@ -22,6 +22,12 @@ function loadTheme() {
   } else if (theme === 'coffee') {
     document.body.classList.add('coffee-mode');
     document.documentElement.classList.add('coffee-mode');
+  } else if (theme === 'root') {
+    document.body.classList.add('root-mode');
+    document.documentElement.classList.add('root-mode');
+  } else if (theme === 'neon') {
+    document.body.classList.add('neon-mode');
+    document.documentElement.classList.add('neon-mode');
   }
 }
 

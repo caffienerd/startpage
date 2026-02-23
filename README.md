@@ -9,7 +9,7 @@ A sleek, fast, and feature-rich browser start page driven by an interactive term
 - **Interactive Terminal**: Command-driven interface with autocomplete (`Tab`), syntax highlighting, and command history (`Up`/`Down`).
 - **Semantic AI Router**: Use the ai: prefix to navigate based on intent. It intelligently routes you to YouTube, Maps, Reddit, or search.
 - **Gemini Integration**: Direct AI prompting via `gem:` or `gemini:`. View responses in a beautiful, non-intrusive modal.
-- **Rich Aesthetics**: Premium design with support for **Dark**, **AMOLED (Black)**, **coffee**, **newspaper** and **Light** themes.
+- **Rich Aesthetics**: Premium design with support for **Dark**, **AMOLED (Black)**, **coffee**, **newspaper**, **root**, **neon** and **Light** themes.
 - **Live Dashboard**: Instant access to local time and real-time weather updates.
 - **Utility Suite**:
   - **IP Info**: Detailed network information via `:ipconfig`.

@@ -97,8 +97,59 @@ body.coffee-mode {
   --terminal-bg: rgba(30, 18, 15, 0.85);
   --terminal-text: #f1e4d1;
   --shadow-color: rgba(0, 0, 0, 0.6);
-  --link-background: rgba(241, 228, 209, 0.04);
   --link-hover: rgba(241, 228, 209, 0.08);
+}
+
+/* Root (Hacker) Theme */
+html.root-mode body,
+body.root-mode {
+  --background-color: #050505;
+  --text-color: #00ff41;
+  --card-background: rgba(0, 50, 10, 0.2);
+  --card-border: rgba(0, 255, 65, 0.3);
+  --terminal-bg: rgba(5, 5, 5, 0.95);
+  --terminal-text: #00ff41;
+  --shadow-color: rgba(0, 255, 65, 0.1);
+  --font-family: 'Source Code Pro', monospace;
+  --link-background: rgba(0, 255, 65, 0.05);
+  --link-hover: rgba(0, 255, 65, 0.15);
+}
+
+html.root-mode body::after {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%,
+      rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg,
+      rgba(255, 0, 0, 0.06),
+      rgba(0, 255, 0, 0.02),
+      rgba(0, 0, 255, 0.06));
+  background-size: 100% 2px, 3px 100%;
+  pointer-events: none;
+  z-index: 1000;
+  opacity: 0.3;
+}
+
+/* Neon (Cyberpunk) Theme */
+html.neon-mode body,
+body.neon-mode {
+  --background-color: #0d0d0d;
+  --text-color: #00f3ff;
+  --card-background: rgba(20, 20, 20, 0.7);
+  --card-border: #ff00ff;
+  --terminal-bg: rgba(13, 13, 13, 0.9);
+  --terminal-text: #00f3ff;
+  --shadow-color: rgba(255, 0, 255, 0.3);
+  --font-family: 'Inter', sans-serif;
+  --link-background: rgba(0, 243, 255, 0.05);
+  --link-hover: rgba(255, 0, 255, 0.15);
+}
+
+html.neon-mode body {
+  background: radial-gradient(circle at center, #1a1a1a 0%, #0d0d0d 100%);
 }
 
 html.newspaper-mode body {
@@ -276,6 +327,10 @@ ul li a img {
 
 html.newspaper-mode ul li a img {
   filter: grayscale(100%) contrast(1.2) brightness(0.9);
+}
+
+html.root-mode ul li a img {
+  filter: grayscale(100%) brightness(0.8) sepia(1) hue-rotate(80deg) saturate(5);
 }
 
 ul li a span {

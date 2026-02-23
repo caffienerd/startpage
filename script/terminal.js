@@ -81,11 +81,13 @@ function updateSyntaxHighlight(value) {
     ':ve': ':version',
     ':no': ':nord',
     ':ne': ':newspaper',
-    ':co': ':coffee'
+    ':co': ':coffee',
+    ':ro': ':root',
+    ':neo': ':neon'
   };
 
-  const themeCommands = [':dark', ':black', ':amoled', ':light', ':nord', ':newspaper', ':coffee'];
-  const knownCommands = [':help', ':help_ai_router', ':aimode', ':bookmarks', ':bm', ':ipconfig', ':ip', ':netspeed', ':speed', ':config', ':weather', ':time', ':gemini', ...themeCommands];
+  const themeCommands = [':dark', ':black', ':amoled', ':light', ':nord', ':newspaper', ':coffee', ':root', ':neon'];
+  const knownCommands = [':help', ':help_ai_router', ':aimode', ':bookmarks', ':bm', ':ipconfig', ':ip', ':netspeed', ':speed', ':config', ':weather', ':time', ':gemini', ':hacker', ':cyberpunk', ...themeCommands];
   const versionCommands = [':version', ':ver'];
   const knownSearch = /^(r|yt|alt|def|ddg|imdb|the|syn|quote|maps|cws|spell|gem|gemini|ai):/;
 
