@@ -17,3 +17,6 @@ Thumbs.db
 
 # Local agent instructions
 AGENTS.md
+
+# Host elemets
+Caddyfile

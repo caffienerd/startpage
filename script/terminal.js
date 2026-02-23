@@ -171,6 +171,11 @@ function handleInput(input, elements) {
     });
   });
 
+  input.addEventListener("scroll", () => {
+    const hintEl = document.getElementById('command-hint');
+    if (hintEl) hintEl.scrollLeft = input.scrollLeft;
+  });
+
   input.addEventListener("blur", () => {
     if (input.value === "") resetStyles(elements);
   });

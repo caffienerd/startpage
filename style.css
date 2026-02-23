@@ -346,7 +346,8 @@ ul li a span {
   font-family: var(--monospace-font-family);
   font-size: 18px;
   font-weight: 500;
-  color: var(--terminal-text);
+  width: 100%;
+  overflow: hidden;
   white-space: pre;
 }
 
