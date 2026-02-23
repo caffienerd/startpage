@@ -28,7 +28,7 @@ function openAiRouterHelp() {
 function handleSpecialCommands(value) {
   const rawValue = value.trim();
   const normalized = rawValue.toLowerCase();
-  const input    = document.getElementById('terminal-input');
+  const input = document.getElementById('terminal-input');
   const elements = document.querySelectorAll("a");
 
   const clear = (hideBadge = true) => {
@@ -39,8 +39,8 @@ function handleSpecialCommands(value) {
   };
 
   // ---- Modal commands ----
-  if (normalized === ":help")                         { openHelp();      clear(); return; }
-  if (normalized === ":help_ai_router")               { openAiRouterHelp(); clear(); return; }
+  if (normalized === ":help") { openHelp(); clear(); return; }
+  if (normalized === ":help_ai_router") { openAiRouterHelp(); clear(); return; }
   if (/^:aimode(\s+(on|off|toggle))?$/i.test(rawValue)) {
     const match = rawValue.match(/^:aimode(?:\s+(on|off|toggle))?$/i);
     const action = (match?.[1] || 'toggle').toLowerCase();
@@ -52,10 +52,11 @@ function handleSpecialCommands(value) {
     clear();
     return;
   }
-  if (normalized === ":version" || normalized === ":ver")  { openVersion();   clear(); return; }
-  if (normalized === ":ipconfig" || normalized === ":ip")  { openIPInfo();    clear(); return; }
-  if (normalized === ":netspeed"  || normalized === ":speed") { openSpeedTest(); clear(); return; }
-  if (normalized === ":gemini")                       { window.location.href = "https://gemini.google.com/app"; return; }
+  if (normalized === ":version" || normalized === ":ver") { openVersion(); clear(); return; }
+  if (normalized === ":ipconfig" || normalized === ":ip") { openIPInfo(); clear(); return; }
+  if (normalized === ":netspeed" || normalized === ":speed") { openSpeedTest(); clear(); return; }
+  if (normalized === ":gemini") { window.location.href = "https://gemini.google.com/app"; return; }
+  if (normalized === ":bookmarks" || normalized === ":bm") { openBookmarksModal(); clear(); return; }
   if (normalized === ":config" || normalized === ":weather" || normalized === ":time") { openConfig(); clear(); return; }
 
   // ---- Theme ----
@@ -115,17 +116,17 @@ function handleSpecialCommands(value) {
   }
 
   // ---- Search shortcuts ----
-  if (/^yt:/i.test(rawValue))    { window.location.href = `https://www.youtube.com/results?search_query=${enc(rawValue, "yt:")}`;             return; }
-  if (/^r:/i.test(rawValue))     { window.location.href = `https://google.com/search?q=site:reddit.com ${rawValue.replace(/^r:/i, "")}`;       return; }
-  if (/^ddg:/i.test(rawValue))   { window.location.href = `https://duckduckgo.com/?q=${enc(rawValue, "ddg:")}`;                               return; }
-  if (/^imdb:/i.test(rawValue))  { window.location.href = `https://www.imdb.com/find?q=${enc(rawValue, "imdb:")}`;                            return; }
-  if (/^alt:/i.test(rawValue))   { window.location.href = `https://alternativeto.net/browse/search/?q=${enc(rawValue, "alt:")}`;              return; }
-  if (/^def:/i.test(rawValue))   { window.location.href = `https://onelook.com/?w=${enc(rawValue, "def:")}`;                                  return; }
-  if (/^the:/i.test(rawValue))   { window.location.href = `https://onelook.com/thesaurus/?s=${enc(rawValue, "the:")}`;                        return; }
-  if (/^syn:/i.test(rawValue))   { window.location.href = `https://onelook.com/?related=1&w=${enc(rawValue, "syn:")}`;                        return; }
-  if (/^quote:/i.test(rawValue)) { window.location.href = `https://onelook.com/?mentions=1&w=${enc(rawValue, "quote:")}`;                     return; }
-  if (/^maps:/i.test(rawValue))  { window.location.href = `https://www.google.com/maps/search/${enc(rawValue, "maps:")}`;                     return; }
-  if (/^cws:/i.test(rawValue))   {
+  if (/^yt:/i.test(rawValue)) { window.location.href = `https://www.youtube.com/results?search_query=${enc(rawValue, "yt:")}`; return; }
+  if (/^r:/i.test(rawValue)) { window.location.href = `https://google.com/search?q=site:reddit.com ${rawValue.replace(/^r:/i, "")}`; return; }
+  if (/^ddg:/i.test(rawValue)) { window.location.href = `https://duckduckgo.com/?q=${enc(rawValue, "ddg:")}`; return; }
+  if (/^imdb:/i.test(rawValue)) { window.location.href = `https://www.imdb.com/find?q=${enc(rawValue, "imdb:")}`; return; }
+  if (/^alt:/i.test(rawValue)) { window.location.href = `https://alternativeto.net/browse/search/?q=${enc(rawValue, "alt:")}`; return; }
+  if (/^def:/i.test(rawValue)) { window.location.href = `https://onelook.com/?w=${enc(rawValue, "def:")}`; return; }
+  if (/^the:/i.test(rawValue)) { window.location.href = `https://onelook.com/thesaurus/?s=${enc(rawValue, "the:")}`; return; }
+  if (/^syn:/i.test(rawValue)) { window.location.href = `https://onelook.com/?related=1&w=${enc(rawValue, "syn:")}`; return; }
+  if (/^quote:/i.test(rawValue)) { window.location.href = `https://onelook.com/?mentions=1&w=${enc(rawValue, "quote:")}`; return; }
+  if (/^maps:/i.test(rawValue)) { window.location.href = `https://www.google.com/maps/search/${enc(rawValue, "maps:")}`; return; }
+  if (/^cws:/i.test(rawValue)) {
     const q = rawValue.replace(/^cws:/i, "").trim();
     window.location.href = getBrowser() === "firefox"
       ? `https://addons.mozilla.org/en-US/firefox/search/?q=${encodeURIComponent(q)}`

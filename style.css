@@ -13,7 +13,8 @@
 }
 
 /* Dark Theme */
-html.dark-mode body, body.dark-mode {
+html.dark-mode body,
+body.dark-mode {
   --background-color: #2d3436;
   --text-color: #dfe6e9;
   --card-background: rgba(45, 52, 54, 0.5);
@@ -24,7 +25,8 @@ html.dark-mode body, body.dark-mode {
 }
 
 /* Full Black Theme */
-html.black-mode body, body.black-mode {
+html.black-mode body,
+body.black-mode {
   --background-color: #000000;
   --text-color: #f4f5f6;
   --card-background: rgba(8, 8, 8, 0.94);
@@ -57,20 +59,19 @@ body {
 }
 
 /* Scanlines ONLY on body background via pseudo-element BELOW content */
-html.dark-mode body::after, body.dark-mode::after {
+html.dark-mode body::after,
+body.dark-mode::after {
   content: '';
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   bottom: 0;
-  background: repeating-linear-gradient(
-    0deg,
-    rgba(0, 0, 0, 0.3) 0px,
-    transparent 1px,
-    transparent 2px,
-    rgba(0, 0, 0, 0.3) 3px
-  );
+  background: repeating-linear-gradient(0deg,
+      rgba(0, 0, 0, 0.3) 0px,
+      transparent 1px,
+      transparent 2px,
+      rgba(0, 0, 0, 0.3) 3px);
   pointer-events: none;
   z-index: -999;
 }
@@ -142,7 +143,8 @@ html.dark-mode body::after, body.dark-mode::after {
   z-index: 10;
 }
 
-html.black-mode body .bookmark-section, body.black-mode .bookmark-section {
+html.black-mode body .bookmark-section,
+body.black-mode .bookmark-section {
   background: #050505;
   border: 1px solid rgba(255, 255, 255, 0.12);
 }
@@ -158,8 +160,10 @@ body:not(.dark-mode):not(.black-mode) .bookmark-section:hover {
   border-color: rgba(0, 0, 0, 0.15);
 }
 
-html.dark-mode body .bookmark-section:hover, body.dark-mode .bookmark-section:hover,
-html.black-mode body .bookmark-section:hover, body.black-mode .bookmark-section:hover {
+html.dark-mode body .bookmark-section:hover,
+body.dark-mode .bookmark-section:hover,
+html.black-mode body .bookmark-section:hover,
+body.black-mode .bookmark-section:hover {
   background: #363d3f;
   border-color: rgba(255, 255, 255, 0.2);
 }
@@ -193,7 +197,8 @@ ul li a {
   z-index: 10;
 }
 
-html.black-mode body ul li a, body.black-mode ul li a {
+html.black-mode body ul li a,
+body.black-mode ul li a {
   background: #0b0b0b;
 }
 
@@ -212,7 +217,8 @@ ul li a:hover {
   transform: translateX(3px);
 }
 
-html.black-mode body ul li a:hover, body.black-mode ul li a:hover {
+html.black-mode body ul li a:hover,
+body.black-mode ul li a:hover {
   background: #141414;
 }
 
@@ -239,7 +245,7 @@ ul li a span {
   border-radius: var(--border-radius);
   background: var(--terminal-bg);
   border: 1px solid var(--card-border);
-  box-shadow: 
+  box-shadow:
     0 4px 10px var(--shadow-color),
     inset 0 0 20px rgba(0, 0, 0, 0.02);
   max-width: 900px;
@@ -250,7 +256,7 @@ ul li a span {
 }
 
 .terminal-section:focus-within {
-  box-shadow: 
+  box-shadow:
     0 6px 15px var(--shadow-color),
     inset 0 0 20px rgba(0, 0, 0, 0.03);
 }
@@ -312,8 +318,13 @@ ul li a span {
 }
 
 @keyframes aiBadgeBump {
-  0% { transform: translateY(-8px) scale(0.985); }
-  100% { transform: translateY(0) scale(1); }
+  0% {
+    transform: translateY(-8px) scale(0.985);
+  }
+
+  100% {
+    transform: translateY(0) scale(1);
+  }
 }
 
 #terminal-input {
@@ -332,10 +343,21 @@ ul li a span {
 }
 
 /* Input text color based on command type */
-#terminal-input.input-cmd     { color: #667eea !important; }
-#terminal-input.input-search  { color: #f39c12 !important; }
-#terminal-input.input-unknown { color: #e74c3c !important; }
-#terminal-input.input-version { color: #00b894 !important; }
+#terminal-input.input-cmd {
+  color: #667eea !important;
+}
+
+#terminal-input.input-search {
+  color: #f39c12 !important;
+}
+
+#terminal-input.input-unknown {
+  color: #e74c3c !important;
+}
+
+#terminal-input.input-version {
+  color: #00b894 !important;
+}
 
 /* Command highlighting with autocomplete suggestion overlay */
 .command-hint {
@@ -385,8 +407,13 @@ ul li a span {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+
+  to {
+    opacity: 1;
+  }
 }
 
 .config-content {
@@ -403,8 +430,15 @@ ul li a span {
 }
 
 @keyframes slideUp {
-  from { transform: translateY(30px); opacity: 0; }
-  to { transform: translateY(0); opacity: 1; }
+  from {
+    transform: translateY(30px);
+    opacity: 0;
+  }
+
+  to {
+    transform: translateY(0);
+    opacity: 1;
+  }
 }
 
 .config-content h2 {
@@ -449,6 +483,72 @@ ul li a span {
   outline: none;
   border-color: #667eea;
   box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+}
+
+.config-header-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+}
+
+.config-header-row h3 {
+  margin-bottom: 0 !important;
+}
+
+.btn-toggle-editor {
+  background: rgba(102, 126, 234, 0.15);
+  border: 1px solid rgba(102, 126, 234, 0.3);
+  color: #667eea;
+  padding: 4px 10px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.btn-toggle-editor:hover {
+  background: rgba(102, 126, 234, 0.25);
+  border-color: #667eea;
+}
+
+.bookmarks-grid-editor {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.bookmark-edit-column {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.bookmark-edit-cell {
+  background: rgba(0, 0, 0, 0.1);
+  padding: 10px;
+  border-radius: 6px;
+  border: 1px solid var(--card-border);
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bookmark-edit-cell input {
+  padding: 6px 8px !important;
+  font-size: 12px !important;
+}
+
+.bookmark-edit-cell .bm-title-input {
+  font-weight: 700;
+  color: #667eea;
+}
+
+.hidden {
+  display: none !important;
 }
 
 .config-content textarea {
@@ -910,7 +1010,7 @@ ul li a span {
   .bookmark-section {
     flex: 1 1 calc(50% - 20px);
   }
-  
+
   .terminal-section {
     flex-direction: column;
     align-items: flex-start;

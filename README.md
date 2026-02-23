@@ -70,6 +70,7 @@ Run `:config` in the terminal to open the settings modal.
 
 - `:help` → Show all commands.
 - `:config` → Open settings.
+- `:bookmarks` → Edit bookmarks.
 - `:dark` | `:black` | `:light` → Change theme.
 - `:ipconfig` → Show network info.
 - `:netspeed` → Run speed test.
@@ -81,9 +82,10 @@ Run `:config` in the terminal to open the settings modal.
 
 ### Bookmarks
 
-You can edit your bookmarks in two ways:
-1.  **GUI**: Open `:config` and edit the `Bookmarks (JSON)` field.
-2.  **Code**: Edit `script/bookmarks.js` directly to modify the default structure.
+The start page features a 4-column layout. You can customize these bookmarks to fit your needs:
+1.  **Visual Editor (Recommended)**: Open `:config` to use the grid-based editor. It maps directly to the 4-column layout on the page, allowing you to organize your links by column and row.
+2.  **JSON Mode**: Toggle "Edit as JSON" in the configuration modal for bulk edits or sharing your setup.
+3.  **Code**: You can also modify the defaults in `script/storage.js` or `script/bookmarks.js`.
 
 ---
 

@@ -44,21 +44,20 @@ function generateBookmarks() {
   container.innerHTML = '';
 
   const bookmarks = getStoredBookmarks();
-  const sorted = [...bookmarks].sort((a, b) => a.title.localeCompare(b.title));
   const itemsPerSection = 5;
-  const numSections = Math.ceil(sorted.length / itemsPerSection);
+  const numSections = Math.ceil(bookmarks.length / itemsPerSection);
 
   for (let i = 0; i < numSections; i++) {
     const section = document.createElement('div');
     section.className = 'bookmark-section';
     const ul = document.createElement('ul');
 
-    const slice = sorted.slice(i * itemsPerSection, (i + 1) * itemsPerSection);
+    const slice = bookmarks.slice(i * itemsPerSection, (i + 1) * itemsPerSection);
     slice.forEach(bookmark => {
       const li = document.createElement('li');
       const fallbacks = getFaviconFallbacks(bookmark.href);
       const faviconUrl = fallbacks[0] || '';
-      const li_id = `bm-${Math.random().toString(36).slice(2,7)}`;
+      const li_id = `bm-${Math.random().toString(36).slice(2, 7)}`;
       li.innerHTML = `
         <a href="${bookmark.href}">
           <img src="${faviconUrl}" alt="${bookmark.title}" data-fallbacks="${encodeURIComponent(JSON.stringify(fallbacks.slice(1)))}" data-fallback-idx="0"

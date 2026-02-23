@@ -3,7 +3,7 @@
 // ========================================
 
 function initializeBrowserInfo() {
-  document.getElementById("username").textContent     = getStoredUsername();
+  document.getElementById("username").textContent = getStoredUsername();
   document.getElementById("browser-info").textContent = getBrowser();
 }
 
@@ -15,7 +15,7 @@ function typePlaceholder(input, examples, typingSpeed = 50) {
   input.placeholder = "";
 
   let exampleIndex = 0;
-  let charIndex    = 0;
+  let charIndex = 0;
 
   function type() {
     if (charIndex < examples[exampleIndex].length) {
@@ -24,7 +24,7 @@ function typePlaceholder(input, examples, typingSpeed = 50) {
     } else {
       input._typingTimeout = setTimeout(() => {
         input.placeholder = "";
-        charIndex    = 0;
+        charIndex = 0;
         exampleIndex = (exampleIndex + 1) % examples.length;
         type();
       }, 2000);
@@ -36,43 +36,44 @@ function typePlaceholder(input, examples, typingSpeed = 50) {
 // ---- Syntax highlighting + autocomplete ghost ----
 function updateSyntaxHighlight(value) {
   const hintEl = document.getElementById('command-hint');
-  const input  = document.getElementById('terminal-input');
+  const input = document.getElementById('terminal-input');
 
   const suggestions = {
-    'r':   'r:',
-    'y':   'yt:',
-    'a':   'alt:',
-    'd':   'def:',
-    'dd':  'ddg:',
-    'i':   'imdb:',
-    't':   'the:',
-    's':   'syn:',
-    'q':   'quote:',
-    'm':   'maps:',
-    'c':   'cws:',
-    'g':   'gem:',
-    'ge':  'gemini:',
-    'ai':  'ai:',
-    'sp':  'spell:',
-    ':c':  ':config',
-    ':d':  ':dark',
-    ':b':  ':black',
+    'r': 'r:',
+    'y': 'yt:',
+    'a': 'alt:',
+    'd': 'def:',
+    'dd': 'ddg:',
+    'i': 'imdb:',
+    't': 'the:',
+    's': 'syn:',
+    'q': 'quote:',
+    'm': 'maps:',
+    'c': 'cws:',
+    'g': 'gem:',
+    'ge': 'gemini:',
+    'ai': 'ai:',
+    'sp': 'spell:',
+    ':c': ':config',
+    ':d': ':dark',
+    ':b': ':black',
     ':am': ':amoled',
-    ':i':  ':ipconfig',
-    ':l':  ':light',
-    ':h':  ':help',
+    ':bm': ':bookmarks',
+    ':i': ':ipconfig',
+    ':l': ':light',
+    ':h': ':help',
     ':ha': ':help_ai_router',
     ':aim': ':aimode',
     ':ge': ':gemini',
-    ':n':  ':netspeed',
-    ':w':  ':weather',
+    ':n': ':netspeed',
+    ':w': ':weather',
     ':ti': ':time',
     ':ve': ':version'
   };
 
-  const knownCommands = [':help',':help_ai_router',':aimode',':ipconfig',':ip',':netspeed',':speed',':config',':weather',':time',':dark',':black',':amoled',':light',':gemini'];
-  const versionCommands = [':version',':ver'];
-  const knownSearch   = /^(r|yt|alt|def|ddg|imdb|the|syn|quote|maps|cws|spell|gem|gemini|ai):/;
+  const knownCommands = [':help', ':help_ai_router', ':aimode', ':bookmarks', ':bm', ':ipconfig', ':ip', ':netspeed', ':speed', ':config', ':weather', ':time', ':dark', ':black', ':amoled', ':light', ':gemini'];
+  const versionCommands = [':version', ':ver'];
+  const knownSearch = /^(r|yt|alt|def|ddg|imdb|the|syn|quote|maps|cws|spell|gem|gemini|ai):/;
 
   // Check for a matching autocomplete suggestion
   for (const [prefix, full] of Object.entries(suggestions)) {
@@ -115,7 +116,7 @@ function updateSyntaxHighlight(value) {
 }
 
 function escapeHTML(str) {
-  return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
 function getBookmarkTitle(anchor) {
@@ -166,7 +167,7 @@ function handleInput(input, elements) {
 
     elements.forEach(el => {
       const isMatch = el.textContent.toLowerCase().includes(value.replace(/^:/, ""));
-      el.classList.toggle("bookmark-match",   isMatch);
+      el.classList.toggle("bookmark-match", isMatch);
       el.classList.toggle("bookmark-nomatch", !isMatch);
     });
   });
@@ -229,7 +230,7 @@ function handleKeyboardEvents(input, elements) {
 
 // ---- Enter key routing ----
 function handleEnterKey(rawValue, value, elements, history) {
-  const isSearch  = value.match(/^(r|yt|alt|ddg|imdb|def|the|syn|quote|maps|cws|spell|gem|gemini|ai):/);
+  const isSearch = value.match(/^(r|yt|alt|ddg|imdb|def|the|syn|quote|maps|cws|spell|gem|gemini|ai):/);
   const isCommand = value.startsWith(':');
 
   if (isSearch || isCommand) {

@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
   <meta charset="UTF-8" />
   <script>
@@ -12,11 +13,15 @@
   <title>Start Page</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
-  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap"
+    rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 
 </head>
+
 <body>
   <div class="content">
     <!-- Time and Weather Info -->
@@ -48,10 +53,15 @@
   <div class="config-modal" id="config-modal">
     <div class="config-content">
       <h2>Configuration</h2>
-      
+
       <div class="config-section">
         <h3>Username</h3>
         <input type="text" id="config-username" placeholder="e.g., coffeenerd" />
+      </div>
+
+      <div class="config-section">
+        <button class="btn-save" style="width: 100%; height: 44px; margin-top: 10px; background: #667eea; color: white;"
+          onclick="openBookmarksModal()">Edit Bookmarks</button>
       </div>
 
       <div class="config-section">
@@ -76,7 +86,8 @@
 
       <div class="config-section">
         <h3>Gemini System Prompt</h3>
-        <textarea id="gemini-system-prompt" placeholder="Optional. Example: You are a concise assistant. Reply in bullet points."></textarea>
+        <textarea id="gemini-system-prompt"
+          placeholder="Optional. Example: You are a concise assistant. Reply in bullet points."></textarea>
       </div>
 
       <div class="config-section">
@@ -95,14 +106,6 @@
           <option value="off">Disabled</option>
         </select>
       </div>
-      
-      <div class="config-section">
-        <h3>Bookmarks (JSON)</h3>
-        <textarea id="config-textarea" placeholder='[
-  { "href": "https://github.com", "title": "Github" },
-  { "href": "https://youtube.com", "title": "YouTube" }
-]'></textarea>
-      </div>
 
       <div class="config-buttons">
         <button class="btn-cancel" onclick="closeConfig()">Cancel</button>
@@ -115,11 +118,12 @@
   <div class="config-modal" id="help-modal">
     <div class="config-content help-content">
       <h2>Available Commands</h2>
-      
+
       <div class="help-section">
         <h3>System</h3>
         <div class="help-commands">
           <div class="help-cmd"><span>:config</span> → Open settings</div>
+          <div class="help-cmd"><span>:bookmarks</span> → Edit bookmarks</div>
           <div class="help-cmd"><span>:gemini</span> → Open Gemini website</div>
           <div class="help-cmd"><span>:ipconfig</span> → Show network information</div>
           <div class="help-cmd"><span>:netspeed</span> → Test network speed</div>
@@ -178,53 +182,53 @@
   <div class="config-modal" id="ip-modal">
     <div class="config-content ip-content">
       <h2>Network Information</h2>
-      
+
       <div class="ip-grid">
         <div class="ip-item">
           <div class="ip-label">IPv4 Address</div>
           <div class="ip-value" id="ip-address">Loading...</div>
         </div>
-        
+
         <div class="ip-item">
           <div class="ip-label">IPv6 Address</div>
           <div class="ip-value" id="ip-ipv6">Loading...</div>
         </div>
-        
+
         <div class="ip-item">
           <div class="ip-label">ISP</div>
           <div class="ip-value" id="ip-isp">Loading...</div>
         </div>
-        
+
         <div class="ip-item">
           <div class="ip-label">Location</div>
           <div class="ip-value" id="ip-location">Loading...</div>
         </div>
-        
+
         <div class="ip-item">
           <div class="ip-label">Timezone</div>
           <div class="ip-value" id="ip-timezone">Loading...</div>
         </div>
-        
+
         <div class="ip-item">
           <div class="ip-label">ASN</div>
           <div class="ip-value" id="ip-asn">Loading...</div>
         </div>
-        
+
         <div class="ip-item">
           <div class="ip-label">BGP Network</div>
           <div class="ip-value" id="ip-network">Loading...</div>
         </div>
-        
+
         <div class="ip-item">
           <div class="ip-label">DNS</div>
           <div class="ip-value" id="ip-dns">Loading...</div>
         </div>
-        
+
         <div class="ip-item">
           <div class="ip-label">Latency</div>
           <div class="ip-value" id="ip-latency">Testing...</div>
         </div>
-        
+
         <div class="ip-item">
           <div class="ip-label">VPN Status</div>
           <div class="ip-value" id="ip-vpn">Checking...</div>
@@ -241,7 +245,7 @@
   <div class="config-modal" id="speed-modal">
     <div class="config-content speed-content">
       <h2>Network Speed Test</h2>
-      
+
       <div class="speed-main">
         <div class="speed-display">
           <div class="speed-value" id="speed-download">--</div>
@@ -260,11 +264,11 @@
       <div class="speed-progress">
         <div class="speed-progress-bar" id="speed-progress-bar"></div>
       </div>
-      
+
       <div class="speed-signal-display">Signal Strength: <span id="speed-signal">--</span></div>
-      
+
       <div class="speed-timer" id="speed-timer">00:00</div>
-      
+
       <div class="speed-status" id="speed-status">Starting test...</div>
 
       <div class="config-buttons">
@@ -282,6 +286,32 @@
       <div class="spell-hint" id="spell-hint"></div>
       <div class="config-buttons">
         <button class="btn-save" onclick="closeSpellModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bookmarks Modal -->
+  <div class="config-modal" id="bookmarks-modal">
+    <div class="config-content" style="max-width: 900px;">
+      <div class="config-header-row">
+        <h2>Manage Bookmarks</h2>
+        <button class="btn-toggle-editor" id="toggle-editor-btn" onclick="toggleEditorMode()">Edit as JSON</button>
+      </div>
+
+      <!-- Visual Grid Editor -->
+      <div id="bookmarks-grid-editor" class="bookmarks-grid-editor">
+        <!-- Dynamically generated -->
+      </div>
+
+      <!-- JSON Editor (Hidden by default) -->
+      <textarea id="config-textarea" class="hidden" style="min-height: 400px;" placeholder='[
+  { "href": "https://github.com", "title": "Github" },
+  { "href": "https://youtube.com", "title": "YouTube" }
+]'></textarea>
+
+      <div class="config-buttons">
+        <button class="btn-cancel" onclick="closeBookmarksModal()">Cancel</button>
+        <button class="btn-save" onclick="saveBookmarksFromModal()">Save Bookmarks</button>
       </div>
     </div>
   </div>
@@ -310,6 +340,7 @@
   <script src="script/time-weather.js"></script>
   <script src="script/bookmarks.js"></script>
   <script src="script/modals/config.js"></script>
+  <script src="script/modals/bookmarks.js"></script>
   <script src="script/modals/help.js"></script>
   <script src="script/modals/ipinfo.js"></script>
   <script src="script/modals/speedtest.js"></script>
@@ -319,4 +350,5 @@
   <script src="script/terminal.js"></script>
   <script src="script/script.js"></script>
 </body>
+
 </html>
