@@ -4,8 +4,8 @@
 
 function loadTheme() {
   const theme = getStoredTheme();
-  document.body.classList.remove('dark-mode', 'black-mode');
-  document.documentElement.classList.remove('dark-mode', 'black-mode');
+  document.body.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'newspaper-mode', 'coffee-mode');
+  document.documentElement.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'newspaper-mode', 'coffee-mode');
 
   if (theme === 'dark') {
     document.body.classList.add('dark-mode');
@@ -13,6 +13,15 @@ function loadTheme() {
   } else if (theme === 'black') {
     document.body.classList.add('black-mode');
     document.documentElement.classList.add('black-mode');
+  } else if (theme === 'nord') {
+    document.body.classList.add('nord-mode');
+    document.documentElement.classList.add('nord-mode');
+  } else if (theme === 'newspaper') {
+    document.body.classList.add('newspaper-mode');
+    document.documentElement.classList.add('newspaper-mode');
+  } else if (theme === 'coffee') {
+    document.body.classList.add('coffee-mode');
+    document.documentElement.classList.add('coffee-mode');
   }
 }
 
@@ -24,7 +33,7 @@ document.addEventListener("DOMContentLoaded", () => {
   updateTime();
   updateWeather();
 
-  setInterval(updateTime,   60000);
+  setInterval(updateTime, 60000);
   setInterval(updateWeather, 1800000);
 });
 
@@ -49,12 +58,12 @@ document.addEventListener('keydown', (e) => {
 // ---- Click-outside closes modals ----
 window.addEventListener('DOMContentLoaded', () => {
   [
-    ['config-modal',  closeConfig],
-    ['help-modal',    closeHelp],
-    ['ip-modal',      closeIPInfo],
-    ['speed-modal',   closeSpeedTest],
-    ['spell-modal',   closeSpellModal],
-    ['gemini-modal',  closeGeminiModal],
+    ['config-modal', closeConfig],
+    ['help-modal', closeHelp],
+    ['ip-modal', closeIPInfo],
+    ['speed-modal', closeSpeedTest],
+    ['spell-modal', closeSpellModal],
+    ['gemini-modal', closeGeminiModal],
   ].forEach(([id, fn]) => {
     document.getElementById(id).addEventListener('click', (e) => {
       if (e.target.id === id) fn();

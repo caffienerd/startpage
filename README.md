@@ -1,25 +1,25 @@
-# 🚀 Professional Terminal Start Page
+# Professional Terminal Start Page
 
 A sleek, fast, and feature-rich browser start page driven by an interactive terminal. Boost your productivity with semantic AI routing, direct Gemini integration, and a suite of built-in utility tools—all wrapped in a premium, modern aesthetic.
 
 ---
 
-## ✨ Features
+## Features
 
-- **⌨️ Interactive Terminal**: Command-driven interface with autocomplete (`Tab`), syntax highlighting, and command history (`Up`/`Down`).
-- **🧠 Semantic AI Router**: Use the `ai:` prefix to navigate based on intent. It intelligently routes you to YouTube, Maps, Reddit, or search.
-- **♊ Gemini Integration**: Direct AI prompting via `gem:` or `gemini:`. View responses in a beautiful, non-intrusive modal.
-- **🌓 Rich Aesthetics**: Premium design with support for **Dark**, **AMOLED (Black)**, and **Light** themes.
-- **📊 Live Dashboard**: Instant access to local time and real-time weather updates.
-- **🛠️ Utility Suite**:
+- **Interactive Terminal**: Command-driven interface with autocomplete (`Tab`), syntax highlighting, and command history (`Up`/`Down`).
+- **Semantic AI Router**: Use the ai: prefix to navigate based on intent. It intelligently routes you to YouTube, Maps, Reddit, or search.
+- **Gemini Integration**: Direct AI prompting via `gem:` or `gemini:`. View responses in a beautiful, non-intrusive modal.
+- **Rich Aesthetics**: Premium design with support for **Dark**, **AMOLED (Black)**, **coffee**, **newspaper** and **Light** themes.
+- **Live Dashboard**: Instant access to local time and real-time weather updates.
+- **Utility Suite**:
   - **IP Info**: Detailed network information via `:ipconfig`.
   - **Speed Test**: Integrated network performance testing via `:netspeed`.
   - **Spell Check**: Smart spelling suggestions via `spell:`.
-- **🔖 Bookmark Management**: Fully customizable bookmark categories managed via JSON.
+- **Bookmark Management**: Fully customizable bookmark categories managed via JSON.
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 
@@ -27,7 +27,7 @@ You need a way to serve the static files locally. While you can open `index.html
 
 #### Option 1: Python (Quickest)
 ```bash
-python -m http.server 8080
+python -m http.server 6174
 ```
 
 #### Option 2: Caddy (Recommended for production)
@@ -35,11 +35,11 @@ python -m http.server 8080
 caddy run --config Caddyfile
 ```
 
-Visit `http://localhost:8080` in your browser.
+Visit `http://localhost:6174` in your browser.
 
 ---
 
-## ⚙️ Configuration
+## Configuration
 
 Run `:config` in the terminal to open the settings modal.
 
@@ -53,7 +53,7 @@ Run `:config` in the terminal to open the settings modal.
 
 ---
 
-## ⌨️ Command Reference
+## Command Reference
 
 | Prefix | Usage | Destination |
 | :--- | :--- | :--- |
@@ -65,6 +65,12 @@ Run `:config` in the terminal to open the settings modal.
 | `spell:` | `spell: accomodation` | Built-in Spell Checker |
 | `def:` | `def: ephemeral` | Dictionary (OneLook) |
 | `ddg:` | `ddg: privacy` | DuckDuckGo |
+| `:light` | Switch to Light mode | Change Theme |
+| `:dark` | Switch to Dark mode | Change Theme |
+| `:black` | Switch to AMOLED mode | Change Theme |
+| `:nord` | Switch to Arctic Nord mode | Change Theme |
+| `:newspaper` | Switch to Classic Newspaper mode | Change Theme |
+| `:coffee` | Switch to Organic Coffee mode | Change Theme |
 
 ### System Commands
 
@@ -78,7 +84,7 @@ Run `:config` in the terminal to open the settings modal.
 
 ---
 
-## 🎨 Customization
+## Customization
 
 ### Bookmarks
 
@@ -89,7 +95,7 @@ The start page features a 4-column layout. You can customize these bookmarks to 
 
 ---
 
-## ⌨️ Keyboard Shortcuts
+## Keyboard Shortcuts
 
 - `Tab` or `Right Arrow`: Accept autocomplete suggestions.
 - `Enter`: Execute command.
@@ -98,6 +104,6 @@ The start page features a 4-column layout. You can customize these bookmarks to 
 
 ---
 
-## 🛡️ Privacy
+## Privacy
 
 All settings, including your **Gemini API Key**, are stored locally in your browser's `localStorage`. No data is sent to external servers except for the necessary API calls to Google Gemini and Open-Meteo (Weather).

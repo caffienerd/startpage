@@ -1,6 +1,8 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Playfair+Display:ital,wght@0,400..900;1,400..900&family=Source+Code+Pro:wght@400;600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap');
+
 /* CSS Variables - Light Theme (Default) */
 :root {
-  --background-color: #dee2e6;
+  --background-color: #ffffff;
   --text-color: #212529;
   --card-background: rgba(255, 255, 255, 0.1);
   --card-border: rgba(0, 0, 0, 0.15);
@@ -10,6 +12,8 @@
   --border-radius: 12px;
   --font-family: "Inter", sans-serif;
   --monospace-font-family: "Source Code Pro", monospace;
+  --link-background: rgba(0, 0, 0, 0.05);
+  --link-hover: rgba(0, 0, 0, 0.1);
 }
 
 /* Dark Theme */
@@ -22,6 +26,8 @@ body.dark-mode {
   --terminal-bg: rgba(20, 30, 40, 0.8);
   --terminal-text: #dfe6e9;
   --shadow-color: rgba(0, 0, 0, 0.3);
+  --link-background: rgba(255, 255, 255, 0.08);
+  --link-hover: rgba(255, 255, 255, 0.12);
 }
 
 /* Full Black Theme */
@@ -34,6 +40,73 @@ body.black-mode {
   --terminal-bg: rgba(7, 7, 7, 0.96);
   --terminal-text: #f4f5f6;
   --shadow-color: rgba(0, 0, 0, 0.55);
+  --link-background: #0b0b0b;
+  --link-hover: #141414;
+}
+
+/* Nord Theme */
+html.nord-mode body,
+body.nord-mode {
+  --background-color: #2e3440;
+  --text-color: #eceff4;
+  --card-background: rgba(59, 66, 82, 0.6);
+  --card-border: rgba(76, 86, 106, 0.4);
+  --terminal-bg: rgba(46, 52, 64, 0.9);
+  --terminal-text: #eceff4;
+  --shadow-color: rgba(0, 0, 0, 0.4);
+  --link-background: rgba(255, 255, 255, 0.05);
+  --link-hover: rgba(255, 255, 255, 0.1);
+}
+
+/* Newspaper Theme */
+html.newspaper-mode body,
+body.newspaper-mode {
+  --background-color: #f4efdf;
+  --text-color: #121212;
+  --card-background: rgba(230, 220, 190, 0.25);
+  --card-border: rgba(18, 18, 18, 0.15);
+  --terminal-bg: rgba(244, 239, 223, 0.9);
+  --terminal-text: #121212;
+  --shadow-color: rgba(0, 0, 0, 0.08);
+  --font-family: 'Libre Baskerville', serif;
+  --link-background: rgba(18, 18, 18, 0.03);
+  --link-hover: rgba(18, 18, 18, 0.06);
+}
+
+/* Texture Overlay for Newspaper */
+html.newspaper-mode body::before {
+  content: "";
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  opacity: 0.06;
+  pointer-events: none;
+  z-index: 1000;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+}
+
+/* Coffee Theme */
+html.coffee-mode body,
+body.coffee-mode {
+  --background-color: #2b1b17;
+  --text-color: #f1e4d1;
+  --card-background: rgba(43, 27, 23, 0.4);
+  --card-border: rgba(241, 228, 209, 0.15);
+  --terminal-bg: rgba(30, 18, 15, 0.85);
+  --terminal-text: #f1e4d1;
+  --shadow-color: rgba(0, 0, 0, 0.6);
+  --link-background: rgba(241, 228, 209, 0.04);
+  --link-hover: rgba(241, 228, 209, 0.08);
+}
+
+html.newspaper-mode body {
+  letter-spacing: -0.01em;
+}
+
+html.newspaper-mode .bookmark-link span {
+  font-weight: 700;
 }
 
 /* Global Styles */
@@ -132,40 +205,33 @@ body.dark-mode::after {
 }
 
 .bookmark-section {
-  background: #363d3f;
+  background: var(--card-background);
   border-radius: var(--border-radius);
   padding: 18px;
   flex: 1 1 calc(25% - 20px);
   min-width: 240px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+  border: 1px solid var(--card-border);
   transition: all 0.2s ease;
   position: relative;
   z-index: 10;
 }
 
-html.black-mode body .bookmark-section,
-body.black-mode .bookmark-section {
-  background: #050505;
-  border: 1px solid rgba(255, 255, 255, 0.12);
+html.coffee-mode .bookmark-section {
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+  border-radius: 16px;
 }
 
-/* Light mode bookmark sections */
-body:not(.dark-mode):not(.black-mode) .bookmark-section {
-  background: #d5d9db;
-  border: 1px solid rgba(0, 0, 0, 0.1);
+html.newspaper-mode .bookmark-section {
+  border-radius: 2px 5px 3px 6px;
+  box-shadow: 1px 1px 0px rgba(0, 0, 0, 0.05);
 }
 
-body:not(.dark-mode):not(.black-mode) .bookmark-section:hover {
-  background: #d5d9db;
-  border-color: rgba(0, 0, 0, 0.15);
-}
-
-html.dark-mode body .bookmark-section:hover,
-body.dark-mode .bookmark-section:hover,
-html.black-mode body .bookmark-section:hover,
-body.black-mode .bookmark-section:hover {
-  background: #363d3f;
-  border-color: rgba(255, 255, 255, 0.2);
+.bookmark-section:hover {
+  background: var(--card-background);
+  border-color: var(--text-color);
+  opacity: 0.95;
 }
 
 ul {
@@ -190,42 +256,26 @@ ul li a {
   gap: 12px;
   padding: 11px 14px;
   border-radius: 7px;
-  background: #3d4547;
+  background: var(--link-background);
   transition: all 0.15s ease;
   opacity: 1;
   position: relative;
   z-index: 10;
 }
 
-html.black-mode body ul li a,
-body.black-mode ul li a {
-  background: #0b0b0b;
-}
-
-/* Light mode link backgrounds */
-body:not(.dark-mode):not(.black-mode) ul li a {
-  background: #cfd3d5;
-  opacity: 1;
-}
-
-body:not(.dark-mode):not(.black-mode) ul li a:hover {
-  background: #c5c9cb;
-}
-
 ul li a:hover {
-  background: #454d50;
+  background: var(--link-hover);
   transform: translateX(3px);
-}
-
-html.black-mode body ul li a:hover,
-body.black-mode ul li a:hover {
-  background: #141414;
 }
 
 ul li a img {
   max-width: 20px;
   max-height: 20px;
   border-radius: 4px;
+}
+
+html.newspaper-mode ul li a img {
+  filter: grayscale(100%) contrast(1.2) brightness(0.9);
 }
 
 ul li a span {
@@ -345,6 +395,12 @@ ul li a span {
 /* Input text color based on command type */
 #terminal-input.input-cmd {
   color: #667eea !important;
+}
+
+.input-theme {
+  color: #f6ad55 !important;
+  /* Earthy Gold for themes */
+  text-shadow: 0 0 8px rgba(246, 173, 85, 0.3);
 }
 
 #terminal-input.input-search {
@@ -1005,10 +1061,12 @@ ul li a span {
 
 .primary-match {
   background: var(--card-background) !important;
-  border: 1.5px solid var(--text-color) !important;
-  transform: translateX(6px) scale(1.02) !important;
-  box-shadow: 0 8px 25px var(--shadow-color) !important;
+  border: 2px solid var(--text-color) !important;
+  transform: translateX(8px) scale(1.03) !important;
+  box-shadow: 0 10px 30px var(--shadow-color) !important;
   z-index: 20;
+  outline: 2px solid rgba(255, 255, 255, 0.1);
+  outline-offset: -4px;
 }
 
 .primary-match span {

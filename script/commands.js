@@ -78,11 +78,36 @@ function handleSpecialCommands(value) {
     clear();
     return;
   }
+  if (normalized === ":nord") {
+    document.body.classList.add('nord-mode');
+    document.body.classList.remove('dark-mode', 'black-mode', 'newspaper-mode');
+    document.documentElement.classList.add('nord-mode');
+    document.documentElement.classList.remove('dark-mode', 'black-mode', 'newspaper-mode');
+    saveTheme('nord');
+    clear();
+    return;
+  }
+  if (normalized === ":newspaper") {
+    document.body.classList.add('newspaper-mode');
+    document.body.classList.remove('dark-mode', 'black-mode', 'nord-mode');
+    document.documentElement.classList.add('newspaper-mode');
+    document.documentElement.classList.remove('dark-mode', 'black-mode', 'nord-mode');
+    saveTheme('newspaper');
+    clear();
+    return;
+  }
+  if (normalized === ":coffee") {
+    document.body.classList.add('coffee-mode');
+    document.body.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'newspaper-mode');
+    document.documentElement.classList.add('coffee-mode');
+    document.documentElement.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'newspaper-mode');
+    saveTheme('coffee');
+    clear();
+    return;
+  }
   if (normalized === ":light") {
-    document.body.classList.remove('dark-mode');
-    document.body.classList.remove('black-mode');
-    document.documentElement.classList.remove('dark-mode');
-    document.documentElement.classList.remove('black-mode');
+    document.body.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'newspaper-mode');
+    document.documentElement.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'newspaper-mode');
     saveTheme('light');
     clear();
     return;

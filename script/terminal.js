@@ -78,10 +78,14 @@ function updateSyntaxHighlight(value) {
     ':n': ':netspeed',
     ':w': ':weather',
     ':ti': ':time',
-    ':ve': ':version'
+    ':ve': ':version',
+    ':no': ':nord',
+    ':ne': ':newspaper',
+    ':co': ':coffee'
   };
 
-  const knownCommands = [':help', ':help_ai_router', ':aimode', ':bookmarks', ':bm', ':ipconfig', ':ip', ':netspeed', ':speed', ':config', ':weather', ':time', ':dark', ':black', ':amoled', ':light', ':gemini'];
+  const themeCommands = [':dark', ':black', ':amoled', ':light', ':nord', ':newspaper', ':coffee'];
+  const knownCommands = [':help', ':help_ai_router', ':aimode', ':bookmarks', ':bm', ':ipconfig', ':ip', ':netspeed', ':speed', ':config', ':weather', ':time', ':gemini', ...themeCommands];
   const versionCommands = [':version', ':ver'];
   const knownSearch = /^(r|yt|alt|def|ddg|imdb|the|syn|quote|maps|cws|spell|gem|gemini|ai):/;
 
@@ -92,7 +96,16 @@ function updateSyntaxHighlight(value) {
       const remaining = full.substring(value.length);
       // Ghost text only AHEAD — invisible spacer keeps alignment
       hintEl.innerHTML = `<span style="visibility:hidden">${escapeHTML(value)}</span><span class="suggestion">${escapeHTML(remaining)}</span>`;
-      input.className = value.startsWith(':') ? (versionCommands.some(c => c.startsWith(value)) ? 'input-version' : 'input-cmd') : (knownSearch.test(value) ? 'input-search' : '');
+
+      if (value.startsWith(':')) {
+        if (versionCommands.some(c => c.startsWith(value))) input.className = 'input-version';
+        else if (themeCommands.some(c => c.startsWith(value))) input.className = 'input-theme';
+        else input.className = 'input-cmd';
+      } else if (knownSearch.test(value)) {
+        input.className = 'input-search';
+      } else {
+        input.className = '';
+      }
       return;
     }
   }
@@ -113,6 +126,8 @@ function updateSyntaxHighlight(value) {
 
   if (value.startsWith(':') && versionCommands.some(c => c === value || c.startsWith(value))) {
     input.className = 'input-version';
+  } else if (value.startsWith(':') && themeCommands.some(c => c === value || c.startsWith(value))) {
+    input.className = 'input-theme';
   } else if (value.startsWith(':') && knownCommands.some(c => c === value || c.startsWith(value))) {
     input.className = 'input-cmd';
   } else if (value.startsWith(':') && value.length > 1) {
