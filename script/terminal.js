@@ -152,8 +152,10 @@ function getBookmarkTitle(anchor) {
 }
 
 function findFirstBookmarkMatch(elements, rawValue) {
-  const value = (rawValue || '').trim().toLowerCase();
-  if (!value) return null;
+  // Do NOT trim rawValue — a trailing space means the user has moved past a bookmark
+  // match intent and should fall through to search instead.
+  if (!rawValue || /\s$/.test(rawValue)) return null;
+  const value = rawValue.toLowerCase().trimStart();
 
   let bestMatch = null;
 
@@ -206,8 +208,8 @@ function handleInput(input, elements) {
       hideAiRouteBadge();
     }
 
-    // 3. Reset styles if input is empty or a special search
-    if (value === "" || value.match(/^(r|yt|alt|ddg|imdb|def|the|syn|quote|maps|cws|spell|gem|gemini|ai):/)) {
+    // 3. Reset styles if input is empty, has trailing space, or is a special search
+    if (value === "" || /\s$/.test(rawValue) || value.match(/^(r|yt|alt|ddg|imdb|def|the|syn|quote|maps|cws|spell|gem|gemini|ai):/)) {
       resetStyles(elements);
       return;
     }
