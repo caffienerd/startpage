@@ -52,16 +52,20 @@ function updateSyntaxHighlight(value) {
     'r': 'r:',
     'y': 'yt:',
     'a': 'alt:',
+    'am': 'amazon:',
     'd': 'def:',
     'dd': 'ddg:',
+    'b': 'bing:',
     'i': 'imdb:',
     't': 'the:',
     's': 'syn:',
     'q': 'quote:',
     'm': 'maps:',
     'c': 'cws:',
-    'g': 'gem:',
-    'ge': 'gemini:',
+    'g': 'ggl:',
+    'gg': 'ggl:',
+    'ge': 'gem:',
+    'gem': 'gemini:',
     'ai': 'ai:',
     'sp': 'spell:',
     ':c': ':config',
@@ -89,7 +93,14 @@ function updateSyntaxHighlight(value) {
   const themeCommands = [':dark', ':black', ':amoled', ':light', ':nord', ':newspaper', ':coffee', ':root', ':neon'];
   const knownCommands = [':help', ':help_ai_router', ':aimode', ':bookmarks', ':bm', ':ipconfig', ':ip', ':netspeed', ':speed', ':config', ':weather', ':time', ':gemini', ':hacker', ':cyberpunk', ...themeCommands];
   const versionCommands = [':version', ':ver'];
-  const knownSearch = /^(r|yt|alt|def|ddg|imdb|the|syn|quote|maps|cws|spell|gem|gemini|ai):/;
+  const knownSearch = /^(r|yt|alt|def|ddg|imdb|the|syn|quote|maps|cws|amazon|ggl|bing|spell|gem|gemini|ai):/;
+
+  // Helper: detect a bare domain/URL (e.g. "chess.com", "github.com/user")
+  function isDirectUrl(v) {
+    if (!v || v.startsWith(':') || v.includes(' ')) return false;
+    if (knownSearch.test(v)) return false;
+    return /^(https?:\/\/)?[a-z0-9-]+(\.[a-z]{2,})(\/\S*)?$/i.test(v);
+  }
 
   // Check for a matching autocomplete suggestion
   for (const [prefix, full] of Object.entries(suggestions)) {
@@ -137,6 +148,9 @@ function updateSyntaxHighlight(value) {
   } else if (knownSearch.test(value)) {
     // prefix only, no text yet — color it
     input.className = 'input-search';
+  } else if (isDirectUrl(value)) {
+    // bare domain / URL — distinct highlight
+    input.className = 'input-url';
   } else {
     input.className = '';
   }
@@ -152,8 +166,8 @@ function getBookmarkTitle(anchor) {
 }
 
 function findFirstBookmarkMatch(elements, rawValue) {
-  // Do NOT trim rawValue — a trailing space means the user has moved past a bookmark
-  // match intent and should fall through to search instead.
+  // Do NOT trim rawValue — a trailing space means the user has moved past a match
+  // intent and should fall through to search instead. Same applies to commands like ":config ".
   if (!rawValue || /\s$/.test(rawValue)) return null;
   const value = rawValue.toLowerCase().trimStart();
 
@@ -202,14 +216,14 @@ function handleInput(input, elements) {
       if (getStoredAiModeEnabled()) {
         showAiRouteBadge(bookmarkMatch.title, rawValue.trim(), 0, 'preview');
       }
-    } else if (getStoredAiModeEnabled() && rawValue.trim() && !rawValue.startsWith(':') && !value.match(/^(r|yt|alt|ddg|imdb|def|the|syn|quote|maps|cws|spell|gem|gemini):/)) {
+    } else if (getStoredAiModeEnabled() && rawValue.trim() && !rawValue.startsWith(':') && !value.match(/^(r|yt|alt|ddg|imdb|def|the|syn|quote|maps|cws|amazon|ggl|bing|spell|gem|gemini):/)) {
       previewAiRoute(rawValue.trim());
     } else {
       hideAiRouteBadge();
     }
 
     // 3. Reset styles if input is empty, has trailing space, or is a special search
-    if (value === "" || /\s$/.test(rawValue) || value.match(/^(r|yt|alt|ddg|imdb|def|the|syn|quote|maps|cws|spell|gem|gemini|ai):/)) {
+    if (value === "" || /\s$/.test(rawValue) || value.match(/^(r|yt|alt|ddg|imdb|def|the|syn|quote|maps|cws|amazon|ggl|bing|spell|gem|gemini|ai):/)) {
       resetStyles(elements);
       return;
     }
@@ -323,8 +337,9 @@ function handleKeyboardEvents(input, elements) {
 
 // ---- Enter key routing ----
 function handleEnterKey(rawValue, value, elements, history) {
-  const isSearch = value.match(/^(r|yt|alt|ddg|imdb|def|the|syn|quote|maps|cws|spell|gem|gemini|ai):/);
-  const isCommand = value.startsWith(':');
+  const isSearch = value.match(/^(r|yt|alt|ddg|imdb|def|the|syn|quote|maps|cws|amazon|ggl|bing|spell|gem|gemini|ai):/);
+  // A command with a trailing space (":config ") is intentionally broken — fall through to Google
+  const isCommand = value.startsWith(':') && !/\s$/.test(rawValue);
 
   if (isSearch || isCommand) {
     handleSpecialCommands(rawValue.trim());

@@ -32,6 +32,7 @@ const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash-lite";
 const DEFAULT_GEMINI_SYSTEM_PROMPT = "";
 const DEFAULT_AI_MODE_ENABLED = false;
 const DEFAULT_AI_ROUTE_BADGE_MODE = "live";
+const DEFAULT_SEARCH_ENGINE = "google"; // "google" | "ddg" | "bing"
 
 // ========================================
 // Bookmarks
@@ -157,4 +158,16 @@ function getStoredAiRouteBadgeMode() {
 function saveAiRouteBadgeMode(mode) {
   const normalized = String(mode || '').toLowerCase();
   localStorage.setItem('aiRouteBadgeMode', ['live', 'route', 'off'].includes(normalized) ? normalized : DEFAULT_AI_ROUTE_BADGE_MODE);
+}
+
+// ========================================
+// Default Search Engine
+// ========================================
+function getStoredSearchEngine() {
+  const stored = localStorage.getItem('searchEngine') || DEFAULT_SEARCH_ENGINE;
+  return ['google', 'ddg', 'bing'].includes(stored) ? stored : DEFAULT_SEARCH_ENGINE;
+}
+function saveSearchEngine(engine) {
+  const normalized = String(engine || '').toLowerCase();
+  localStorage.setItem('searchEngine', ['google', 'ddg', 'bing'].includes(normalized) ? normalized : DEFAULT_SEARCH_ENGINE);
 }

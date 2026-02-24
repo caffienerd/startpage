@@ -108,6 +108,9 @@ function handleSpecialCommands(value) {
   if (/^yt:/i.test(rawValue)) { navigate(`https://www.youtube.com/results?search_query=${encodeSearchQuery(rawValue, "yt:")}`); return; }
   if (/^r:/i.test(rawValue)) { navigate(`https://google.com/search?q=site:reddit.com ${rawValue.replace(/^r:/i, "")}`); return; }
   if (/^ddg:/i.test(rawValue)) { navigate(`https://duckduckgo.com/?q=${encodeSearchQuery(rawValue, "ddg:")}`); return; }
+  if (/^bing:/i.test(rawValue)) { navigate(`https://www.bing.com/search?q=${encodeSearchQuery(rawValue, "bing:")}`); return; }
+  if (/^ggl:/i.test(rawValue)) { navigate(`https://www.google.com/search?q=${encodeSearchQuery(rawValue, "ggl:")}`); return; }
+  if (/^amazon:/i.test(rawValue)) { navigate(`https://www.amazon.com/s?k=${encodeSearchQuery(rawValue, "amazon:")}`); return; }
   if (/^imdb:/i.test(rawValue)) { navigate(`https://www.imdb.com/find?q=${encodeSearchQuery(rawValue, "imdb:")}`); return; }
   if (/^alt:/i.test(rawValue)) { navigate(`https://alternativeto.net/browse/search/?q=${encodeSearchQuery(rawValue, "alt:")}`); return; }
   if (/^def:/i.test(rawValue)) { navigate(`https://onelook.com/?w=${encodeSearchQuery(rawValue, "def:")}`); return; }
@@ -123,11 +126,15 @@ function handleSpecialCommands(value) {
     return;
   }
 
-  // ---- Direct URL or Google ----
+  // ---- Direct URL or default search ----
   if (rawValue.split(".").length >= 2 && !rawValue.includes(" ")) {
     navigate(rawValue.startsWith("http") ? rawValue : `https://${rawValue}`);
   } else {
-    navigate(`https://google.com/search?q=${encodeURIComponent(rawValue)}`);
+    const engine = (typeof getStoredSearchEngine === 'function') ? getStoredSearchEngine() : 'google';
+    const q = encodeURIComponent(rawValue);
+    if (engine === 'ddg') navigate(`https://duckduckgo.com/?q=${q}`);
+    else if (engine === 'bing') navigate(`https://www.bing.com/search?q=${q}`);
+    else navigate(`https://google.com/search?q=${q}`);
   }
 }
 
@@ -183,7 +190,11 @@ function routeSemanticIntent(query) {
     return;
   }
 
-  navRoute(`https://google.com/search?q=${encodeURIComponent(cleaned || raw)}`, 'Google Search');
+  const engine = (typeof getStoredSearchEngine === 'function') ? getStoredSearchEngine() : 'google';
+  const q = encodeURIComponent(cleaned || raw);
+  if (engine === 'ddg') navRoute(`https://duckduckgo.com/?q=${q}`, 'DuckDuckGo Search');
+  else if (engine === 'bing') navRoute(`https://www.bing.com/search?q=${q}`, 'Bing Search');
+  else navRoute(`https://google.com/search?q=${q}`, 'Google Search');
 }
 
 function stripIntentLead(query) {

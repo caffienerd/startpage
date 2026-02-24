@@ -10,6 +10,7 @@ function openConfig() {
   document.getElementById('gemini-system-prompt').value = getStoredGeminiSystemPrompt();
   document.getElementById('ai-mode-enabled').checked = getStoredAiModeEnabled();
   document.getElementById('ai-route-badge-mode').value = getStoredAiRouteBadgeMode();
+  document.getElementById('search-engine').value = getStoredSearchEngine();
   document.getElementById('config-modal').classList.add('active');
 }
 
@@ -28,6 +29,7 @@ function saveConfig() {
   const geminiSystemPromptInput = document.getElementById('gemini-system-prompt');
   const aiModeEnabledInput = document.getElementById('ai-mode-enabled');
   const aiRouteBadgeModeInput = document.getElementById('ai-route-badge-mode');
+  const searchEngineInput = document.getElementById('search-engine');
 
   const loc = sanitize(weatherInput.value) || (typeof DEFAULT_WEATHER_LOCATION !== 'undefined' ? DEFAULT_WEATHER_LOCATION : '');
   const tz = sanitize(timezoneInput.value) || (typeof DEFAULT_TIMEZONE !== 'undefined' ? DEFAULT_TIMEZONE : '');
@@ -40,6 +42,7 @@ function saveConfig() {
   saveGeminiSystemPrompt(geminiSystemPromptInput.value);
   saveAiModeEnabled(!!aiModeEnabledInput.checked);
   saveAiRouteBadgeMode(aiRouteBadgeModeInput.value);
+  saveSearchEngine(searchEngineInput.value);
 
   updateWeather();
   closeConfig();

@@ -130,6 +130,16 @@
         </select>
       </div>
 
+      <div class="config-section">
+        <h3>Default Search Engine</h3>
+        <select id="search-engine">
+          <option value="google">Google</option>
+          <option value="ddg">DuckDuckGo</option>
+          <option value="bing">Bing</option>
+        </select>
+        <p class="config-hint">Used when no prefix is typed (e.g. plain text or <span class="config-code">ai:</span> fallback).</p>
+      </div>
+
       <div class="config-buttons">
         <button class="btn-cancel" onclick="closeConfig()">Cancel</button>
         <button class="btn-save" onclick="saveConfig()">Save</button>
@@ -175,8 +185,11 @@
         <div class="help-commands">
           <div class="help-cmd"><span>r:query</span> → Search Reddit</div>
           <div class="help-cmd"><span>yt:query</span> → Search YouTube</div>
-          <div class="help-cmd"><span>alt:query</span> → Search AlternativeTo</div>
+          <div class="help-cmd"><span>ggl:query</span> → Search Google explicitly</div>
+          <div class="help-cmd"><span>bing:query</span> → Search Bing</div>
           <div class="help-cmd"><span>ddg:query</span> → Search DuckDuckGo</div>
+          <div class="help-cmd"><span>amazon:query</span> → Search Amazon</div>
+          <div class="help-cmd"><span>alt:query</span> → Search AlternativeTo</div>
           <div class="help-cmd"><span>imdb:movie</span> → Search IMDb</div>
           <div class="help-cmd"><span>def:word</span> → Define word (OneLook)</div>
           <div class="help-cmd"><span>the:phrase</span> → Thesaurus (OneLook)</div>
