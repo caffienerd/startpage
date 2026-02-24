@@ -14,6 +14,7 @@ function openSpeedTest() {
 
 function closeSpeedTest() {
   document.getElementById('speed-modal').classList.remove('active');
+  isSpeedTestActive = false;
 }
 
 // Helper: generate large random data within crypto limits
@@ -28,7 +29,23 @@ function generateRandomData(size) {
   return data;
 }
 
+const DOWNLOAD_DURATION = 12000;
+const UPLOAD_DURATION = 12000;
+const MAX_CHUNK_SIZE = 25 * 1024 * 1024;
+const SMOOTHING_FACTOR = 0.8;
+const ADAPTIVE_THRESHOLD_MS = 200;
+const MAX_RETRIES = 3;
+
+let isSpeedTestActive = false;
+
+function calculateProgress(type, elapsedPct) {
+  const base = type === 'download' ? 10 : 55;
+  const scale = 45;
+  return base + (elapsedPct * scale);
+}
+
 async function runSpeedTest() {
+  isSpeedTestActive = true;
   const statusEl = document.getElementById('speed-status');
   const progressEl = document.getElementById('speed-progress-bar');
   const dlEl = document.getElementById('speed-download');
@@ -44,17 +61,16 @@ async function runSpeedTest() {
   let totalBytes = 0;
   let startTime = 0;
   let currentMbps = 0;
-  let isActive = true;
 
   // Timer
-  const timerStart = Date.now();
+  const timerStart = performance.now();
   const timerInterval = setInterval(() => {
-    const s = Math.floor((Date.now() - timerStart) / 1000);
+    const s = Math.floor((performance.now() - timerStart) / 1000);
     timerEl.textContent = `${String(Math.floor(s / 60)).padStart(2, '0')}:${String(s % 60).padStart(2, '0')}`;
   }, 100);
   const stopTimer = () => {
     clearInterval(timerInterval);
-    isActive = false;
+    isSpeedTestActive = false;
   };
 
   const signalStrength = (pings) => {
@@ -86,7 +102,8 @@ async function runSpeedTest() {
     let chunkSize = type === 'download' ? 5 * 1024 * 1024 : 1 * 1024 * 1024;
 
     async function worker() {
-      while (performance.now() < endTime && isActive) {
+      let retries = 0;
+      while (performance.now() < endTime && isSpeedTestActive) {
         try {
           const streamStart = performance.now();
           if (type === 'download') {
@@ -94,23 +111,26 @@ async function runSpeedTest() {
             const reader = res.body.getReader();
             while (true) {
               const { done, value } = await reader.read();
-              if (done) break;
+              if (done || !isSpeedTestActive) break;
               totalBytes += value.length;
               updateVisuals();
             }
           } else {
             const data = generateRandomData(chunkSize);
             await fetch('https://speed.cloudflare.com/__up', { method: 'POST', body: data, cache: 'no-store' });
+            if (!isSpeedTestActive) break;
             totalBytes += chunkSize;
             updateVisuals();
           }
 
-          // Adaptive chunking: if it took less than 200ms, double it (up to 25MB)
+          // Adaptive chunking
           const streamDuration = performance.now() - streamStart;
-          if (streamDuration < 200 && chunkSize < 25 * 1024 * 1024) {
+          if (streamDuration < ADAPTIVE_THRESHOLD_MS && chunkSize < MAX_CHUNK_SIZE) {
             chunkSize *= 1.5;
           }
+          retries = 0;
         } catch (e) {
+          if (++retries > MAX_RETRIES) throw e;
           console.warn('Stream failed, retrying...', e);
           await new Promise(r => setTimeout(r, 500));
         }
@@ -125,7 +145,7 @@ async function runSpeedTest() {
       const mbps = (totalBytes * 8) / elapsed / 1e6;
 
       // Professional smoothing
-      currentMbps = currentMbps === 0 ? mbps : currentMbps * 0.8 + mbps * 0.2;
+      currentMbps = currentMbps === 0 ? mbps : currentMbps * SMOOTHING_FACTOR + mbps * (1 - SMOOTHING_FACTOR);
 
       if (type === 'download') dlEl.textContent = currentMbps.toFixed(2);
       else ulEl.textContent = currentMbps.toFixed(2);
@@ -137,11 +157,9 @@ async function runSpeedTest() {
     const workers = Array.from({ length: streams }, () => worker());
 
     // Wait for the duration to pass
-    while (performance.now() < endTime && isActive) {
-      const progressBase = type === 'download' ? 10 : 55;
-      const progressScale = 45;
+    while (performance.now() < endTime && isSpeedTestActive) {
       const elapsedPct = (performance.now() - startTime) / durationMs;
-      updateProgress(progressBase + (elapsedPct * progressScale));
+      updateProgress(calculateProgress(type, elapsedPct));
       await new Promise(r => setTimeout(r, 100));
     }
 
@@ -169,14 +187,15 @@ async function runSpeedTest() {
     // 2. DOWNLOAD (15 Seconds / 5 Streams)
     setStatus('Testing Download (Sustaining...)');
     currentMbps = 0;
-    const finalDl = await performTest('download', 15000, 5);
-    dlEl.textContent = finalDl.toFixed(2);
+    const finalDl = await performTest('download', DOWNLOAD_DURATION, 5);
+    if (isSpeedTestActive) dlEl.textContent = finalDl.toFixed(2);
 
     // 3. UPLOAD (12 Seconds / 4 Streams)
+    if (!isSpeedTestActive) return;
     setStatus('Testing Upload (Sustaining...)');
     currentMbps = 0;
-    const finalUl = await performTest('upload', 12000, 4);
-    ulEl.textContent = finalUl.toFixed(2);
+    const finalUl = await performTest('upload', UPLOAD_DURATION, 4);
+    if (isSpeedTestActive) ulEl.textContent = finalUl.toFixed(2);
 
     updateProgress(100);
     setStatus('Test Complete');

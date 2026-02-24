@@ -60,73 +60,19 @@ function handleSpecialCommands(value) {
   if (normalized === ":config" || normalized === ":weather" || normalized === ":time") { openConfig(); clear(); return; }
 
   // ---- Theme ----
-  if (normalized === ":dark") {
-    document.body.classList.add('dark-mode');
-    document.body.classList.remove('black-mode', 'nord-mode', 'newspaper-mode', 'coffee-mode', 'root-mode', 'neon-mode');
-    document.documentElement.classList.add('dark-mode');
-    document.documentElement.classList.remove('black-mode', 'nord-mode', 'newspaper-mode', 'coffee-mode', 'root-mode', 'neon-mode');
-    saveTheme('dark');
-    clear();
-    return;
-  }
-  if (normalized === ":black" || normalized === ":amoled") {
-    document.body.classList.add('black-mode');
-    document.body.classList.remove('dark-mode', 'nord-mode', 'newspaper-mode', 'coffee-mode', 'root-mode', 'neon-mode');
-    document.documentElement.classList.add('black-mode');
-    document.documentElement.classList.remove('dark-mode', 'nord-mode', 'newspaper-mode', 'coffee-mode', 'root-mode', 'neon-mode');
-    saveTheme('black');
-    clear();
-    return;
-  }
-  if (normalized === ":nord") {
-    document.body.classList.add('nord-mode');
-    document.body.classList.remove('dark-mode', 'black-mode', 'newspaper-mode', 'coffee-mode', 'root-mode', 'neon-mode');
-    document.documentElement.classList.add('nord-mode');
-    document.documentElement.classList.remove('dark-mode', 'black-mode', 'newspaper-mode', 'coffee-mode', 'root-mode', 'neon-mode');
-    saveTheme('nord');
-    clear();
-    return;
-  }
-  if (normalized === ":newspaper") {
-    document.body.classList.add('newspaper-mode');
-    document.body.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'coffee-mode', 'root-mode', 'neon-mode');
-    document.documentElement.classList.add('newspaper-mode');
-    document.documentElement.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'coffee-mode', 'root-mode', 'neon-mode');
-    saveTheme('newspaper');
-    clear();
-    return;
-  }
-  if (normalized === ":coffee") {
-    document.body.classList.add('coffee-mode');
-    document.body.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'newspaper-mode', 'root-mode', 'neon-mode');
-    document.documentElement.classList.add('coffee-mode');
-    document.documentElement.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'newspaper-mode', 'root-mode', 'neon-mode');
-    saveTheme('coffee');
-    clear();
-    return;
-  }
-  if (normalized === ":root" || normalized === ":hacker") {
-    document.body.classList.add('root-mode');
-    document.body.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'newspaper-mode', 'coffee-mode', 'neon-mode');
-    document.documentElement.classList.add('root-mode');
-    document.documentElement.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'newspaper-mode', 'coffee-mode', 'neon-mode');
-    saveTheme('root');
-    clear();
-    return;
-  }
-  if (normalized === ":neon" || normalized === ":cyberpunk") {
-    document.body.classList.add('neon-mode');
-    document.body.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'newspaper-mode', 'coffee-mode', 'root-mode');
-    document.documentElement.classList.add('neon-mode');
-    document.documentElement.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'newspaper-mode', 'coffee-mode', 'root-mode');
-    saveTheme('neon');
-    clear();
-    return;
-  }
-  if (normalized === ":light") {
-    document.body.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'newspaper-mode', 'coffee-mode', 'root-mode', 'neon-mode');
-    document.documentElement.classList.remove('dark-mode', 'black-mode', 'nord-mode', 'newspaper-mode', 'coffee-mode', 'root-mode', 'neon-mode');
-    saveTheme('light');
+  const themeMatch = normalized.replace(/^:/, '');
+  const THEME_ALIASES = { 'amoled': 'black', 'hacker': 'root', 'cyberpunk': 'neon' };
+  const targetTheme = THEME_ALIASES[themeMatch] || themeMatch;
+
+  if (THEMES.includes(targetTheme) || targetTheme === 'light') {
+    THEMES.forEach(t => {
+      document.body.classList.remove(`${t}-mode`);
+      document.documentElement.classList.remove(`${t}-mode`);
+    });
+    if (targetTheme !== 'light') {
+      document.documentElement.classList.add(`${targetTheme}-mode`);
+    }
+    saveTheme(targetTheme);
     clear();
     return;
   }
@@ -159,73 +105,85 @@ function handleSpecialCommands(value) {
   }
 
   // ---- Search shortcuts ----
-  if (/^yt:/i.test(rawValue)) { window.location.href = `https://www.youtube.com/results?search_query=${enc(rawValue, "yt:")}`; return; }
-  if (/^r:/i.test(rawValue)) { window.location.href = `https://google.com/search?q=site:reddit.com ${rawValue.replace(/^r:/i, "")}`; return; }
-  if (/^ddg:/i.test(rawValue)) { window.location.href = `https://duckduckgo.com/?q=${enc(rawValue, "ddg:")}`; return; }
-  if (/^imdb:/i.test(rawValue)) { window.location.href = `https://www.imdb.com/find?q=${enc(rawValue, "imdb:")}`; return; }
-  if (/^alt:/i.test(rawValue)) { window.location.href = `https://alternativeto.net/browse/search/?q=${enc(rawValue, "alt:")}`; return; }
-  if (/^def:/i.test(rawValue)) { window.location.href = `https://onelook.com/?w=${enc(rawValue, "def:")}`; return; }
-  if (/^the:/i.test(rawValue)) { window.location.href = `https://onelook.com/thesaurus/?s=${enc(rawValue, "the:")}`; return; }
-  if (/^syn:/i.test(rawValue)) { window.location.href = `https://onelook.com/?related=1&w=${enc(rawValue, "syn:")}`; return; }
-  if (/^quote:/i.test(rawValue)) { window.location.href = `https://onelook.com/?mentions=1&w=${enc(rawValue, "quote:")}`; return; }
-  if (/^maps:/i.test(rawValue)) { window.location.href = `https://www.google.com/maps/search/${enc(rawValue, "maps:")}`; return; }
+  if (/^yt:/i.test(rawValue)) { navigate(`https://www.youtube.com/results?search_query=${encodeSearchQuery(rawValue, "yt:")}`); return; }
+  if (/^r:/i.test(rawValue)) { navigate(`https://google.com/search?q=site:reddit.com ${rawValue.replace(/^r:/i, "")}`); return; }
+  if (/^ddg:/i.test(rawValue)) { navigate(`https://duckduckgo.com/?q=${encodeSearchQuery(rawValue, "ddg:")}`); return; }
+  if (/^imdb:/i.test(rawValue)) { navigate(`https://www.imdb.com/find?q=${encodeSearchQuery(rawValue, "imdb:")}`); return; }
+  if (/^alt:/i.test(rawValue)) { navigate(`https://alternativeto.net/browse/search/?q=${encodeSearchQuery(rawValue, "alt:")}`); return; }
+  if (/^def:/i.test(rawValue)) { navigate(`https://onelook.com/?w=${encodeSearchQuery(rawValue, "def:")}`); return; }
+  if (/^the:/i.test(rawValue)) { navigate(`https://onelook.com/thesaurus/?s=${encodeSearchQuery(rawValue, "the:")}`); return; }
+  if (/^syn:/i.test(rawValue)) { navigate(`https://onelook.com/?related=1&w=${encodeSearchQuery(rawValue, "syn:")}`); return; }
+  if (/^quote:/i.test(rawValue)) { navigate(`https://onelook.com/?mentions=1&w=${encodeSearchQuery(rawValue, "quote:")}`); return; }
+  if (/^maps:/i.test(rawValue)) { navigate(`https://www.google.com/maps/search/${encodeSearchQuery(rawValue, "maps:")}`); return; }
   if (/^cws:/i.test(rawValue)) {
     const q = rawValue.replace(/^cws:/i, "").trim();
-    window.location.href = getBrowser() === "firefox"
+    navigate(getBrowser() === "firefox"
       ? `https://addons.mozilla.org/en-US/firefox/search/?q=${encodeURIComponent(q)}`
-      : `https://chromewebstore.google.com/search/${encodeURIComponent(q)}`;
+      : `https://chromewebstore.google.com/search/${encodeURIComponent(q)}`);
     return;
   }
 
   // ---- Direct URL or Google ----
   if (rawValue.split(".").length >= 2 && !rawValue.includes(" ")) {
-    window.location.href = rawValue.startsWith("http") ? rawValue : `https://${rawValue}`;
+    navigate(rawValue.startsWith("http") ? rawValue : `https://${rawValue}`);
   } else {
-    window.location.href = `https://google.com/search?q=${encodeURIComponent(rawValue)}`;
+    navigate(`https://google.com/search?q=${encodeURIComponent(rawValue)}`);
   }
 }
 
-// Shorthand: strip prefix and encode
-function enc(value, prefix) {
-  const escapedPrefix = prefix.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  return encodeURIComponent(value.replace(new RegExp(`^${escapedPrefix}`, 'i'), "").trim());
+function navigate(url) {
+  try { window.location.href = url; } catch (e) { console.error('Navigation failed', e); }
 }
 
-async function routeSemanticIntent(query) {
+// Shorthand: strip prefix and encode
+function encodeSearchQuery(value, prefix) {
+  return encodeURIComponent(value.startsWith(prefix) ? value.slice(prefix.length).trim() : value.trim());
+}
+
+function routeSemanticIntent(query) {
   const raw = query.trim();
   const cleaned = stripIntentLead(raw);
   const cleanedLower = cleaned.toLowerCase();
 
-  const commandRoute = async (cmd) => {
-    await showAiRouteBadge(getAiCommandDestination(cmd), raw, AI_ROUTE_BADGE_NAV_DELAY_MS);
-    handleSpecialCommands(cmd);
+  const commandRoute = (cmd) => {
+    showAiRouteBadge(getAiCommandDestination(cmd), raw, AI_ROUTE_BADGE_NAV_DELAY_MS).then(() => {
+      handleSpecialCommands(cmd);
+    });
   };
 
-  const navRoute = async (url, destination) => {
-    await showAiRouteBadge(destination || getAiUrlDestination(url), raw, AI_ROUTE_BADGE_NAV_DELAY_MS);
-    window.location.href = url;
+  const navRoute = (url, destination) => {
+    showAiRouteBadge(destination || getAiUrlDestination(url), raw, AI_ROUTE_BADGE_NAV_DELAY_MS).then(() => {
+      navigate(url);
+    });
   };
 
   const mappedCommand = matchCommandIntent(cleanedLower);
   if (mappedCommand) {
-    await commandRoute(mappedCommand);
+    commandRoute(mappedCommand);
     return;
   }
 
   const directUrl = extractIntentUrl(cleaned);
   if (directUrl) {
-    await navRoute(directUrl, getAiUrlDestination(directUrl));
+    navRoute(directUrl, getAiUrlDestination(directUrl));
     return;
   }
 
   const mappedUrl = matchWebIntent(cleaned, cleanedLower, { allowSideEffects: true });
-  if (mappedUrl === '__handled__') return;
+  if (mappedUrl === HANDLED_INTERNALLY) return;
+  if (mappedUrl && mappedUrl.startsWith('spell://')) {
+    const candidate = mappedUrl.replace(/^spell:\/\//, '');
+    showAiRouteBadge('Spell Check', cleanedQuery, AI_ROUTE_BADGE_NAV_DELAY_MS).then(() => {
+      handleSpellCheck(candidate);
+    });
+    return;
+  }
   if (mappedUrl) {
-    await navRoute(mappedUrl);
+    navRoute(mappedUrl);
     return;
   }
 
-  await navRoute(`https://google.com/search?q=${encodeURIComponent(cleaned || raw)}`, 'Google Search');
+  navRoute(`https://google.com/search?q=${encodeURIComponent(cleaned || raw)}`, 'Google Search');
 }
 
 function stripIntentLead(query) {
@@ -303,11 +261,6 @@ function matchWebIntent(cleanedQuery, lowerQuery, options = {}) {
   if (includesAny(lowerQuery, [/\b(spell|spelling)\b/])) {
     const candidate = cleanedQuery.replace(/\b(spell|spelling|how do you spell)\b/gi, '').trim();
     if (candidate && !candidate.includes(' ')) {
-      if (allowSideEffects) {
-        showAiRouteBadge('Spell Check', cleanedQuery);
-        handleSpellCheck(candidate);
-        return '__handled__';
-      }
       return `spell://${candidate}`;
     }
   }

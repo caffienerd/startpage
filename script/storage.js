@@ -24,10 +24,11 @@ const DEFAULT_BOOKMARKS = [
   { href: "https://claude.ai/new", title: "Claude" }
 ];
 
-const DEFAULT_USERNAME        = "coffeenerd";
+const DEFAULT_USERNAME = "coffeenerd";
 const DEFAULT_WEATHER_LOCATION = "Gurgaon";
-const DEFAULT_TIMEZONE        = "UTC+5:30";
-const DEFAULT_GEMINI_MODEL    = "gemini-2.5-flash-lite";
+const DEFAULT_WEATHER_UNIT = "celsius";
+const DEFAULT_TIMEZONE = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
+const DEFAULT_GEMINI_MODEL = "gemini-2.5-flash-lite";
 const DEFAULT_GEMINI_SYSTEM_PROMPT = "";
 const DEFAULT_AI_MODE_ENABLED = false;
 const DEFAULT_AI_ROUTE_BADGE_MODE = "live";
@@ -36,11 +37,22 @@ const DEFAULT_AI_ROUTE_BADGE_MODE = "live";
 // Bookmarks
 // ========================================
 function getStoredBookmarks() {
-  const stored = localStorage.getItem('bookmarks');
-  return stored ? JSON.parse(stored) : DEFAULT_BOOKMARKS;
+  try {
+    const stored = localStorage.getItem('bookmarks');
+    return stored ? JSON.parse(stored) : DEFAULT_BOOKMARKS;
+  } catch (e) {
+    console.error('Failed to parse bookmarks:', e);
+    return DEFAULT_BOOKMARKS;
+  }
 }
 function saveBookmarks(bookmarks) {
-  localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+  if (!Array.isArray(bookmarks)) throw new Error('Invalid bookmarks data');
+  try {
+    localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
+  } catch (e) {
+    console.error('Failed to save bookmarks:', e);
+    alert('Could not save bookmarks. Storage may be full.');
+  }
 }
 
 // ========================================
@@ -50,7 +62,12 @@ function getStoredUsername() {
   return localStorage.getItem('username') || DEFAULT_USERNAME;
 }
 function saveUsername(name) {
-  localStorage.setItem('username', name);
+  if (!name || typeof name !== 'string') throw new Error('Invalid username');
+  try {
+    localStorage.setItem('username', name.trim());
+  } catch (e) {
+    console.error('Failed to save username:', e);
+  }
 }
 
 // ========================================
@@ -60,7 +77,11 @@ function getStoredTheme() {
   return localStorage.getItem('theme') || 'light';
 }
 function saveTheme(theme) {
-  localStorage.setItem('theme', theme);
+  try {
+    localStorage.setItem('theme', theme);
+  } catch (e) {
+    console.error('Failed to save theme:', e);
+  }
 }
 
 // ========================================
@@ -70,13 +91,25 @@ function getStoredWeatherLocation() {
   return localStorage.getItem('weatherLocation') || DEFAULT_WEATHER_LOCATION;
 }
 function saveWeatherLocation(location) {
-  localStorage.setItem('weatherLocation', location);
+  try {
+    localStorage.setItem('weatherLocation', location);
+  } catch (e) { console.error(e); }
+}
+function getStoredWeatherUnit() {
+  return localStorage.getItem('weatherUnit') || DEFAULT_WEATHER_UNIT;
+}
+function saveWeatherUnit(unit) {
+  try {
+    localStorage.setItem('weatherUnit', unit);
+  } catch (e) { console.error(e); }
 }
 function getStoredTimezone() {
   return localStorage.getItem('timezone') || DEFAULT_TIMEZONE;
 }
 function saveTimezone(tz) {
-  localStorage.setItem('timezone', tz);
+  try {
+    localStorage.setItem('timezone', tz);
+  } catch (e) { console.error(e); }
 }
 
 // ========================================
@@ -87,11 +120,7 @@ function getStoredGeminiApiKey() {
 }
 
 function normalizeGeminiApiKey(key) {
-  const trimmed = String(key || '').trim();
-  if ((trimmed.startsWith('"') && trimmed.endsWith('"')) || (trimmed.startsWith("'") && trimmed.endsWith("'"))) {
-    return trimmed.slice(1, -1).trim();
-  }
-  return trimmed;
+  return String(key || '').trim();
 }
 
 function saveGeminiApiKey(key) {

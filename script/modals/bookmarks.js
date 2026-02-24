@@ -25,14 +25,20 @@ function openBookmarksModal() {
     // Handle Esc key specifically for this modal
     const handleEsc = (e) => {
         if (e.key === 'Escape') {
-            saveBookmarksFromModal();
+            closeBookmarksModal();
             document.removeEventListener('keydown', handleEsc);
         }
     };
-    document.addEventListener('keydown', handleEsc);
 
-    // If config modal is open, close it (or keep it under)
-    // closeConfig(); 
+    // Clean up to prevent leaks if closed another way
+    const cleanupEsc = (e) => {
+        if (!document.getElementById('bookmarks-modal').classList.contains('active')) {
+            document.removeEventListener('keydown', handleEsc);
+            document.removeEventListener('click', cleanupEsc);
+        }
+    };
+    document.addEventListener('keydown', handleEsc);
+    document.addEventListener('click', cleanupEsc);
 }
 
 function closeBookmarksModal() {
@@ -44,7 +50,8 @@ function renderGridEditor(bookmarks) {
     grid.innerHTML = '';
 
     const columns = 4;
-    const rows = 5;
+    // Calculate required rows, ensuring at least 5 to maintain some UI stability
+    const rows = Math.max(5, Math.ceil(bookmarks.length / columns));
 
     for (let c = 0; c < columns; c++) {
         const colDiv = document.createElement('div');
@@ -52,14 +59,25 @@ function renderGridEditor(bookmarks) {
 
         for (let r = 0; r < rows; r++) {
             const idx = c * rows + r;
-            const bm = bookmarks[idx] || { title: '', href: '' };
+            const bm = (bookmarks[idx] && typeof bookmarks[idx] === 'object') ? bookmarks[idx] : { title: '', href: '' };
 
             const cell = document.createElement('div');
             cell.className = 'bookmark-edit-cell';
-            cell.innerHTML = `
-        <input type="text" class="bm-title-input" placeholder="Title" value="${bm.title.replace(/"/g, '&quot;')}">
-        <input type="text" class="bm-url-input" placeholder="https://..." value="${bm.href.replace(/"/g, '&quot;')}">
-      `;
+
+            const titleInput = document.createElement('input');
+            titleInput.type = 'text';
+            titleInput.className = 'bm-title-input';
+            titleInput.placeholder = 'Title';
+            titleInput.value = bm.title || '';
+
+            const urlInput = document.createElement('input');
+            urlInput.type = 'text';
+            urlInput.className = 'bm-url-input';
+            urlInput.placeholder = 'https://...';
+            urlInput.value = bm.href || '';
+
+            cell.appendChild(titleInput);
+            cell.appendChild(urlInput);
             colDiv.appendChild(cell);
         }
         grid.appendChild(colDiv);
@@ -76,10 +94,13 @@ function toggleEditorMode() {
         try {
             const bookmarks = JSON.parse(textarea.value);
             renderGridEditor(Array.isArray(bookmarks) ? bookmarks : []);
-        } catch (e) { }
-        grid.classList.remove('hidden');
-        textarea.classList.add('hidden');
-        btn.textContent = 'Edit as JSON';
+            grid.classList.remove('hidden');
+            textarea.classList.add('hidden');
+            btn.textContent = 'Edit as JSON';
+        } catch (e) {
+            console.error('Failed to parse bookmarks JSON:', e);
+            alert('Invalid JSON format. Please fix any syntax errors before switching to grid view.');
+        }
     } else {
         // Switching to JSON
         const bookmarks = collectGridBookmarks();
@@ -120,18 +141,16 @@ function saveBookmarksFromModal() {
             } else {
                 bookmarkError = true;
             }
-        } catch {
+        } catch (e) {
+            console.error('Failed to parse bookmarks JSON when saving:', e);
             bookmarkError = true;
         }
     }
 
-    if (bookmarks) {
+    if (bookmarks && !bookmarkError) {
         saveBookmarks(bookmarks);
         generateBookmarks(); // Update the UI
         closeBookmarksModal();
-        if (bookmarkError) {
-            alert('Bookmarks saved. Some JSON parts were invalid, so they were cleaned during save.');
-        }
     } else if (bookmarkError) {
         alert('Invalid JSON! Please fix it or switch back to grid mode.');
     }

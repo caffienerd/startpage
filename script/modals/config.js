@@ -18,6 +18,8 @@ function closeConfig() {
 }
 
 function saveConfig() {
+  const sanitize = (str) => typeof str === 'string' ? str.replace(/[<>]/g, '').trim() : '';
+
   const weatherInput = document.getElementById('weather-location');
   const timezoneInput = document.getElementById('time-zone');
   const usernameInput = document.getElementById('config-username');
@@ -27,8 +29,11 @@ function saveConfig() {
   const aiModeEnabledInput = document.getElementById('ai-mode-enabled');
   const aiRouteBadgeModeInput = document.getElementById('ai-route-badge-mode');
 
-  saveWeatherLocation(weatherInput.value || DEFAULT_WEATHER_LOCATION);
-  saveTimezone(timezoneInput.value || DEFAULT_TIMEZONE);
+  const loc = sanitize(weatherInput.value) || (typeof DEFAULT_WEATHER_LOCATION !== 'undefined' ? DEFAULT_WEATHER_LOCATION : '');
+  const tz = sanitize(timezoneInput.value) || (typeof DEFAULT_TIMEZONE !== 'undefined' ? DEFAULT_TIMEZONE : '');
+
+  saveWeatherLocation(loc);
+  saveTimezone(tz);
   if (usernameInput.value.trim()) saveUsername(usernameInput.value.trim());
   saveGeminiApiKey(geminiKeyInput.value);
   saveGeminiModel(geminiModelInput.value.trim() || DEFAULT_GEMINI_MODEL);
@@ -39,5 +44,6 @@ function saveConfig() {
   updateWeather();
   closeConfig();
   if (typeof hideAiRouteBadge === 'function') hideAiRouteBadge();
-  initializeTerminal();
+  document.getElementById('username').textContent = getStoredUsername();
+  alert('Configuration saved successfully!');
 }

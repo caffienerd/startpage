@@ -1,20 +1,57 @@
 // ========================================
 // Spell Check Modal
 // ========================================
-let spellSuggestions  = [];
-let spellSelectedIndex = 0;
+const spellState = {
+  suggestions: [],
+  selectedIndex: 0,
+  abortController: null
+};
+
+// Keyboard nav 
+const handleSpellKeydown = (e) => {
+  const modal = document.getElementById('spell-modal');
+  if (!modal?.classList.contains('active')) return;
+
+  if (['ArrowDown', 'ArrowUp', 'Enter'].includes(e.key)) {
+    e.preventDefault();
+    e.stopImmediatePropagation();
+  }
+  if (!spellState.suggestions.length) return;
+
+  if (e.key === 'ArrowDown') {
+    spellState.selectedIndex = (spellState.selectedIndex + 1) % spellState.suggestions.length;
+    renderSpellSuggestions();
+  } else if (e.key === 'ArrowUp') {
+    spellState.selectedIndex = (spellState.selectedIndex - 1 + spellState.suggestions.length) % spellState.suggestions.length;
+    renderSpellSuggestions();
+  } else if (e.key === 'Enter') {
+    copySpellSuggestion();
+  }
+};
+
+let spellTypingTimeout = null;
 
 function openSpellModal(query) {
-  spellSuggestions   = [];
-  spellSelectedIndex = 0;
+  spellState.suggestions = [];
+  spellState.selectedIndex = 0;
+  if (spellState.abortController) {
+    spellState.abortController.abort();
+  }
+  spellState.abortController = new AbortController();
 
-  document.getElementById('spell-query-word').textContent    = query;
-  document.getElementById('spell-result-area').innerHTML     = '<span class="spell-unknown">checking...</span>';
-  document.getElementById('spell-hint').textContent          = '';
+  document.getElementById('spell-query-word').textContent = query;
+  document.getElementById('spell-result-area').innerHTML = '<span class="spell-unknown">checking...</span>';
+  document.getElementById('spell-hint').textContent = '';
   document.getElementById('spell-modal').classList.add('active');
 
+  document.addEventListener('keydown', handleSpellKeydown, true);
+
   const words = query.trim().split(/\s+/);
-  words.length === 1 ? checkSingleWord(words[0]) : checkMultipleWords(words);
+
+  clearTimeout(spellTypingTimeout);
+  spellTypingTimeout = setTimeout(() => {
+    words.length === 1 ? checkSingleWord(words[0]) : checkMultipleWords(words);
+  }, 300); // basic debounce
 }
 
 function handleSpellCheck(query) {
@@ -23,9 +60,12 @@ function handleSpellCheck(query) {
 
 // ---- Single word ----
 function checkSingleWord(word) {
-  fetch(`https://api.datamuse.com/words?sp=${encodeURIComponent(word)}&max=5`)
+  const timeoutId = setTimeout(() => { if (spellState.abortController) spellState.abortController.abort(); }, 5000);
+
+  fetch(`https://api.datamuse.com/words?sp=${encodeURIComponent(word)}&max=5`, { signal: spellState.abortController.signal })
     .then(r => r.json())
     .then(results => {
+      clearTimeout(timeoutId);
       const area = document.getElementById('spell-result-area');
       const hint = document.getElementById('spell-hint');
       if (!area) return;
@@ -37,17 +77,18 @@ function checkSingleWord(word) {
 
       const isCorrect = results[0].word.toLowerCase() === word.toLowerCase();
       if (isCorrect) {
-        area.innerHTML   = '<span class="spell-correct">✓ Looks correct!</span>';
+        area.innerHTML = '<span class="spell-correct">✓ Looks correct!</span>';
         hint.textContent = '';
         return;
       }
 
-      spellSuggestions   = results.map(r => r.word);
-      spellSelectedIndex = 0;
+      spellState.suggestions = results.map(r => r.word);
+      spellState.selectedIndex = 0;
       renderSpellSuggestions();
       hint.textContent = '↑ ↓ navigate  ·  Enter to copy  ·  Esc to close';
     })
-    .catch(() => {
+    .catch((err) => {
+      if (err.name === 'AbortError') return;
       const area = document.getElementById('spell-result-area');
       if (area) area.innerHTML = '<span class="spell-unknown">offline or error</span>';
     });
@@ -58,25 +99,28 @@ function checkMultipleWords(words) {
   const area = document.getElementById('spell-result-area');
   const hint = document.getElementById('spell-hint');
 
+  const timeoutId = setTimeout(() => { if (spellState.abortController) spellState.abortController.abort(); }, 5000);
+
   Promise.all(
     words.map(word => {
-      const clean = word.replace(/^[^a-zA-Z]+|[^a-zA-Z]+$/g, '');
+      const clean = word.replace(/^[^a-zA-Z']+|[^a-zA-Z']+$/g, '');
       if (!clean) return Promise.resolve({ word, clean, correct: true, suggestion: null });
 
-      return fetch(`https://api.datamuse.com/words?sp=${encodeURIComponent(clean)}&max=5`)
+      return fetch(`https://api.datamuse.com/words?sp=${encodeURIComponent(clean)}&max=5`, { signal: spellState.abortController.signal })
         .then(r => r.json())
         .then(results => {
-          const exactMatch    = results.some(r => r.word.toLowerCase() === clean.toLowerCase());
+          const exactMatch = results.some(r => r.word.toLowerCase() === clean.toLowerCase());
           const topSuggestion = results[0]?.word ?? null;
           return { word, clean, correct: exactMatch, suggestion: exactMatch ? null : topSuggestion };
         })
         .catch(() => ({ word, clean, correct: false, suggestion: null }));
     })
   ).then(wordResults => {
+    clearTimeout(timeoutId);
     if (!area) return;
 
     if (wordResults.every(r => r.correct)) {
-      area.innerHTML   = '<span class="spell-correct">✓ All words look correct!</span>';
+      area.innerHTML = '<span class="spell-correct">✓ All words look correct!</span>';
       hint.textContent = '';
       return;
     }
@@ -114,16 +158,20 @@ function renderSpellSuggestions() {
   const area = document.getElementById('spell-result-area');
   if (!area) return;
 
-  area.innerHTML = spellSuggestions.map((word, i) => `
-    <div class="spell-suggestion-item ${i === spellSelectedIndex ? 'spell-selected' : ''}" data-index="${i}">
-      <span class="spell-index">${i === spellSelectedIndex ? '▶' : ' '}</span>
+  area.setAttribute('role', 'listbox');
+  area.innerHTML = spellState.suggestions.map((word, i) => `
+    <div class="spell-suggestion-item ${i === spellState.selectedIndex ? 'spell-selected' : ''}" 
+         role="option" 
+         aria-selected="${i === spellState.selectedIndex}" 
+         data-index="${i}">
+      <span class="spell-index">${i === spellState.selectedIndex ? '▶' : ' '}</span>
       <span class="spell-word">${word}</span>
       ${i === 0 ? '<span class="spell-badge">best match</span>' : ''}
     </div>`).join('');
 
   area.querySelectorAll('.spell-suggestion-item').forEach(el => {
     el.addEventListener('click', () => {
-      spellSelectedIndex = parseInt(el.dataset.index);
+      spellState.selectedIndex = parseInt(el.dataset.index);
       copySpellSuggestion();
     });
   });
@@ -131,39 +179,39 @@ function renderSpellSuggestions() {
 
 // ---- Clipboard ----
 function copyToClipboard(text) {
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).catch(err => {
+      console.error('Clipboard API failed', err);
+      fallbackCopyTextToClipboard(text);
+    });
+  } else {
+    fallbackCopyTextToClipboard(text);
+  }
+}
+
+function fallbackCopyTextToClipboard(text) {
   const ta = document.createElement('textarea');
   ta.value = text;
   ta.style.cssText = 'position:fixed;opacity:0';
   document.body.appendChild(ta);
   ta.focus(); ta.select();
-  document.execCommand('copy');
+  try { document.execCommand('copy'); } catch (e) { }
   document.body.removeChild(ta);
 }
 
 function copySpellSuggestion() {
-  const word = spellSuggestions[spellSelectedIndex];
+  const word = spellState.suggestions[spellState.selectedIndex];
   if (word) { copyToClipboard(word); closeSpellModal(); }
 }
 
 function closeSpellModal() {
   document.getElementById('spell-modal').classList.remove('active');
-  spellSuggestions   = [];
-  spellSelectedIndex = 0;
+  spellState.suggestions = [];
+  spellState.selectedIndex = 0;
+  if (spellState.abortController) {
+    spellState.abortController.abort();
+    spellState.abortController = null;
+  }
+  document.removeEventListener('keydown', handleSpellKeydown, true);
   document.getElementById('terminal-input').focus();
 }
-
-// Keyboard nav ? capture phase so Enter doesn't also fire search
-document.addEventListener('keydown', (e) => {
-  const modal = document.getElementById('spell-modal');
-  if (!modal?.classList.contains('active')) return;
-
-  if (['ArrowDown','ArrowUp','Enter'].includes(e.key)) {
-    e.preventDefault();
-    e.stopImmediatePropagation();
-  }
-  if (!spellSuggestions.length) return;
-
-  if (e.key === 'ArrowDown')  spellSelectedIndex = (spellSelectedIndex + 1) % spellSuggestions.length, renderSpellSuggestions();
-  else if (e.key === 'ArrowUp') spellSelectedIndex = (spellSelectedIndex - 1 + spellSuggestions.length) % spellSuggestions.length, renderSpellSuggestions();
-  else if (e.key === 'Enter') copySpellSuggestion();
-}, true);

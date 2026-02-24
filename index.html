@@ -10,6 +10,11 @@
     if (initialTheme === 'black') document.documentElement.classList.add('black-mode');
   </script>
   <meta name="viewport" content="width=device-width" />
+  <meta name="description" content="A minimal, keyboard-centric start page with dynamic themes and AI routing." />
+  <meta property="og:title" content="Start Page" />
+  <meta property="og:description" content="A minimal, keyboard-centric start page." />
+  <meta name="theme-color" content="#ffffff" id="meta-theme-color" />
+  <link rel="icon" type="image/png" href="icon/favicon.png">
   <title>Start Page</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -18,11 +23,23 @@
   <link
     href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap"
     rel="stylesheet" />
+  <link
+    href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
+    rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 
 </head>
 
 <body>
+  <noscript>
+    <div
+      style="position: fixed; top: 0; left: 0; width: 100%; padding: 20px; background: #e74c3c; color: white; text-align: center; z-index: 9999;">
+      This start page requires JavaScript to function. Please enable JavaScript in your browser settings.
+    </div>
+  </noscript>
+  <div id="theme-overlay-scanlines" class="theme-overlay"></div>
+  <div id="theme-overlay-texture" class="theme-overlay"></div>
+
   <div class="content">
     <!-- Time and Weather Info -->
     <div class="info-section">
@@ -43,51 +60,57 @@
       <p><span id="username">user</span>@<span id="browser-info">browser</span><span>$</span></p>
       <div class="terminal-input-wrapper">
         <div class="command-hint" id="command-hint"></div>
-        <input id="terminal-input" type="text" autocomplete="off" />
+        <input id="terminal-input" type="text" autocomplete="off" aria-label="Terminal Input" />
       </div>
       <div class="ai-route-badge" id="ai-route-badge" aria-live="polite"></div>
     </section>
   </div>
 
   <!-- Config Modal -->
-  <div class="config-modal" id="config-modal">
+  <div class="config-modal" id="config-modal" lang="en" role="dialog" aria-labelledby="config-modal-title">
     <div class="config-content">
-      <h2>Configuration</h2>
+      <h2 id="config-modal-title">Configuration</h2>
 
       <div class="config-section">
         <h3>Username</h3>
-        <input type="text" id="config-username" placeholder="e.g., coffeenerd" />
+        <input type="text" id="config-username" />
       </div>
 
       <div class="config-section">
-        <button class="btn-save" style="width: 100%; height: 44px; margin-top: 10px; background: #667eea; color: white;"
-          onclick="openBookmarksModal()">Edit Bookmarks</button>
+        <button class="btn-save btn-edit-bookmarks" onclick="openBookmarksModal()">Edit Bookmarks</button>
       </div>
 
       <div class="config-section">
         <h3>Weather Location</h3>
-        <input type="text" id="weather-location" placeholder="e.g., London, Tokyo, New York" />
+        <input type="text" id="weather-location" />
+      </div>
+
+      <div class="config-section">
+        <h3>Weather Unit</h3>
+        <select id="weather-unit">
+          <option value="celsius">Celsius (°C)</option>
+          <option value="fahrenheit">Fahrenheit (°F)</option>
+        </select>
       </div>
 
       <div class="config-section">
         <h3>Time Zone</h3>
-        <input type="text" id="time-zone" placeholder="e.g., America/New_York, Europe/London, Asia/Tokyo" />
+        <input type="text" id="time-zone" />
       </div>
 
       <div class="config-section">
         <h3>Gemini API Key</h3>
-        <input type="password" id="gemini-api-key" placeholder="AIza..." autocomplete="off" />
+        <input type="password" id="gemini-api-key" autocomplete="off" />
       </div>
 
       <div class="config-section">
         <h3>Gemini Model</h3>
-        <input type="text" id="gemini-model" placeholder="e.g., gemini-2.5-flash-lite (free)" />
+        <input type="text" id="gemini-model" />
       </div>
 
       <div class="config-section">
         <h3>Gemini System Prompt</h3>
-        <textarea id="gemini-system-prompt"
-          placeholder="Optional. Example: You are a concise assistant. Reply in bullet points."></textarea>
+        <textarea id="gemini-system-prompt"></textarea>
       </div>
 
       <div class="config-section">
@@ -115,9 +138,9 @@
   </div>
 
   <!-- Help Modal -->
-  <div class="config-modal" id="help-modal">
+  <div class="config-modal" id="help-modal" lang="en" role="dialog" aria-labelledby="help-modal-title">
     <div class="config-content help-content">
-      <h2>Available Commands</h2>
+      <h2 id="help-modal-title">Available Commands</h2>
 
       <div class="help-section">
         <h3>System</h3>
@@ -192,9 +215,9 @@
   </div>
 
   <!-- IP Info Modal -->
-  <div class="config-modal" id="ip-modal">
+  <div class="config-modal" id="ip-modal" lang="en" role="dialog" aria-labelledby="ip-modal-title">
     <div class="config-content ip-content">
-      <h2>Network Information</h2>
+      <h2 id="ip-modal-title">Network Information</h2>
 
       <div class="ip-grid">
         <div class="ip-item">
@@ -255,9 +278,9 @@
   </div>
 
   <!-- Network Speed Test Modal -->
-  <div class="config-modal" id="speed-modal">
+  <div class="config-modal" id="speed-modal" lang="en" role="dialog" aria-labelledby="speed-modal-title">
     <div class="config-content speed-content">
-      <h2>Network Speed Test</h2>
+      <h2 id="speed-modal-title">Network Speed Test</h2>
 
       <div class="speed-main">
         <div class="speed-display">
@@ -291,9 +314,9 @@
   </div>
 
   <!-- Spell Check Modal -->
-  <div class="config-modal" id="spell-modal">
+  <div class="config-modal" id="spell-modal" lang="en" role="dialog" aria-labelledby="spell-modal-title">
     <div class="config-content spell-check-content">
-      <h2>Spell Check</h2>
+      <h2 id="spell-modal-title">Spell Check</h2>
       <div class="spell-query-display">spell: <span id="spell-query-word"></span></div>
       <div id="spell-result-area" class="spell-result-area">checking...</div>
       <div class="spell-hint" id="spell-hint"></div>
@@ -304,10 +327,10 @@
   </div>
 
   <!-- Bookmarks Modal -->
-  <div class="config-modal" id="bookmarks-modal">
+  <div class="config-modal" id="bookmarks-modal" lang="en" role="dialog" aria-labelledby="bookmarks-modal-title">
     <div class="config-content" style="max-width: 900px;">
       <div class="config-header-row">
-        <h2>Manage Bookmarks</h2>
+        <h2 id="bookmarks-modal-title">Manage Bookmarks</h2>
         <button class="btn-toggle-editor" id="toggle-editor-btn" onclick="toggleEditorMode()">Edit as JSON</button>
       </div>
 
@@ -330,9 +353,9 @@
   </div>
 
   <!-- Gemini Modal -->
-  <div class="config-modal" id="gemini-modal">
+  <div class="config-modal" id="gemini-modal" lang="en" role="dialog" aria-labelledby="gemini-modal-title">
     <div class="config-content gemini-content">
-      <h2>Gemini Response</h2>
+      <h2 id="gemini-modal-title">Gemini Response</h2>
       <div class="gemini-meta-row">
         <div class="spell-query-display">prompt: <span id="gemini-query-text"></span></div>
         <div class="gemini-model-badge" id="gemini-model-badge">model</div>
@@ -349,6 +372,7 @@
 
   <script src="version/version.js"></script>
   <!-- load order matters: storage ? utils ? ui ? modals ? terminal ? commands ? main -->
+  <script src="script/utils.js"></script>
   <script src="script/storage.js"></script>
   <script src="script/time-weather.js"></script>
   <script src="script/bookmarks.js"></script>

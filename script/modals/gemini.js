@@ -1,17 +1,38 @@
 // ========================================
 // Gemini Modal + API
 // ========================================
+let geminiAbortController = null;
+
+const handleGeminiCopyShortcut = (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
+    e.preventDefault();
+    copyGeminiResponse();
+  }
+};
+
 function openGeminiModal() {
   document.getElementById('gemini-modal').classList.add('active');
+  document.addEventListener('keydown', handleGeminiCopyShortcut);
 }
 
 function closeGeminiModal() {
   document.getElementById('gemini-modal').classList.remove('active');
+  document.removeEventListener('keydown', handleGeminiCopyShortcut);
+
+  if (geminiAbortController) {
+    geminiAbortController.abort();
+    geminiAbortController = null;
+  }
 }
 
 async function handleGeminiPrompt(prompt) {
+  if (window.location.protocol === 'file:') {
+    alert('Gemini API requires HTTPS or localhost HTTP. Please host this page on a local web server (e.g., using `python3 -m http.server`) for Gemini execution privileges to bypass CORS restrictions.');
+    return;
+  }
+
   const apiKey = normalizeGeminiApiKey(getStoredGeminiApiKey());
-  const primaryModel = getStoredGeminiModel() || DEFAULT_GEMINI_MODEL;
+  const primaryModel = getStoredGeminiModel() || (typeof DEFAULT_GEMINI_MODEL !== 'undefined' ? DEFAULT_GEMINI_MODEL : '');
   const systemPrompt = getStoredGeminiSystemPrompt();
   const responseArea = document.getElementById('gemini-response-area');
   const queryText = document.getElementById('gemini-query-text');
@@ -40,18 +61,26 @@ async function handleGeminiPrompt(prompt) {
   }
 
   try {
-    const modelsToTry = [primaryModel, DEFAULT_GEMINI_MODEL, 'gemini-2.0-flash-lite', 'gemini-2.0-flash']
-      .filter((m, i, arr) => !!m && arr.indexOf(m) === i);
+    const defaultModel = typeof DEFAULT_GEMINI_MODEL !== 'undefined' ? DEFAULT_GEMINI_MODEL : '';
+    const modelsToTry = [...new Set([primaryModel, defaultModel, 'gemini-2.0-flash-lite', 'gemini-2.0-flash'].filter(Boolean))];
 
     let data = null;
     let usedModel = '';
     let lastErr = '';
 
+    geminiAbortController = new AbortController();
+
     for (const model of modelsToTry) {
-      const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent?key=${encodeURIComponent(apiKey)}`;
+      if (geminiAbortController.signal.aborted) throw new Error('Request aborted by user closure.');
+
+      const url = `https://generativelanguage.googleapis.com/v1beta/models/${encodeURIComponent(model)}:generateContent`;
       const res = await fetch(url, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        signal: geminiAbortController.signal,
+        headers: {
+          'Content-Type': 'application/json',
+          'x-goog-api-key': apiKey
+        },
         body: JSON.stringify({
           ...(systemPrompt ? {
             systemInstruction: {
@@ -94,11 +123,13 @@ async function handleGeminiPrompt(prompt) {
     modelBadge.textContent = usedModel || primaryModel;
     responseArea.textContent = text || 'No text response returned.';
   } catch (err) {
-    statusText.textContent = 'Network error';
-    responseArea.textContent = `Request failed: ${err?.message || 'Unknown error.'}
+    if (err.name === 'AbortError') return; // Expected upon closing modal mid-request
 
-If you are on file:// and this keeps failing, check browser privacy/shield settings blocking cross-origin requests.`;
+    statusText.textContent = 'Network error';
+    responseArea.textContent = `Request failed: ${err?.message || 'Unknown error.'}`;
     responseArea.classList.add('gemini-error');
+  } finally {
+    geminiAbortController = null;
   }
 }
 
@@ -114,10 +145,4 @@ function copyGeminiResponse() {
   });
 }
 
-document.addEventListener('keydown', (e) => {
-  const isGeminiOpen = document.getElementById('gemini-modal')?.classList.contains('active');
-  if (isGeminiOpen && (e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'c') {
-    e.preventDefault();
-    copyGeminiResponse();
-  }
-});
+

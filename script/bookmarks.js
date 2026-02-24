@@ -25,16 +25,9 @@ function getFaviconFallbacks(url) {
   }
 }
 
-function faviconError(img) {
-  const fallbacks = JSON.parse(decodeURIComponent(img.dataset.fallbacks || '%5B%5D'));
-  const idx = parseInt(img.dataset.fallbackIdx || '0');
-  if (idx < fallbacks.length) {
-    img.dataset.fallbackIdx = idx + 1;
-    img.src = fallbacks[idx];
-  } else {
-    img.style.display = 'none';
-  }
-}
+
+
+const ITEMS_PER_SECTION = 5;
 
 // ========================================
 // Generate bookmark grid
@@ -44,26 +37,39 @@ function generateBookmarks() {
   container.innerHTML = '';
 
   const bookmarks = getStoredBookmarks();
-  const itemsPerSection = 5;
-  const numSections = Math.ceil(bookmarks.length / itemsPerSection);
+  const numSections = Math.ceil(bookmarks.length / ITEMS_PER_SECTION);
 
   for (let i = 0; i < numSections; i++) {
     const section = document.createElement('div');
     section.className = 'bookmark-section';
     const ul = document.createElement('ul');
 
-    const slice = bookmarks.slice(i * itemsPerSection, (i + 1) * itemsPerSection);
+    const slice = bookmarks.slice(i * ITEMS_PER_SECTION, (i + 1) * ITEMS_PER_SECTION);
     slice.forEach(bookmark => {
+      if (!bookmark.href || !bookmark.title) return;
+
       const li = document.createElement('li');
       const fallbacks = getFaviconFallbacks(bookmark.href);
       const faviconUrl = fallbacks[0] || '';
-      const li_id = `bm-${Math.random().toString(36).slice(2, 7)}`;
+
       li.innerHTML = `
-        <a href="${bookmark.href}">
-          <img src="${faviconUrl}" alt="${bookmark.title}" data-fallbacks="${encodeURIComponent(JSON.stringify(fallbacks.slice(1)))}" data-fallback-idx="0"
-               onerror="faviconError(this)">
+        <a href="${bookmark.href}" class="bookmark-link">
+          <img alt="${bookmark.title}" class="bookmark-icon">
           <span>${bookmark.title}</span>
         </a>`;
+
+      const img = li.querySelector('img');
+      img._fallbacks = fallbacks.slice(1);
+      img._fallbackIdx = 0;
+      img.addEventListener('error', function () {
+        if (this._fallbackIdx < this._fallbacks.length) {
+          this.src = this._fallbacks[this._fallbackIdx++];
+        } else {
+          this.style.display = 'none';
+        }
+      });
+      img.src = faviconUrl;
+
       ul.appendChild(li);
     });
 
