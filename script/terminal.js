@@ -281,13 +281,25 @@ function handleKeyboardEvents(input, elements) {
       return;
     }
 
-    // Ctrl+C clears
-    if (e.ctrlKey && e.key === "c") {
+    // Ctrl+Enter opens result in a new background tab (excluding theme/config commands)
+    if (e.ctrlKey && !e.shiftKey && e.key === "Enter") {
       e.preventDefault();
-      input.value = "";
-      resetStyles(elements);
-      updateSyntaxHighlight("");
-      hideAiRouteBadge();
+      const rawValue = input.value;
+      const bookmarkMatch = findFirstBookmarkMatch(elements, rawValue);
+      if (bookmarkMatch) {
+        window.open(bookmarkMatch.href, "_blank");
+      }
+      return;
+    }
+    // Ctrl+Shift+Enter opens result in a new tab and focuses it
+    if (e.ctrlKey && e.shiftKey && e.key === "Enter") {
+      e.preventDefault();
+      const rawValue = input.value;
+      const bookmarkMatch = findFirstBookmarkMatch(elements, rawValue);
+      if (bookmarkMatch) {
+        const newWin = window.open(bookmarkMatch.href, "_blank");
+        if (newWin) newWin.focus();
+      }
       return;
     }
 
