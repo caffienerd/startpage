@@ -69,12 +69,14 @@ function renderGridEditor(bookmarks) {
             titleInput.className = 'bm-title-input';
             titleInput.placeholder = 'Title';
             titleInput.value = bm.title || '';
+            titleInput.spellcheck = false;
 
             const urlInput = document.createElement('input');
             urlInput.type = 'text';
             urlInput.className = 'bm-url-input';
             urlInput.placeholder = 'https://...';
             urlInput.value = bm.href || '';
+            urlInput.spellcheck = false;
 
             cell.appendChild(titleInput);
             cell.appendChild(urlInput);

@@ -69,6 +69,7 @@ function updateSyntaxHighlight(value) {
     'ai': 'ai:',
     'sp': 'spell:',
     ':c': ':config',
+    ':cu': ':customize',
     ':d': ':dark',
     ':b': ':black',
     ':am': ':amoled',
@@ -91,7 +92,7 @@ function updateSyntaxHighlight(value) {
   };
 
   const themeCommands = [':dark', ':black', ':amoled', ':light', ':nord', ':newspaper', ':coffee', ':root', ':neon'];
-  const knownCommands = [':help', ':help_ai_router', ':aimode', ':bookmarks', ':bm', ':ipconfig', ':ip', ':netspeed', ':speed', ':config', ':weather', ':time', ':gemini', ':hacker', ':cyberpunk', ...themeCommands];
+  const knownCommands = [':help', ':help_ai_router', ':aimode', ':bookmarks', ':bm', ':ipconfig', ':ip', ':netspeed', ':speed', ':config', ':customize', ':custom', ':weather', ':time', ':gemini', ':hacker', ':cyberpunk', ...themeCommands];
   const versionCommands = [':version', ':ver'];
   const knownSearch = /^(r|yt|alt|def|ddg|imdb|the|syn|quote|maps|cws|amazon|ggl|bing|spell|gem|gemini|ai):/;
 

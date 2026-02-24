@@ -35,6 +35,42 @@ const DEFAULT_AI_ROUTE_BADGE_MODE = "live";
 const DEFAULT_SEARCH_ENGINE = "google"; // "google" | "ddg" | "bing"
 
 // ========================================
+// Syntax Colors — universal, theme-independent
+// ========================================
+const DEFAULT_SYNTAX_COLORS = {
+  cmd:     '#667eea', // :commands
+  theme:   '#f6ad55', // :theme commands
+  search:  '#f39c12', // search prefixes (yt:, maps:, etc.)
+  version: '#00b894', // :version
+  url:     '#5fafaf', // direct URLs (chess.com)
+  unknown: '#e74c3c', // unrecognised :commands
+};
+
+function getStoredSyntaxColors() {
+  try {
+    const stored = localStorage.getItem('syntaxColors');
+    if (!stored) return { ...DEFAULT_SYNTAX_COLORS };
+    return { ...DEFAULT_SYNTAX_COLORS, ...JSON.parse(stored) };
+  } catch (e) {
+    return { ...DEFAULT_SYNTAX_COLORS };
+  }
+}
+function saveSyntaxColors(colors) {
+  try {
+    localStorage.setItem('syntaxColors', JSON.stringify(colors));
+  } catch (e) { console.error('Failed to save syntax colors:', e); }
+}
+function applySyntaxColors(colors) {
+  const root = document.documentElement;
+  root.style.setProperty('--syn-cmd',     colors.cmd     || DEFAULT_SYNTAX_COLORS.cmd);
+  root.style.setProperty('--syn-theme',   colors.theme   || DEFAULT_SYNTAX_COLORS.theme);
+  root.style.setProperty('--syn-search',  colors.search  || DEFAULT_SYNTAX_COLORS.search);
+  root.style.setProperty('--syn-version', colors.version || DEFAULT_SYNTAX_COLORS.version);
+  root.style.setProperty('--syn-url',     colors.url     || DEFAULT_SYNTAX_COLORS.url);
+  root.style.setProperty('--syn-unknown', colors.unknown || DEFAULT_SYNTAX_COLORS.unknown);
+}
+
+// ========================================
 // Bookmarks
 // ========================================
 function getStoredBookmarks() {

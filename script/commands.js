@@ -57,6 +57,7 @@ function handleSpecialCommands(value) {
   if (normalized === ":netspeed" || normalized === ":speed") { openSpeedTest(); clear(); return; }
   if (normalized === ":gemini") { window.location.href = "https://gemini.google.com/app"; return; }
   if (normalized === ":bookmarks" || normalized === ":bm") { openBookmarksModal(); clear(); return; }
+  if (normalized === ":customize" || normalized === ":custom") { openCustomizeModal(); clear(); return; }
   if (normalized === ":config" || normalized === ":weather" || normalized === ":time") { openConfig(); clear(); return; }
 
   // ---- Theme ----

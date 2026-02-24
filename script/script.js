@@ -38,6 +38,7 @@ const WEATHER_UPDATE_INTERVAL = 30 * 60 * 1000;
 document.addEventListener("DOMContentLoaded", () => {
   initPlaceholders();
   loadTheme();
+  applySyntaxColors(getStoredSyntaxColors());
   try { generateBookmarks(); } catch (e) { console.error('Bookmarks init error:', e); }
   initializeTerminal();
   updateTime();
@@ -54,6 +55,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ['speed-modal', closeSpeedTest],
     ['spell-modal', closeSpellModal],
     ['gemini-modal', closeGeminiModal],
+    ['customize-modal', closeCustomizeModal],
   ].forEach(([id, fn]) => {
     if (typeof fn === 'function') {
       const el = document.getElementById(id);
@@ -81,6 +83,7 @@ document.addEventListener('keydown', (e) => {
     if (typeof closeSpellModal === 'function') closeSpellModal();
     if (typeof closeGeminiModal === 'function') closeGeminiModal();
     if (typeof closeBookmarksModal === 'function') closeBookmarksModal();
+    if (typeof closeCustomizeModal === 'function') closeCustomizeModal();
     return;
   }
 
@@ -117,4 +120,3 @@ document.addEventListener('keydown', (e) => {
     }
   }
 });
-
