@@ -52,6 +52,7 @@ function updateSyntaxHighlight(value) {
     'r': 'r:',
     'y': 'yt:',
     'a': 'alt:',
+    'am': 'amazon:',
     'd': 'def:',
     'dd': 'ddg:',
     'i': 'imdb:',
@@ -61,10 +62,13 @@ function updateSyntaxHighlight(value) {
     'm': 'maps:',
     'c': 'cws:',
     'g': 'gem:',
+    'gg': 'ggl:',
     'ge': 'gemini:',
+    'bi': 'bing:',
     'ai': 'ai:',
     'sp': 'spell:',
     ':c': ':config',
+    ':cu': ':customize',
     ':d': ':dark',
     ':b': ':black',
     ':am': ':amoled',
@@ -87,9 +91,9 @@ function updateSyntaxHighlight(value) {
   };
 
   const themeCommands = [':dark', ':black', ':amoled', ':light', ':nord', ':newspaper', ':coffee', ':root', ':neon'];
-  const knownCommands = [':help', ':help_ai_router', ':aimode', ':bookmarks', ':bm', ':ipconfig', ':ip', ':netspeed', ':speed', ':config', ':weather', ':time', ':gemini', ':hacker', ':cyberpunk', ...themeCommands];
+  const knownCommands = [':help', ':help_ai_router', ':aimode', ':bookmarks', ':bm', ':ipconfig', ':ip', ':netspeed', ':speed', ':config', ':customize', ':custom', ':weather', ':time', ':gemini', ':hacker', ':cyberpunk', ...themeCommands];
   const versionCommands = [':version', ':ver'];
-  const knownSearch = /^(r|yt|alt|def|ddg|imdb|the|syn|quote|maps|cws|spell|gem|gemini|ai):/;
+  const knownSearch = /^(r|yt|alt|def|ddg|ggl|bing|amazon|imdb|the|syn|quote|maps|cws|spell|gem|gemini|ai):/;
 
   // Check for a matching autocomplete suggestion
   for (const [prefix, full] of Object.entries(suggestions)) {
