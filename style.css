@@ -309,7 +309,6 @@ html.newspaper-mode .bookmark-section {
 
 .bookmark-section:hover {
   background: var(--card-background);
-  border-color: var(--text-color);
   opacity: 0.95;
 }
 
@@ -1150,25 +1149,18 @@ ul li a span {
 
 /* Bookmark Matching Styles */
 .bookmark-match {
-  background: rgba(255, 255, 255, 0.15) !important;
+  background: rgba(255, 255, 255, 0.08) !important;
 }
 
 .primary-match {
-  background: var(--card-background) !important;
-  border: 2px solid var(--text-color) !important;
-  transform: translateX(8px) scale(1.03) !important;
-  box-shadow: 0 10px 30px var(--shadow-color) !important;
+  background: rgba(255, 255, 255, 0.22) !important;
+  transform: translateX(5px) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), 0 0 12px rgba(255, 255, 255, 0.08) !important;
   z-index: 20;
-  outline: 2px solid rgba(255, 255, 255, 0.1);
-  outline-offset: -4px;
 }
 
 .primary-match span {
-  font-weight: 700 !important;
-}
-
-.primary-match img {
-  filter: brightness(1.1) saturate(1.1);
+  font-weight: 600 !important;
 }
 
 .bookmark-nomatch {
