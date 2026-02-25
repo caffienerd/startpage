@@ -10,13 +10,14 @@ A sleek, fast, and feature-rich browser start page driven by an interactive term
 
 ## Demo
 
-<video src="videos/demo.mp4" width="100%" controls muted autoplay loop>
+<video src="https://github.com/user-attachments/assets/00b84648-b7f3-46f2-a4ea-d0494217559c" width="100%" muted autoplay loop controls>
 </video>
 
 ---
+
 ## Themes
 
-<video src="videos/themes.mp4" width="100%" controls muted autoplay loop>
+<video src="https://github.com/user-attachments/assets/b2a2c9b2-5a87-40fc-b0e8-1ed5b7170b7f" width="100%" muted autoplay loop controls>
 </video>
 
 ---
