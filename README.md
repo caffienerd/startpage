@@ -10,12 +10,14 @@ A sleek, fast, and feature-rich browser start page driven by an interactive term
 
 ## Demo
 
-![Start Page Demo](videos/demo.mp4)
-https://github.com/caffienerd/startpage/blob/master/videos/demo.mp4
+<video src="videos/demo.mp4" width="100%" controls muted autoplay loop>
+</video>
 
+---
+## Themes
 
-![Start Page Demo](videos/themes.mp4)
-https://github.com/caffienerd/startpage/blob/master/videos/themes.mp4
+<video src="videos/themes.mp4" width="100%" controls muted autoplay loop>
+</video>
 
 ---
 
