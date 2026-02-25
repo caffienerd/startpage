@@ -737,6 +737,25 @@ ul li a span {
   gap: 12px;
   justify-content: flex-end;
   margin-top: 28px;
+  align-items: center;
+}
+
+.btn-customize-link {
+  margin-right: auto;
+  background: none;
+  border: none;
+  padding: 0;
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--color-error);
+  cursor: pointer;
+  opacity: 0.75;
+  font-family: var(--font-family);
+  transition: opacity 0.15s;
+}
+
+.btn-customize-link:hover {
+  opacity: 1;
 }
 
 .config-buttons button {
