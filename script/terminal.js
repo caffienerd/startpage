@@ -285,29 +285,16 @@ function handleKeyboardEvents(input, elements) {
     if ((e.ctrlKey || e.altKey) && !e.shiftKey && e.key === "Enter") {
       e.preventDefault();
       e.stopPropagation();
-      const rawValue = input.value;
-      const bookmarkMatch = findFirstBookmarkMatch(elements, rawValue);
-      if (bookmarkMatch) {
-        const a = document.createElement('a');
-        a.href = bookmarkMatch.href;
-        a.target = '_blank';
-        a.rel = 'noopener';
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-      }
+      const url = resolveUrl(input.value, elements);
+      if (url) openInNewTab(url, false);
       return;
     }
     // Ctrl+Shift+Enter or Alt+Shift+Enter — open in new focused tab
     if ((e.ctrlKey || e.altKey) && e.shiftKey && e.key === "Enter") {
       e.preventDefault();
       e.stopPropagation();
-      const rawValue = input.value;
-      const bookmarkMatch = findFirstBookmarkMatch(elements, rawValue);
-      if (bookmarkMatch) {
-        const newWin = window.open(bookmarkMatch.href, '_blank');
-        if (newWin) newWin.focus();
-      }
+      const url = resolveUrl(input.value, elements);
+      if (url) openInNewTab(url, true);
       return;
     }
 
@@ -325,6 +312,68 @@ function handleKeyboardEvents(input, elements) {
       historyIndex = history.length;
     }
   });
+}
+
+// ---- Resolve what URL the current input would navigate to ----
+function resolveUrl(rawValue, elements) {
+  const value = rawValue.trim().toLowerCase();
+  if (!value) return null;
+
+  // Skip pure commands (:config, :dark, etc.) — nothing to open in a tab
+  const isCommand = value.startsWith(':') && !value.match(/^:(gemini)$/);
+  if (isCommand) return null;
+
+  // Bookmark match takes priority
+  const bookmarkMatch = findFirstBookmarkMatch(elements, rawValue);
+  if (bookmarkMatch) return bookmarkMatch.href;
+
+  // Search prefixes — mirror commands.js logic but return URL instead of navigating
+  const enc = (str) => encodeURIComponent(str);
+  const strip = (prefix) => rawValue.replace(new RegExp(`^${prefix}`, 'i'), '').trim();
+
+  if (/^yt:/i.test(value))     return `https://www.youtube.com/results?search_query=${enc(strip('yt:'))}`;
+  if (/^r:/i.test(value))      return `https://google.com/search?q=site:reddit.com ${enc(strip('r:'))}`;
+  if (/^ddg:/i.test(value))    return `https://duckduckgo.com/?q=${enc(strip('ddg:'))}`;
+  if (/^bing:/i.test(value))   return `https://www.bing.com/search?q=${enc(strip('bing:'))}`;
+  if (/^ggl:/i.test(value))    return `https://www.google.com/search?q=${enc(strip('ggl:'))}`;
+  if (/^amazon:/i.test(value)) return `https://www.amazon.com/s?k=${enc(strip('amazon:'))}`;
+  if (/^imdb:/i.test(value))   return `https://www.imdb.com/find?q=${enc(strip('imdb:'))}`;
+  if (/^alt:/i.test(value))    return `https://alternativeto.net/browse/search/?q=${enc(strip('alt:'))}`;
+  if (/^def:/i.test(value))    return `https://onelook.com/?w=${enc(strip('def:'))}`;
+  if (/^the:/i.test(value))    return `https://onelook.com/thesaurus/?s=${enc(strip('the:'))}`;
+  if (/^syn:/i.test(value))    return `https://onelook.com/?related=1&w=${enc(strip('syn:'))}`;
+  if (/^quote:/i.test(value))  return `https://onelook.com/?mentions=1&w=${enc(strip('quote:'))}`;
+  if (/^maps:/i.test(value))   return `https://www.google.com/maps/search/${enc(strip('maps:'))}`;
+  if (/^cws:/i.test(value)) {
+    const q = enc(strip('cws:'));
+    return typeof getBrowser === 'function' && getBrowser() === 'firefox'
+      ? `https://addons.mozilla.org/en-US/firefox/search/?q=${q}`
+      : `https://chromewebstore.google.com/search/${q}`;
+  }
+
+  // Direct URL
+  if (rawValue.split('.').length >= 2 && !rawValue.includes(' '))
+    return rawValue.startsWith('http') ? rawValue : `https://${rawValue}`;
+
+  // Plain text — default search engine
+  const engine = typeof getStoredSearchEngine === 'function' ? getStoredSearchEngine() : 'google';
+  const q = enc(rawValue.trim());
+  if (engine === 'ddg')  return `https://duckduckgo.com/?q=${q}`;
+  if (engine === 'bing') return `https://www.bing.com/search?q=${q}`;
+  return `https://google.com/search?q=${q}`;
+}
+
+// ---- Open a URL in a new tab (background or focused) ----
+function openInNewTab(url, focus) {
+  const a = document.createElement('a');
+  a.href = url;
+  a.target = '_blank';
+  a.rel = 'noopener noreferrer';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  // For focused tab, browser will naturally focus it on click
+  // (window.open().focus() is what gets blocked, anchor click is not)
 }
 
 // ---- Enter key routing ----
