@@ -4,6 +4,20 @@ A sleek, fast, and feature-rich browser start page driven by an interactive term
 
 **→ Try it live: [caffienerd.github.io/startpage](https://caffienerd.github.io/startpage/)**
 
+> Inspired by [ahmetdem/start-page](https://github.com/ahmetdem/start-page)
+
+---
+
+## Demo
+
+### Overview
+
+https://github.com/user-attachments/assets/videos/demo.mp4
+
+### Themes
+
+https://github.com/user-attachments/assets/videos/themes.mp4
+
 ---
 
 ## Features
