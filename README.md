@@ -10,13 +10,12 @@ A sleek, fast, and feature-rich browser start page driven by an interactive term
 
 ## Demo
 
-### Overview
+![Start Page Demo](videos/demo.mp4)
+https://github.com/caffienerd/startpage/blob/master/videos/demo.mp4
 
-https://github.com/user-attachments/assets/videos/demo.mp4
 
-### Themes
-
-https://github.com/user-attachments/assets/videos/themes.mp4
+![Start Page Demo](videos/themes.mp4)
+https://github.com/caffienerd/startpage/blob/master/videos/themes.mp4
 
 ---
 
