@@ -69,6 +69,7 @@ function updateSyntaxHighlight(value) {
     'sp': 'spell:',
     ':c': ':config',
     ':cu': ':customize',
+    ':ta': ':tags',
     ':d': ':dark',
     ':b': ':black',
     ':am': ':amoled',
@@ -90,10 +91,22 @@ function updateSyntaxHighlight(value) {
     ':neo': ':neon'
   };
 
+  // Inject custom tags into suggestions
+  const customTags = typeof getStoredCustomTags === 'function' ? getStoredCustomTags() : [];
+  customTags.forEach(tag => {
+    if (tag.prefix && tag.prefix.length >= 2) {
+      suggestions[tag.prefix.slice(0, 2)] = tag.prefix + ':';
+    }
+  });
+  const customTagPrefixes = customTags.map(t => t.prefix).filter(Boolean);
+
   const themeCommands = [':dark', ':black', ':amoled', ':light', ':nord', ':newspaper', ':coffee', ':root', ':neon'];
-  const knownCommands = [':help', ':help_ai_router', ':aimode', ':bookmarks', ':bm', ':ipconfig', ':ip', ':netspeed', ':speed', ':config', ':customize', ':custom', ':weather', ':time', ':gemini', ':hacker', ':cyberpunk', ...themeCommands];
+  const knownCommands = [':help', ':help_ai_router', ':aimode', ':bookmarks', ':bm', ':ipconfig', ':ip', ':netspeed', ':speed', ':config', ':customize', ':custom', ':tags', ':weather', ':time', ':gemini', ':hacker', ':cyberpunk', ...themeCommands];
   const versionCommands = [':version', ':ver'];
   const knownSearch = /^(r|yt|alt|def|ddg|ggl|bing|amazon|imdb|the|syn|quote|maps|cws|spell|gem|gemini|ai):/;
+  const knownSearchDynamic = customTagPrefixes.length
+    ? new RegExp(`^(r|yt|alt|def|ddg|ggl|bing|amazon|imdb|the|syn|quote|maps|cws|spell|gem|gemini|ai|${customTagPrefixes.map(p => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')}):`)
+    : knownSearch;
 
   // Check for a matching autocomplete suggestion
   for (const [prefix, full] of Object.entries(suggestions)) {
@@ -107,7 +120,7 @@ function updateSyntaxHighlight(value) {
         if (versionCommands.some(c => c.startsWith(value))) input.className = 'input-version';
         else if (themeCommands.some(c => c.startsWith(value))) input.className = 'input-theme';
         else input.className = 'input-cmd';
-      } else if (knownSearch.test(value)) {
+      } else if (knownSearchDynamic.test(value)) {
         input.className = 'input-search';
       } else if (value.length > 3 && /[a-z0-9]\.[a-z]+/.test(value) && !value.includes(' ')) {
         input.className = 'input-url';
@@ -123,7 +136,7 @@ function updateSyntaxHighlight(value) {
 
   // For search prefixes with content after colon: show colored prefix in hint, white input
   const searchMatch = value.match(/^([a-z]+:)(.+)$/);
-  if (searchMatch && knownSearch.test(value)) {
+  if (searchMatch && knownSearchDynamic.test(value)) {
     const [, prefix, rest] = searchMatch;
     hintEl.innerHTML = `<span class="search">${escapeHTML(prefix)}</span><span style="visibility:hidden">${escapeHTML(rest)}</span>`;
     input.className = '';
@@ -140,7 +153,7 @@ function updateSyntaxHighlight(value) {
     input.className = 'input-cmd';
   } else if (value.startsWith(':') && value.length > 1) {
     input.className = 'input-unknown';
-  } else if (knownSearch.test(value)) {
+  } else if (knownSearchDynamic.test(value)) {
     // prefix only, no text yet — color it
     input.className = 'input-search';
   } else if (value.length > 3 && /[a-z0-9]\.[a-z]+/.test(value) && !value.includes(' ')) {

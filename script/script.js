@@ -56,6 +56,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ['spell-modal', closeSpellModal],
     ['gemini-modal', closeGeminiModal],
     ['customize-modal', closeCustomizeModal],
+    ['tags-modal',      closeTagsModal],
   ].forEach(([id, fn]) => {
     if (typeof fn === 'function') {
       const el = document.getElementById(id);
@@ -84,6 +85,7 @@ document.addEventListener('keydown', (e) => {
     if (typeof closeGeminiModal === 'function') closeGeminiModal();
     if (typeof closeBookmarksModal === 'function') closeBookmarksModal();
     if (typeof closeCustomizeModal === 'function') closeCustomizeModal();
+    if (typeof closeTagsModal === 'function') closeTagsModal();
     return;
   }
 

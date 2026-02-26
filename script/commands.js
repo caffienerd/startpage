@@ -58,6 +58,7 @@ function handleSpecialCommands(value) {
   if (normalized === ":gemini") { window.location.href = "https://gemini.google.com/app"; return; }
   if (normalized === ":bookmarks" || normalized === ":bm") { openBookmarksModal(); clear(); return; }
   if (normalized === ":customize" || normalized === ":custom") { openCustomizeModal(); clear(); return; }
+  if (normalized === ":tags") { openTagsModal(); clear(); return; }
   if (normalized === ":config" || normalized === ":weather" || normalized === ":time") { openConfig(); clear(); return; }
 
   // ---- Theme ----
@@ -105,20 +106,35 @@ function handleSpecialCommands(value) {
     return;
   }
 
+  // ---- Custom tags (user-defined prefix:url) ----
+  const customTags = typeof getStoredCustomTags === 'function' ? getStoredCustomTags() : [];
+  for (const tag of customTags) {
+    if (!tag.prefix || !tag.url) continue;
+    const re = new RegExp(`^${tag.prefix}:`, 'i');
+    if (re.test(rawValue)) {
+      const q = encodeURIComponent(rawValue.replace(re, '').trim());
+      navigate(tag.url.replace(/\$q/g, q) + (tag.url.includes('$q') ? '' : q));
+      return;
+    }
+  }
+
+  // ---- Search overrides check ----
+  const overrides = typeof getStoredSearchOverrides === 'function' ? getStoredSearchOverrides() : {};
+
   // ---- Search shortcuts ----
-  if (/^yt:/i.test(rawValue)) { navigate(`https://www.youtube.com/results?search_query=${encodeSearchQuery(rawValue, "yt:")}`); return; }
-  if (/^r:/i.test(rawValue)) { navigate(`https://google.com/search?q=site:reddit.com ${rawValue.replace(/^r:/i, "")}`); return; }
-  if (/^ddg:/i.test(rawValue)) { navigate(`https://duckduckgo.com/?q=${encodeSearchQuery(rawValue, "ddg:")}`); return; }
-  if (/^bing:/i.test(rawValue)) { navigate(`https://www.bing.com/search?q=${encodeSearchQuery(rawValue, "bing:")}`); return; }
-  if (/^ggl:/i.test(rawValue)) { navigate(`https://www.google.com/search?q=${encodeSearchQuery(rawValue, "ggl:")}`); return; }
-  if (/^amazon:/i.test(rawValue)) { navigate(`https://www.amazon.com/s?k=${encodeSearchQuery(rawValue, "amazon:")}`); return; }
-  if (/^imdb:/i.test(rawValue)) { navigate(`https://www.imdb.com/find?q=${encodeSearchQuery(rawValue, "imdb:")}`); return; }
-  if (/^alt:/i.test(rawValue)) { navigate(`https://alternativeto.net/browse/search/?q=${encodeSearchQuery(rawValue, "alt:")}`); return; }
+  if (/^yt:/i.test(rawValue)) { navigate(`${overrides.yt || 'https://www.youtube.com/results?search_query='}${encodeSearchQuery(rawValue, 'yt:')}`); return; }
+  if (/^r:/i.test(rawValue)) { navigate(`${overrides.r || 'https://google.com/search?q=site:reddit.com '}${rawValue.replace(/^r:/i, '')}`); return; }
+  if (/^ddg:/i.test(rawValue)) { navigate(`${overrides.ddg || 'https://duckduckgo.com/?q='}${encodeSearchQuery(rawValue, 'ddg:')}`); return; }
+  if (/^bing:/i.test(rawValue)) { navigate(`${overrides.bing || 'https://www.bing.com/search?q='}${encodeSearchQuery(rawValue, 'bing:')}`); return; }
+  if (/^ggl:/i.test(rawValue)) { navigate(`${overrides.ggl || 'https://www.google.com/search?q='}${encodeSearchQuery(rawValue, 'ggl:')}`); return; }
+  if (/^amazon:/i.test(rawValue)) { navigate(`${overrides.amazon || 'https://www.amazon.com/s?k='}${encodeSearchQuery(rawValue, 'amazon:')}`); return; }
+  if (/^imdb:/i.test(rawValue)) { navigate(`${overrides.imdb || 'https://www.imdb.com/find?q='}${encodeSearchQuery(rawValue, 'imdb:')}`); return; }
+  if (/^alt:/i.test(rawValue)) { navigate(`${overrides.alt || 'https://alternativeto.net/browse/search/?q='}${encodeSearchQuery(rawValue, 'alt:')}`); return; }
+  if (/^maps:/i.test(rawValue)) { navigate(`${overrides.maps || 'https://www.google.com/maps/search/'}${encodeSearchQuery(rawValue, 'maps:')}`); return; }
   if (/^def:/i.test(rawValue)) { navigate(`https://onelook.com/?w=${encodeSearchQuery(rawValue, "def:")}`); return; }
   if (/^the:/i.test(rawValue)) { navigate(`https://onelook.com/thesaurus/?s=${encodeSearchQuery(rawValue, "the:")}`); return; }
   if (/^syn:/i.test(rawValue)) { navigate(`https://onelook.com/?related=1&w=${encodeSearchQuery(rawValue, "syn:")}`); return; }
   if (/^quote:/i.test(rawValue)) { navigate(`https://onelook.com/?mentions=1&w=${encodeSearchQuery(rawValue, "quote:")}`); return; }
-  if (/^maps:/i.test(rawValue)) { navigate(`https://www.google.com/maps/search/${encodeSearchQuery(rawValue, "maps:")}`); return; }
   if (/^cws:/i.test(rawValue)) {
     const q = rawValue.replace(/^cws:/i, "").trim();
     navigate(getBrowser() === "firefox"

@@ -81,6 +81,10 @@
       </div>
 
       <div class="config-section">
+        <button class="btn-save btn-edit-bookmarks" onclick="closeConfig(); openTagsModal()" style="background: var(--terminal-bg); color: var(--text-color); border: 1px solid var(--card-border);">Search Overrides &amp; Custom Tags</button>
+      </div>
+
+      <div class="config-section">
         <h3>Weather Location</h3>
         <input type="text" id="weather-location" spellcheck="false" autocorrect="off" />
       </div>
@@ -158,6 +162,7 @@
         <div class="help-commands">
           <div class="help-cmd"><span>:config</span> → Open settings (weather, timezone, Gemini, AI mode)</div>
           <div class="help-cmd"><span>:customize</span> → Customize syntax colors &amp; switch theme</div>
+          <div class="help-cmd"><span>:tags</span> → Override search URLs &amp; add custom prefix shortcuts</div>
           <div class="help-cmd"><span>:bookmarks</span> → Edit bookmarks (grid or JSON)</div>
           <div class="help-cmd"><span>:ipconfig</span> → Show network info &amp; VPN status</div>
           <div class="help-cmd"><span>:netspeed</span> → Run internet speed test</div>
@@ -411,6 +416,31 @@
     </div>
   </div>
 
+  <!-- Tags Modal -->
+  <div class="config-modal" id="tags-modal" lang="en" role="dialog" aria-labelledby="tags-modal-title">
+    <div class="config-content tags-content">
+      <h2 id="tags-modal-title">Search Overrides &amp; Tags</h2>
+
+      <div class="config-section">
+        <div class="customize-section-title">Search Overrides</div>
+        <p class="config-hint" style="margin-bottom: 12px;">Replace the default URL for built-in prefixes. Leave blank to use the default.</p>
+        <div id="tags-overrides-grid" class="tags-overrides-grid"></div>
+      </div>
+
+      <div class="config-section">
+        <div class="customize-section-title">Custom Tags</div>
+        <p class="config-hint" style="margin-bottom: 12px;">Define your own <span class="config-code">prefix:</span> shortcuts. The search query is appended to the URL.</p>
+        <div id="tags-custom-list" class="tags-custom-list"></div>
+        <button class="tags-add-btn" onclick="addCustomTag()">+ Add tag</button>
+      </div>
+
+      <div class="config-buttons">
+        <button class="btn-cancel" onclick="closeTagsModal()">Cancel</button>
+        <button class="btn-save" onclick="saveTagsModal()">Save</button>
+      </div>
+    </div>
+  </div>
+
   <script src="version/version.js"></script>
   <!-- load order matters: storage → utils → ui → modals → terminal → commands → main -->
   <script src="script/utils.js"></script>
@@ -425,6 +455,7 @@
   <script src="script/modals/spell.js"></script>
   <script src="script/modals/gemini.js"></script>
   <script src="script/modals/customize.js"></script>
+  <script src="script/modals/tags.js"></script>
   <script src="script/commands.js"></script>
   <script src="script/terminal.js"></script>
   <script src="script/script.js"></script>
