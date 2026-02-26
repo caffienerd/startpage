@@ -19,4 +19,9 @@ Thumbs.db
 AGENTS.md
 
 # Host elemets
-# Caddyfile
+Caddyfile
+
+# Build
+tmp/
+storage/
+backups/

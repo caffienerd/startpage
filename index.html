@@ -146,6 +146,8 @@
 
       <div class="config-buttons">
         <button class="btn-customize-link" onclick="closeConfig(); openCustomizeModal()">Customize?</button>
+        <button class="btn-backup" onclick="importBackup()" title="Import backup">↑ Import</button>
+        <button class="btn-backup" onclick="exportBackup()" title="Export backup">↓ Export</button>
         <button class="btn-cancel" onclick="closeConfig()">Cancel</button>
         <button class="btn-save" onclick="saveConfig()">Save</button>
       </div>
@@ -456,6 +458,7 @@
   <script src="script/modals/gemini.js"></script>
   <script src="script/modals/customize.js"></script>
   <script src="script/modals/tags.js"></script>
+  <script src="script/modals/backup.js"></script>
   <script src="script/commands.js"></script>
   <script src="script/terminal.js"></script>
   <script src="script/script.js"></script>
