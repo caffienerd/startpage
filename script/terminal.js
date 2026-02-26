@@ -109,6 +109,8 @@ function updateSyntaxHighlight(value) {
         else input.className = 'input-cmd';
       } else if (knownSearch.test(value)) {
         input.className = 'input-search';
+      } else if (value.length > 3 && /[a-z0-9]\.[a-z]+/.test(value) && !value.includes(' ')) {
+        input.className = 'input-url';
       } else {
         input.className = '';
       }
@@ -141,6 +143,8 @@ function updateSyntaxHighlight(value) {
   } else if (knownSearch.test(value)) {
     // prefix only, no text yet — color it
     input.className = 'input-search';
+  } else if (value.length > 3 && /[a-z0-9]\.[a-z]+/.test(value) && !value.includes(' ')) {
+    input.className = 'input-url';
   } else {
     input.className = '';
   }
@@ -384,6 +388,24 @@ function openInNewTab(url, focus) {
 function handleEnterKey(rawValue, value, elements, history) {
   const isSearch = value.match(/^(r|yt|alt|ddg|imdb|def|the|syn|quote|maps|cws|spell|gem|gemini|ai):/);
   const isCommand = value.startsWith(':');
+  const hasTrailingSpace = /\s$/.test(rawValue);
+
+  if (isSearch || isCommand) {
+    handleSpecialCommands(rawValue.trim());
+    if (rawValue.trim()) history.push(rawValue.trim());
+    return;
+  }
+
+  // If trailing space on a URL-like value — force search instead of navigate
+  if (hasTrailingSpace && /[a-z0-9]\.[a-z]+/i.test(rawValue.trim()) && !rawValue.trim().includes(' ')) {
+    const q = encodeURIComponent(rawValue.trim());
+    const engine = typeof getStoredSearchEngine === 'function' ? getStoredSearchEngine() : 'google';
+    if (engine === 'ddg') navigate(`https://duckduckgo.com/?q=${q}`);
+    else if (engine === 'bing') navigate(`https://www.bing.com/search?q=${q}`);
+    else navigate(`https://google.com/search?q=${q}`);
+    if (rawValue.trim()) history.push(rawValue.trim());
+    return;
+  }
 
   if (isSearch || isCommand) {
     handleSpecialCommands(rawValue.trim());
