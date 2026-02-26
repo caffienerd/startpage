@@ -1,0 +1,4 @@
+:6174 {
+    root * /path/to/this/dir
+    file_server
+}

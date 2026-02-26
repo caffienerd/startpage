@@ -50,10 +50,14 @@ You need a way to serve the static files locally. While you can open `index.html
 python -m http.server 6174
 ```
 
-#### Option 2: Caddy (Recommended for production)
+#### Option 2: Caddy
+Copy `Caddyfile.example` to `Caddyfile`, set your directory path inside it, then:
 ```bash
 caddy run --config Caddyfile
 ```
+
+#### Other options
+Any static file server works — `npx serve`, nginx, etc.
 
 Visit `http://localhost:6174` in your browser.
 
@@ -64,7 +68,7 @@ Visit `http://localhost:6174` in your browser.
 Run `:config` in the terminal to open the settings modal.
 
 1. **Identity**: Customize your terminal `username`.
-2. **Weather**: Set your location (e.g., `New York, US`).
+2. **Weather**: Set your location (e.g., `New York`, `London`, `Jerusalem`, `Delhi`).
 3. **Gemini AI**:
    - **API Key**: Get one from [Google AI Studio](https://aistudio.google.com/app/apikey).
    - **Model**: Default is `gemini-2.5-flash-lite`.
@@ -86,23 +90,22 @@ Run `:customize` to open the customization modal.
 
 | Prefix | Usage | Destination |
 | :--- | :--- | :--- |
-| `yt:` | `yt: lofi hip hop` | YouTube Search |
-| `r:` | `r: webdev` | Reddit Search |
-| `maps:` | `maps: cafes near me` | Google Maps |
-| `ddg:` | `ddg: privacy` | DuckDuckGo |
-| `ggl:` | `ggl: something` | Google (explicit) |
-| `bing:` | `bing: something` | Bing Search |
-| `amazon:` | `amazon: mechanical keyboard` | Amazon Search |
-| `imdb:` | `imdb: inception` | IMDb Search |
-| `alt:` | `alt: notion` | AlternativeTo |
-| `def:` | `def: ephemeral` | Dictionary (OneLook) |
-| `the:` | `the: happy` | Thesaurus (OneLook) |
-| `syn:` | `syn: fast` | Synonyms (OneLook) |
-| `quote:` | `quote: churchill` | Quotes (OneLook) |
-| `spell:` | `spell: accomodation` | Built-in Spell Checker |
-| `cws:` | `cws: ublock` | Chrome/Firefox Extension Store |
-| `gem:` | `gem: explain quantum` | Gemini Direct Prompt |
-| `gemini:` | `gemini: summarize this` | Gemini Direct Prompt (alias) |
+| `yt:` | `yt: youtube search` | YouTube Search |
+| `r:` | `r: something to find in reddit` | Reddit Search |
+| `maps:` | `maps: location` | Google Maps |
+| `ddg:` | `ddg: search with DuckDuckGo` | DuckDuckGo |
+| `ggl:` | `ggl: search with Google` | Google (explicit) |
+| `bing:` | `bing: search with bing` | Bing Search |
+| `amazon:` | `amazon: mechanical keyboards` | Amazon Search |
+| `imdb:` | `imdb: Breaking Bad` | IMDb Search |
+| `alt:` | `alt: alternative of something` | AlternativeTo |
+| `def:` | `def: deffination of something` | Dictionary (OneLook) |
+| `the:` | `the: a phrase to get the thesaurus of` | Thesaurus (OneLook) |
+| `syn:` | `syn: synonyms of something` | Synonyms (OneLook) |
+| `quote:` | `quote: quotes containfing keywords ` | Quotes (OneLook) |
+| `spell:` | `spell: word / phrase to check` | Built-in Spell Checker |
+| `cws:` | `cws: extention` | Chrome/Firefox Extension Store |
+| `gem:` | `gem: talk to gemini` | Gemini Direct Prompt |
 | `ai:` | `ai: directions to central park` | Semantic AI Router |
 
 ### System Commands
@@ -118,6 +121,7 @@ Run `:customize` to open the customization modal.
 | `:aimode` | Toggle automatic AI routing |
 | `:version` | Show app version |
 | `:gemini` | Open Gemini website |
+| `:tags` | Override search URLs & add custom prefix shortcuts |
 | `:help_ai_router` | Guide for `ai:` routing |
 
 ### Theme Commands
@@ -144,7 +148,6 @@ Run `:customize` to open the customization modal.
 | `Ctrl+Enter` | Open result in new background tab |
 | `Ctrl+Shift+Enter` | Open result in new focused tab |
 | `↑` / `↓` | Navigate command history |
-| `Ctrl+C` | Clear current input |
 
 > `Ctrl+Enter` and `Ctrl+Shift+Enter` work for bookmarks, search prefixes, direct URLs, and plain-text searches.
 
@@ -159,9 +162,17 @@ The start page features a 4-column layout. You can customize bookmarks in two wa
 1. **Visual Editor (Recommended)**: Run `:bookmarks` to use the grid-based editor. It maps directly to the 4-column layout, letting you organize links by column and row.
 2. **JSON Mode**: Toggle "Edit as JSON" in the bookmarks modal for bulk edits or sharing your setup.
 
+### Search Overrides & Custom Tags
+
+Run `:tags` to override built-in search prefix URLs (e.g. point `amazon:` to `amazon.in` instead of `amazon.com`) or define entirely new prefixes. Custom tag prefixes get full syntax highlighting and autocomplete automatically.
+
 ### Syntax Colors
 
 Run `:customize` to independently set the highlight color for each input type. Colors are stored separately from themes — changing themes won't reset your colors.
+
+### Backup & Restore
+
+Use the **↓ Export** and **↑ Import** buttons in `:config` to save all settings (bookmarks, colors, API keys, custom tags) to a JSON file and restore them anytime.
 
 ---
 
