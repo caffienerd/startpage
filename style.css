@@ -1573,3 +1573,41 @@ html:not(.dark-mode):not(.black-mode):not(.nord-mode):not(.coffee-mode):not(.roo
   line-height: 1.5;
   font-family: var(--monospace-font-family);
 }
+
+/* ---- Loading Overlay ---- */
+#loading-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: var(--background-color);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+#loading-overlay.visible {
+  display: flex;
+  opacity: 1;
+}
+
+#loading-overlay.hiding {
+  opacity: 0;
+}
+
+#loading-ring {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: var(--text-color);
+  opacity: 0.35;
+  animation: loading-spin 0.9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes loading-spin {
+  to { transform: rotate(360deg); }
+}

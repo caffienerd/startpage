@@ -35,6 +35,15 @@ function initPlaceholders() {
 const TIME_UPDATE_INTERVAL = 60 * 1000;
 const WEATHER_UPDATE_INTERVAL = 30 * 60 * 1000;
 
+// Hide loading overlay if user navigates back (bfcache restore)
+window.addEventListener('pageshow', (e) => {
+  const el = document.getElementById('loading-overlay');
+  if (!el) return;
+  el.classList.remove('visible');
+  el.classList.add('hiding');
+  setTimeout(() => el.classList.remove('hiding'), 300);
+});
+
 document.addEventListener("DOMContentLoaded", () => {
   initPlaceholders();
   loadTheme();

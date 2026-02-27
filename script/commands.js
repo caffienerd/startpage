@@ -55,7 +55,7 @@ function handleSpecialCommands(value) {
   if (normalized === ":version" || normalized === ":ver") { openVersion(); clear(); return; }
   if (normalized === ":ipconfig" || normalized === ":ip") { openIPInfo(); clear(); return; }
   if (normalized === ":netspeed" || normalized === ":speed") { openSpeedTest(); clear(); return; }
-  if (normalized === ":gemini") { window.location.href = "https://gemini.google.com/app"; return; }
+  if (normalized === ":gemini") { navigate("https://gemini.google.com/app"); return; }
   if (normalized === ":bookmarks" || normalized === ":bm") { openBookmarksModal(); clear(); return; }
   if (normalized === ":customize" || normalized === ":custom") { openCustomizeModal(); clear(); return; }
   if (normalized === ":tags") { openTagsModal(); clear(); return; }
@@ -155,8 +155,18 @@ function handleSpecialCommands(value) {
   }
 }
 
+function showLoading() {
+  const el = document.getElementById('loading-overlay');
+  if (!el) return;
+  el.classList.remove('hiding');
+  el.classList.add('visible');
+}
+
 function navigate(url) {
-  try { window.location.href = url; } catch (e) { console.error('Navigation failed', e); }
+  try {
+    showLoading();
+    window.location.href = url;
+  } catch (e) { console.error('Navigation failed', e); }
 }
 
 // Shorthand: strip prefix and encode

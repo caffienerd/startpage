@@ -431,12 +431,16 @@ function handleEnterKey(rawValue, value, elements, history) {
   let matched = false;
   if (bookmarkMatch) {
     matched = true;
+    const goToBookmark = (href) => {
+      if (typeof showLoading === 'function') showLoading();
+      window.location.href = href;
+    };
     if (getStoredAiModeEnabled()) {
       showAiRouteBadge(bookmarkMatch.title, rawValue.trim(), AI_ROUTE_BADGE_NAV_DELAY_MS).then(() => {
-        window.location.href = bookmarkMatch.href;
+        goToBookmark(bookmarkMatch.href);
       });
     } else {
-      window.location.href = bookmarkMatch.href;
+      goToBookmark(bookmarkMatch.href);
     }
   }
 

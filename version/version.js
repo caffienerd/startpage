@@ -1,2 +1,2 @@
 // Edit the version number below
-window.APP_VERSION = '4.7.2';
+window.APP_VERSION = '4.8.1';
