@@ -1,0 +1,10 @@
+{
+  "name": "start-page-extension",
+  "private": true,
+  "version": "4.5.7",
+  "description": "Build helper for Start Page browser extension packages",
+  "scripts": {
+    "buildweb": "node scripts/build-web.js",
+    "build:web": "node scripts/build-web.js"
+  }
+}

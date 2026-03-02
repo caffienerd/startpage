@@ -1,0 +1,34 @@
+{
+  "manifest_version": 3,
+  "name": "Start Page",
+  "description": "A minimal, keyboard-centric start page that replaces the browser New Tab page.",
+  "version": "4.5.7",
+  "chrome_url_overrides": {
+    "newtab": "focus.html"
+  },
+  "icons": {
+    "16": "icon/favicon.png",
+    "32": "icon/favicon.png",
+    "48": "icon/favicon.png",
+    "128": "icon/favicon.png"
+  },
+  "host_permissions": [
+    "https://geocoding-api.open-meteo.com/*",
+    "https://api.open-meteo.com/*",
+    "https://api.datamuse.com/*",
+    "https://speed.cloudflare.com/*",
+    "https://www.cloudflare.com/*",
+    "https://ipapi.co/*",
+    "https://api6.ipify.org/*",
+    "https://generativelanguage.googleapis.com/*"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://geocoding-api.open-meteo.com https://api.open-meteo.com https://api.datamuse.com https://speed.cloudflare.com https://www.cloudflare.com https://ipapi.co https://api6.ipify.org https://generativelanguage.googleapis.com;"
+  },
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "startpage-newtab@example.local",
+      "strict_min_version": "109.0"
+    }
+  }
+}

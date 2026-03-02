@@ -1,0 +1,42 @@
+{
+  "manifest_version": 3,
+  "name": "Start Page",
+  "description": "A minimal, keyboard-centric start page extension for Opera.",
+  "version": "4.5.7",
+  "icons": {
+    "16": "icon/favicon.png",
+    "32": "icon/favicon.png",
+    "48": "icon/favicon.png",
+    "128": "icon/favicon.png"
+  },
+  "permissions": [
+    "tabs"
+  ],
+  "background": {
+    "service_worker": "script/background-opera.js"
+  },
+  "action": {
+    "default_title": "Open Start Page"
+  },
+  "commands": {
+    "open-start-page": {
+      "suggested_key": {
+        "default": "Ctrl+Shift+Y"
+      },
+      "description": "Open Start Page in a new tab"
+    }
+  },
+  "host_permissions": [
+    "https://geocoding-api.open-meteo.com/*",
+    "https://api.open-meteo.com/*",
+    "https://api.datamuse.com/*",
+    "https://speed.cloudflare.com/*",
+    "https://www.cloudflare.com/*",
+    "https://ipapi.co/*",
+    "https://api6.ipify.org/*",
+    "https://generativelanguage.googleapis.com/*"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'self'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://geocoding-api.open-meteo.com https://api.open-meteo.com https://api.datamuse.com https://speed.cloudflare.com https://www.cloudflare.com https://ipapi.co https://api6.ipify.org https://generativelanguage.googleapis.com;"
+  }
+}
