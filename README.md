@@ -164,6 +164,8 @@ dir//ggl: keyword        ← no category, explicit Google
 | `:netspeed` / `:speed` | Run speed test |
 | `:aimode` | Toggle automatic AI routing |
 | `:version` | Show app version |
+| `:export` | Export all settings to a JSON backup file |
+| `:import` | Import settings from a JSON backup file |
 | `:gemini` | Open Gemini website |
 | `:tags` | Override search URLs & add custom prefix shortcuts |
 | `:help_ai_router` | Guide for `ai:` routing |

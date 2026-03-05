@@ -53,6 +53,8 @@ function handleSpecialCommands(value) {
     return;
   }
   if (normalized === ":version" || normalized === ":ver") { openVersion(); clear(); return; }
+  if (normalized === ":export") { exportBackup(); clear(); return; }
+  if (normalized === ":import") { importBackup(); clear(); return; }
   if (normalized === ":ipconfig" || normalized === ":ip") { openIPInfo(); clear(); return; }
   if (normalized === ":netspeed" || normalized === ":speed") { openSpeedTest(); clear(); return; }
   if (normalized === ":gemini") { navigate("https://gemini.google.com/app"); return; }

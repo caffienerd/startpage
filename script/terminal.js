@@ -80,22 +80,22 @@ function getDirSyntaxHtml(value) {
 function getDirAutocompleteSuggestion(value) {
   const lower = value.toLowerCase();
 
-  // Suggest 'dir:' when user types 'd' or 'di'
-  if ((lower === 'd' || lower === 'di') && 'dir:'.startsWith(lower)) {
-    return 'dir:';
-  }
+  // Suggest 'dir:' when user types 'd' or 'di', 'dir/' when they type 'dir'
+  if ((lower === 'd' || lower === 'di') && 'dir:'.startsWith(lower)) return 'dir:';
+  if (lower === 'dir') return 'dir/';
 
   // After 'dir/' — suggest categories
   const afterDirSlash = lower.match(/^dir\/([a-z]*)$/);
   if (afterDirSlash) {
     const typed = afterDirSlash[1];
-    const allCats = Object.keys(DIR_CATEGORIES);
-    // Also include aliases
     const allOptions = [];
     for (const [key, def] of Object.entries(DIR_CATEGORIES)) {
       allOptions.push(key);
       def.aliases.forEach(a => allOptions.push(a));
     }
+    // If typed exactly matches a valid category, suggest the trailing slash
+    if (typed && allOptions.includes(typed)) return `dir/${typed}/`;
+    // Otherwise suggest first prefix match
     const match = allOptions.find(c => c.startsWith(typed) && c !== typed);
     if (match) return `dir/${match}/`;
   }
@@ -166,6 +166,8 @@ function updateSyntaxHighlight(value) {
     ':w': ':weather',
     ':ti': ':time',
     ':ve': ':version',
+    ':ex': ':export',
+    ':im': ':import',
     ':no': ':nord',
     ':ne': ':newspaper',
     ':co': ':coffee',
@@ -183,8 +185,8 @@ function updateSyntaxHighlight(value) {
   const customTagPrefixes = customTags.map(t => t.prefix).filter(Boolean);
 
   const themeCommands = [':dark', ':black', ':amoled', ':light', ':nord', ':newspaper', ':coffee', ':root', ':neon'];
-  const knownCommands = [':help', ':help_ai_router', ':aimode', ':bookmarks', ':bm', ':ipconfig', ':ip', ':netspeed', ':speed', ':config', ':customize', ':custom', ':tags', ':dir', ':dirconfig', ':prompts', ':weather', ':time', ':gemini', ':hacker', ':cyberpunk', ...themeCommands];
-  const versionCommands = [':version', ':ver'];
+  const knownCommands = [':help', ':help_ai_router', ':aimode', ':bookmarks', ':bm', ':ipconfig', ':ip', ':netspeed', ':speed', ':config', ':customize', ':custom', ':tags', ':dir', ':dirconfig', ':prompts', ':export', ':import', ':weather', ':time', ':gemini', ':hacker', ':cyberpunk', ...themeCommands];
+  const versionCommands = [':version', ':ver', ':export', ':import'];
   const knownSearch = /^(r|yt|alt|def|ddg|ggl|bing|amazon|imdb|the|syn|quote|maps|cws|spell|gem|gemini|ai):/;
   const knownSearchDynamic = customTagPrefixes.length
     ? new RegExp(`^(r|yt|alt|def|ddg|ggl|bing|amazon|imdb|the|syn|quote|maps|cws|spell|gem|gemini|ai|${customTagPrefixes.map(p => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')}):`)
@@ -400,7 +402,7 @@ function handleKeyboardEvents(input, elements) {
       e.preventDefault();
       const suggestion = input.getAttribute('data-suggestion');
       input.value = suggestion;
-      updateSyntaxHighlight(suggestion);
+      updateSyntaxHighlight(suggestion.toLowerCase());
       input.removeAttribute('data-suggestion');
       input.placeholder = '';
       return;
