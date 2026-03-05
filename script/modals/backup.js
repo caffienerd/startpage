@@ -6,7 +6,7 @@ const BACKUP_KEYS = [
   'username', 'theme', 'weatherLocation', 'weatherUnit', 'timezone',
   'geminiApiKey', 'geminiModel', 'geminiSystemPrompt',
   'aiModeEnabled', 'aiRouteBadgeMode', 'searchEngine',
-  'bookmarks', 'syntaxColors', 'searchOverrides', 'customTags'
+  'bookmarks', 'syntaxColors', 'searchOverrides', 'customTags', 'dirExtensions', 'terminalPrompts'
 ];
 
 function exportBackup() {

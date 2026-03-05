@@ -1859,3 +1859,34 @@ input.input-dir-active {
 .dirconfig-add-input::placeholder {
   opacity: 0.4;
 }
+
+/* ========================================
+   :prompts — Placeholder Suggestions Editor
+   ======================================== */
+.prompts-content {
+  max-width: 520px;
+}
+
+.prompts-textarea {
+  width: 100%;
+  min-height: 260px;
+  background: var(--terminal-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-family: var(--monospace-font-family);
+  font-size: 13px;
+  color: var(--text-color);
+  resize: vertical;
+  outline: none;
+  line-height: 1.7;
+  transition: border-color 0.15s;
+}
+
+.prompts-textarea:focus {
+  border-color: var(--syn-cmd);
+}
+
+.prompts-textarea::placeholder {
+  opacity: 0.35;
+}

@@ -151,6 +151,7 @@ function updateSyntaxHighlight(value) {
     ':ta': ':tags',
     ':di': ':dir',
     ':dirc': ':dirconfig',
+    ':p': ':prompts',
     ':d': ':dark',
     ':b': ':black',
     ':am': ':amoled',
@@ -182,7 +183,7 @@ function updateSyntaxHighlight(value) {
   const customTagPrefixes = customTags.map(t => t.prefix).filter(Boolean);
 
   const themeCommands = [':dark', ':black', ':amoled', ':light', ':nord', ':newspaper', ':coffee', ':root', ':neon'];
-  const knownCommands = [':help', ':help_ai_router', ':aimode', ':bookmarks', ':bm', ':ipconfig', ':ip', ':netspeed', ':speed', ':config', ':customize', ':custom', ':tags', ':dir', ':dirconfig', ':weather', ':time', ':gemini', ':hacker', ':cyberpunk', ...themeCommands];
+  const knownCommands = [':help', ':help_ai_router', ':aimode', ':bookmarks', ':bm', ':ipconfig', ':ip', ':netspeed', ':speed', ':config', ':customize', ':custom', ':tags', ':dir', ':dirconfig', ':prompts', ':weather', ':time', ':gemini', ':hacker', ':cyberpunk', ...themeCommands];
   const versionCommands = [':version', ':ver'];
   const knownSearch = /^(r|yt|alt|def|ddg|ggl|bing|amazon|imdb|the|syn|quote|maps|cws|spell|gem|gemini|ai):/;
   const knownSearchDynamic = customTagPrefixes.length
@@ -551,21 +552,14 @@ function handleEnterKey(rawValue, value, elements, history) {
 // ---- Initialize terminal ----
 function initializeTerminal() {
   const input = document.getElementById("terminal-input");
-  const examples = [
-    "search anything...",
-    ":help → commands",
-    ":config → settings",
-    "ai:directions to home → maps",
-    ":aimode → toggle no-prefix AI routing",
-    "yt:query → youtube",
-    "maps:location → google maps",
-    "dir/books: dune → open directory",
-    "dir/music/ddg: flac albums → open dir on DDG",
-  ];
   const elements = document.querySelectorAll("#bookmarks a");
 
   initializeBrowserInfo();
-  typePlaceholder(input, examples);
+  typePlaceholder(input, typeof getActivePrompts === 'function' ? getActivePrompts() : [
+    "search anything...",
+    ":help → commands",
+    ":config → settings",
+  ]);
 
   if (!input._listenersAttached) {
     handleInput(input, elements);

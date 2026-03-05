@@ -61,6 +61,7 @@ function handleSpecialCommands(value) {
   if (normalized === ":tags") { openTagsModal(); clear(); return; }
   if (normalized === ":dir") { openDirModal(); clear(); return; }
   if (normalized === ":dirconfig") { openDirConfigModal(); clear(); return; }
+  if (normalized === ":prompts") { openPromptsModal(); clear(); return; }
   if (normalized === ":config" || normalized === ":weather" || normalized === ":time") { openConfig(); clear(); return; }
 
   // ---- Open Directory search ----
