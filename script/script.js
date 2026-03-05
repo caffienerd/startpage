@@ -56,6 +56,29 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(updateTime, TIME_UPDATE_INTERVAL);
   setInterval(updateWeather, WEATHER_UPDATE_INTERVAL);
 
+  // Dir modal — category + engine button interactivity
+  document.querySelectorAll('#dir-cat-grid .dir-cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#dir-cat-grid .dir-cat-btn').forEach(b => b.classList.remove('active-cat'));
+      btn.classList.add('active-cat');
+      if (typeof _updateDirPreview === 'function') _updateDirPreview();
+    });
+  });
+  document.querySelectorAll('#dir-engine-grid .dir-engine-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#dir-engine-grid .dir-engine-btn').forEach(b => b.classList.remove('active-engine'));
+      btn.classList.add('active-engine');
+      if (typeof _updateDirPreview === 'function') _updateDirPreview();
+    });
+  });
+  const dirKwInput = document.getElementById('dir-keyword-input');
+  if (dirKwInput) {
+    dirKwInput.addEventListener('input', () => { if (typeof _updateDirPreview === 'function') _updateDirPreview(); });
+    dirKwInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); if (typeof fireDirSearch === 'function') fireDirSearch(); }
+    });
+  }
+
   // Click-outside closes modals
   [
     ['config-modal', closeConfig],
@@ -66,6 +89,8 @@ document.addEventListener("DOMContentLoaded", () => {
     ['gemini-modal', closeGeminiModal],
     ['customize-modal', closeCustomizeModal],
     ['tags-modal',      closeTagsModal],
+    ['dir-modal',       closeDirModal],
+    ['dirconfig-modal', closeDirConfigModal],
   ].forEach(([id, fn]) => {
     if (typeof fn === 'function') {
       const el = document.getElementById(id);
@@ -95,6 +120,8 @@ document.addEventListener('keydown', (e) => {
     if (typeof closeBookmarksModal === 'function') closeBookmarksModal();
     if (typeof closeCustomizeModal === 'function') closeCustomizeModal();
     if (typeof closeTagsModal === 'function') closeTagsModal();
+    if (typeof closeDirModal === 'function') closeDirModal();
+    if (typeof closeDirConfigModal === 'function') closeDirConfigModal();
     return;
   }
 

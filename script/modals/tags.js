@@ -108,13 +108,11 @@ function addCustomTag() {
   const list = document.getElementById('tags-custom-list');
   const index = list.children.length;
   _renderCustomTagRow(list, { prefix: '', url: '' }, index);
-  // Focus the new prefix input
   list.lastElementChild.querySelector('.tags-custom-prefix').focus();
 }
 
 // ---- Save ----
 function saveTagsModal() {
-  // Save overrides
   const overrides = {};
   document.querySelectorAll('#tags-overrides-grid .tags-override-input').forEach(input => {
     const val = input.value.trim();
@@ -122,7 +120,6 @@ function saveTagsModal() {
   });
   saveSearchOverrides(overrides);
 
-  // Save custom tags
   const tags = [];
   document.querySelectorAll('#tags-custom-list .tags-custom-row').forEach(row => {
     const prefix = row.querySelector('.tags-custom-prefix').value.trim().toLowerCase().replace(/[^a-z0-9]/g, '');

@@ -141,7 +141,7 @@
           <option value="ddg">DuckDuckGo</option>
           <option value="bing">Bing</option>
         </select>
-        <p class="config-hint">Used when no prefix is typed (e.g. plain text or <span class="config-code">ai:</span> fallback).</p>
+        <p class="config-hint">Used when no prefix is typed (e.g. plain text or <span class="config-code">ai:</span> fallback). Also the default engine for <span class="config-code">dir:</span> searches.</p>
       </div>
 
       <div class="config-buttons">
@@ -166,6 +166,8 @@
           <div class="help-cmd"><span>:customize</span> → Customize syntax colors &amp; switch theme</div>
           <div class="help-cmd"><span>:tags</span> → Override search URLs &amp; add custom prefix shortcuts</div>
           <div class="help-cmd"><span>:bookmarks</span> → Edit bookmarks (grid or JSON)</div>
+          <div class="help-cmd"><span>:dir</span> → Open directory search builder</div>
+          <div class="help-cmd"><span>:dirconfig</span> → Customize file extensions per category</div>
           <div class="help-cmd"><span>:ipconfig</span> → Show network info &amp; VPN status</div>
           <div class="help-cmd"><span>:netspeed</span> → Run internet speed test</div>
           <div class="help-cmd"><span>:aimode</span> → Toggle AI mode (no <span>ai:</span> prefix needed)</div>
@@ -206,6 +208,22 @@
           <div class="help-cmd"><span>quote:phrase</span> → Find quotes (OneLook)</div>
           <div class="help-cmd"><span>spell:word</span> → Check spelling</div>
           <div class="help-cmd"><span>cws:name</span> → Search browser extensions</div>
+        </div>
+      </div>
+
+      <div class="help-section">
+        <h3>Open Directory</h3>
+        <div class="help-commands">
+          <div class="help-cmd"><span>dir: keyword</span> → Open dir search, default engine, no filter</div>
+          <div class="help-cmd"><span>dir/media: keyword</span> → Filter for video files</div>
+          <div class="help-cmd"><span>dir/books: keyword</span> → Filter for ebook formats</div>
+          <div class="help-cmd"><span>dir/music: keyword</span> → Filter for audio files</div>
+          <div class="help-cmd"><span>dir/software: keyword</span> → Filter for executables &amp; archives</div>
+          <div class="help-cmd"><span>dir/images: keyword</span> → Filter for image files</div>
+          <div class="help-cmd"><span>dir/other: keyword</span> → Raw open dir, no file filter</div>
+          <div class="help-cmd" style="margin-top:6px;"><span>dir/cat/ggl:</span> <span>dir/cat/ddg:</span> <span>dir/cat/bing:</span> → Override search engine</div>
+          <div class="help-cmd" style="margin-top:4px; opacity:0.7;">Aliases: <span>vid</span> <span>video</span> · <span>book</span> <span>ebook</span> · <span>audio</span> <span>mus</span> · <span>soft</span> <span>iso</span> <span>app</span> · <span>img</span> <span>pics</span></div>
+          <div class="help-cmd" style="opacity:0.7;">Tab autocomplete works after <span>dir/</span> for categories and engines.</div>
         </div>
       </div>
 
@@ -437,8 +455,80 @@
       </div>
 
       <div class="config-buttons">
+        <button class="btn-cancel tags-dir-btn" onclick="closeTagsModal(); openDirConfigModal()" title="Customize Open Directory file extensions">⊞ Dir Extensions</button>
         <button class="btn-cancel" onclick="closeTagsModal()">Cancel</button>
         <button class="btn-save" onclick="saveTagsModal()">Save</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Open Directory Modal -->
+  <div class="config-modal" id="dir-modal" lang="en" role="dialog" aria-labelledby="dir-modal-title">
+    <div class="config-content dir-content">
+      <h2 id="dir-modal-title">Open Directory Search</h2>
+      <p class="config-hint" style="margin-bottom: 16px;">
+        Search for public open directory indexes using Google dorking. Uses <span class="config-code">intitle:index.of</span> with file-type filters.
+        Inspired by <a href="https://ewasion.github.io/opendirectory-finder/" target="_blank" rel="noopener noreferrer" style="color: var(--accent-color, var(--syn-cmd));">ewasion's opendirectory-finder</a>.
+      </p>
+
+      <!-- Keyword -->
+      <div class="config-section">
+        <h3>Keyword</h3>
+        <input type="text" id="dir-keyword-input" spellcheck="false" autocorrect="off" placeholder="e.g. dune, pink floyd, photoshop..." />
+      </div>
+
+      <!-- Category -->
+      <div class="config-section">
+        <h3>Category <span class="config-hint" style="font-weight:normal; font-size:0.85em;">(optional)</span></h3>
+        <div class="dir-cat-grid" id="dir-cat-grid">
+          <button class="dir-cat-btn active-cat" data-cat="">All files</button>
+          <button class="dir-cat-btn" data-cat="media">Media <span class="dir-cat-hint">mkv mp4 avi</span></button>
+          <button class="dir-cat-btn" data-cat="books">Books <span class="dir-cat-hint">pdf epub mobi</span></button>
+          <button class="dir-cat-btn" data-cat="music">Music <span class="dir-cat-hint">mp3 flac ogg</span></button>
+          <button class="dir-cat-btn" data-cat="software">Software <span class="dir-cat-hint">exe iso zip apk</span></button>
+          <button class="dir-cat-btn" data-cat="images">Images <span class="dir-cat-hint">jpg png psd</span></button>
+          <button class="dir-cat-btn" data-cat="other">Other <span class="dir-cat-hint">no filter</span></button>
+        </div>
+      </div>
+
+      <!-- Engine -->
+      <div class="config-section">
+        <h3>Search Engine <span class="config-hint" style="font-weight:normal; font-size:0.85em;">(optional override)</span></h3>
+        <div class="dir-engine-grid" id="dir-engine-grid">
+          <button class="dir-engine-btn active-engine" data-engine="">Default (Google)</button>
+          <button class="dir-engine-btn" data-engine="ggl">Google</button>
+          <button class="dir-engine-btn" data-engine="ddg">DuckDuckGo</button>
+          <button class="dir-engine-btn" data-engine="bing">Bing</button>
+        </div>
+      </div>
+
+      <!-- Preview -->
+      <div class="dir-preview-box">
+        <div class="dir-preview-label">Terminal command</div>
+        <div class="dir-preview-cmd" id="dir-command-preview">dir: &lt;keyword&gt;</div>
+        <div class="dir-preview-url" id="dir-url-preview">Enter a keyword to preview</div>
+      </div>
+
+      <div class="config-buttons">
+        <button class="btn-cancel" id="dir-copy-btn" onclick="copyDirCommand()">Copy Command</button>
+        <button class="btn-cancel" onclick="closeDirModal()">Cancel</button>
+        <button class="btn-save" onclick="fireDirSearch()">Search</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Dir Config Modal — Extension Editor -->
+  <div class="config-modal" id="dirconfig-modal" lang="en" role="dialog" aria-labelledby="dirconfig-modal-title">
+    <div class="config-content dirconfig-content">
+      <h2 id="dirconfig-modal-title">Open Dir — File Extensions</h2>
+      <p class="config-hint" style="margin-bottom: 16px;">
+        Customize which file extensions each <span class="config-code">dir/category:</span> filter searches for.
+        Click <span class="config-code">×</span> to remove, type + Enter to add. Use <span class="config-code">↺</span> to reset a category to defaults.
+      </p>
+      <div id="dirconfig-categories" class="dirconfig-categories"></div>
+      <div class="config-buttons">
+        <button class="btn-cancel" onclick="closeDirConfigModal()">Cancel</button>
+        <button class="btn-save" onclick="saveDirConfig()">Save</button>
       </div>
     </div>
   </div>
@@ -464,6 +554,7 @@
   <script src="script/modals/customize.js"></script>
   <script src="script/modals/tags.js"></script>
   <script src="script/modals/backup.js"></script>
+  <script src="script/modals/dir.js"></script>
   <script src="script/commands.js"></script>
   <script src="script/terminal.js"></script>
   <script src="script/script.js"></script>

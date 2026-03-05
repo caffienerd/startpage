@@ -59,7 +59,15 @@ function handleSpecialCommands(value) {
   if (normalized === ":bookmarks" || normalized === ":bm") { openBookmarksModal(); clear(); return; }
   if (normalized === ":customize" || normalized === ":custom") { openCustomizeModal(); clear(); return; }
   if (normalized === ":tags") { openTagsModal(); clear(); return; }
+  if (normalized === ":dir") { openDirModal(); clear(); return; }
+  if (normalized === ":dirconfig") { openDirConfigModal(); clear(); return; }
   if (normalized === ":config" || normalized === ":weather" || normalized === ":time") { openConfig(); clear(); return; }
+
+  // ---- Open Directory search ----
+  // Matches: dir: kw  /  dir/cat: kw  /  dir/cat/eng: kw  /  dir//eng: kw
+  if (/^dir(\/[a-z]*)?(\/[a-z]*)?:/i.test(rawValue)) {
+    if (handleDirCommand(rawValue)) { clear(); return; }
+  }
 
   // ---- Theme ----
   const themeMatch = normalized.replace(/^:/, '');
@@ -203,17 +211,13 @@ function routeSemanticIntent(query) {
     return;
   }
 
-  const mappedUrl = matchWebIntent(cleaned, cleanedLower, { allowSideEffects: true });
-  if (mappedUrl === HANDLED_INTERNALLY) return;
-  if (mappedUrl && mappedUrl.startsWith('spell://')) {
-    const candidate = mappedUrl.replace(/^spell:\/\//, '');
-    showAiRouteBadge('Spell Check', cleanedQuery, AI_ROUTE_BADGE_NAV_DELAY_MS).then(() => {
-      handleSpellCheck(candidate);
-    });
-    return;
-  }
+  const mappedUrl = matchWebIntent(cleaned, cleanedLower);
   if (mappedUrl) {
-    navRoute(mappedUrl);
+    if (mappedUrl.startsWith('spell://')) {
+      handleSpellCheck(mappedUrl.replace('spell://', ''));
+      return;
+    }
+    navRoute(mappedUrl, getAiUrlDestination(mappedUrl));
     return;
   }
 

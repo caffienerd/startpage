@@ -1,10 +1,11 @@
 # Professional Terminal Start Page
 
-A sleek, fast, and feature-rich browser start page driven by an interactive terminal. Boost your productivity with semantic AI routing, direct Gemini integration, and a suite of built-in utility tools—all wrapped in a premium, modern aesthetic.
+A sleek, fast, and feature-rich browser start page driven by an interactive terminal. Boost your productivity with semantic AI routing, direct Gemini integration, open directory search, and a suite of built-in utility tools—all wrapped in a premium, modern aesthetic.
 
 **→ Try it live: [caffienerd.github.io/startpage](https://caffienerd.github.io/startpage/)**
 
-> Inspired by [ahmetdem/start-page](https://github.com/ahmetdem/start-page)
+> Inspired by [ahmetdem/start-page](https://github.com/ahmetdem/start-page)  
+> Open directory search inspired by [ewasion/opendirectory-finder](https://ewasion.github.io/opendirectory-finder/#)
 
 ---
 
@@ -27,8 +28,9 @@ A sleek, fast, and feature-rich browser start page driven by an interactive term
 - **Interactive Terminal**: Command-driven interface with autocomplete (`Tab`), syntax highlighting per command type, and command history (`Up`/`Down`).
 - **Semantic AI Router**: Use the `ai:` prefix to navigate based on intent. Intelligently routes you to YouTube, Maps, Reddit, or search.
 - **Gemini Integration**: Direct AI prompting via `gem:` or `gemini:`. View responses in a clean, non-intrusive modal.
+- **Open Directory Search**: Power-user Google dorking via `dir/<category>/<engine>: keyword`. Search public open directory indexes filtered by file type, with full autocomplete and an interactive builder (`:dir`).
 - **Rich Aesthetics**: Premium design with support for **Light**, **Dark**, **AMOLED (Black)**, **Nord**, **Newspaper**, **Coffee**, **Root (Hacker)**, and **Neon (Cyberpunk)** themes.
-- **Syntax Highlighting**: Color-coded input for commands, themes, search prefixes, URLs, and more — fully customizable via `:customize`.
+- **Syntax Highlighting**: Color-coded input for commands, themes, search prefixes, open directory tokens, URLs, and more — fully customizable via `:customize`.
 - **Live Dashboard**: Instant access to local time and real-time weather updates.
 - **Utility Suite**:
   - **IP Info**: Detailed network information via `:ipconfig`.
@@ -75,7 +77,7 @@ Run `:config` in the terminal to open the settings modal.
    - **System Prompt**: Optional personality for your AI assistant.
 4. **AI Mode**: Toggle between explicit (`ai:`) and automatic intent routing.
 5. **AI Route Badge**: Control when the route preview badge is shown.
-6. **Default Search Engine**: Set Google, DuckDuckGo, or Bing as your fallback search.
+6. **Default Search Engine**: Set Google, DuckDuckGo, or Bing as your fallback search. Also used as the default engine for `dir:` searches.
 
 Run `:customize` to open the customization modal.
 
@@ -99,14 +101,54 @@ Run `:customize` to open the customization modal.
 | `amazon:` | `amazon: mechanical keyboards` | Amazon Search |
 | `imdb:` | `imdb: Breaking Bad` | IMDb Search |
 | `alt:` | `alt: alternative of something` | AlternativeTo |
-| `def:` | `def: deffination of something` | Dictionary (OneLook) |
+| `def:` | `def: definition of something` | Dictionary (OneLook) |
 | `the:` | `the: a phrase to get the thesaurus of` | Thesaurus (OneLook) |
 | `syn:` | `syn: synonyms of something` | Synonyms (OneLook) |
-| `quote:` | `quote: quotes containfing keywords ` | Quotes (OneLook) |
+| `quote:` | `quote: quotes containing keywords` | Quotes (OneLook) |
 | `spell:` | `spell: word / phrase to check` | Built-in Spell Checker |
-| `cws:` | `cws: extention` | Chrome/Firefox Extension Store |
+| `cws:` | `cws: extension` | Chrome/Firefox Extension Store |
 | `gem:` | `gem: talk to gemini` | Gemini Direct Prompt |
 | `ai:` | `ai: directions to central park` | Semantic AI Router |
+
+### Open Directory Prefixes
+
+Search for public open directory indexes using Google dorking (`intitle:index.of`). The syntax is:
+
+```
+dir/<category>/<engine>: keyword
+```
+
+Both `<category>` and `<engine>` are optional. If no engine is specified, your configured default search engine is used.
+
+| Prefix | Example | Description |
+| :--- | :--- | :--- |
+| `dir:` | `dir: interstellar` | Open dir search, no file filter |
+| `dir/media:` | `dir/media: interstellar` | Video files (mkv, mp4, avi…) |
+| `dir/books:` | `dir/books: dune` | Ebook formats (pdf, epub, mobi…) |
+| `dir/music:` | `dir/music: pink floyd` | Audio files (mp3, flac, ogg…) |
+| `dir/software:` | `dir/software: photoshop` | Executables & archives (exe, iso, zip, apk…) |
+| `dir/images:` | `dir/images: wallpapers 4k` | Image files (jpg, png, psd…) |
+| `dir/other:` | `dir/other: keyword` | Raw open dir, no file filter |
+
+**Engine override** — append `/ggl`, `/ddg`, or `/bing` before the colon:
+
+```
+dir/music/ddg: flac albums
+dir/books/bing: operating systems pdf
+dir//ggl: keyword        ← no category, explicit Google
+```
+
+**Category aliases** (shorter to type):
+
+| Category | Aliases |
+| :--- | :--- |
+| `media` | `vid`, `video` |
+| `books` | `book`, `ebook` |
+| `music` | `audio`, `mus` |
+| `software` | `soft`, `iso`, `app` |
+| `images` | `img`, `pics` |
+
+> Tab autocomplete works after `dir/` (suggests categories) and after `dir/category/` (suggests engines).
 
 ### System Commands
 
@@ -116,6 +158,8 @@ Run `:customize` to open the customization modal.
 | `:config` | Open settings |
 | `:customize` / `:custom` | Open customization (colors & theme) |
 | `:bookmarks` / `:bm` | Edit bookmarks |
+| `:dir` | Open interactive directory search builder |
+| `:dirconfig` | Customize file extensions per `dir/` category |
 | `:ipconfig` / `:ip` | Show network info |
 | `:netspeed` / `:speed` | Run speed test |
 | `:aimode` | Toggle automatic AI routing |
@@ -149,7 +193,7 @@ Run `:customize` to open the customization modal.
 | `Ctrl+Shift+Enter` | Open result in new focused tab |
 | `↑` / `↓` | Navigate command history |
 
-> `Ctrl+Enter` and `Ctrl+Shift+Enter` work for bookmarks, search prefixes, direct URLs, and plain-text searches.
+> `Ctrl+Enter` and `Ctrl+Shift+Enter` work for bookmarks, search prefixes, direct URLs, plain-text searches, and `dir:` queries.
 
 ---
 
@@ -166,13 +210,19 @@ The start page features a 4-column layout. You can customize bookmarks in two wa
 
 Run `:tags` to override built-in search prefix URLs (e.g. point `amazon:` to `amazon.in` instead of `amazon.com`) or define entirely new prefixes. Custom tag prefixes get full syntax highlighting and autocomplete automatically.
 
+From `:tags` you can also open **⊞ Dir Extensions** to customize the file extensions used by each `dir/` category.
+
+### Open Directory Extensions
+
+Run `:dirconfig` (or open it via the **⊞ Dir Extensions** button in `:tags`) to customize which file extensions each `dir/` category searches for. Each category shows pill-style tags — click `×` to remove an extension, type a new one and press Enter to add it. Use `↺` to reset any category back to its defaults. Changes are saved per-category and persist across sessions.
+
 ### Syntax Colors
 
 Run `:customize` to independently set the highlight color for each input type. Colors are stored separately from themes — changing themes won't reset your colors.
 
 ### Backup & Restore
 
-Use the **↓ Export** and **↑ Import** buttons in `:config` to save all settings (bookmarks, colors, API keys, custom tags) to a JSON file and restore them anytime.
+Use the **↓ Export** and **↑ Import** buttons in `:config` to save all settings (bookmarks, colors, API keys, custom tags, dir extensions) to a JSON file and restore them anytime.
 
 ---
 

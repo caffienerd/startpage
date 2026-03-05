@@ -1611,3 +1611,251 @@ html:not(.dark-mode):not(.black-mode):not(.nord-mode):not(.coffee-mode):not(.roo
 @keyframes loading-spin {
   to { transform: rotate(360deg); }
 }
+/* ========================================
+   Open Directory — Syntax Highlight Tokens
+   dir uses cmd color, cat uses search color,
+   engine uses theme color (reusing existing palette)
+   ======================================== */
+
+/* input-dir: partial dir command (no colon yet) */
+input.input-dir {
+  color: var(--syn-cmd) !important;
+}
+
+/* input-dir-active: dir command with colon + keyword */
+input.input-dir-active {
+  color: var(--text-color);
+}
+
+/* Hint overlay tokens */
+.command-hint .syn-dir     { color: var(--syn-cmd); }
+.command-hint .syn-dir-cat { color: var(--syn-search); }
+.command-hint .syn-dir-eng { color: var(--syn-theme); }
+.command-hint .syn-dir-sep { color: var(--text-color); opacity: 0.45; }
+.command-hint .syn-dir-kw  { color: transparent; } /* hidden — input shows this */
+
+/* ========================================
+   Open Directory Modal
+   ======================================== */
+.dir-content {
+  max-width: 600px;
+}
+
+.dir-cat-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.dir-cat-btn {
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  background: var(--link-background);
+  color: var(--text-color);
+  font-family: var(--monospace-font-family);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dir-cat-btn:hover {
+  background: var(--link-hover);
+  border-color: var(--syn-search);
+}
+
+.dir-cat-btn.active-cat {
+  background: color-mix(in srgb, var(--syn-search) 18%, transparent);
+  border-color: var(--syn-search);
+  color: var(--syn-search);
+}
+
+.dir-cat-hint {
+  font-size: 10px;
+  opacity: 0.55;
+  font-style: italic;
+}
+
+.dir-engine-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.dir-engine-btn {
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  background: var(--link-background);
+  color: var(--text-color);
+  font-family: var(--monospace-font-family);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.dir-engine-btn:hover {
+  background: var(--link-hover);
+  border-color: var(--syn-theme);
+}
+
+.dir-engine-btn.active-engine {
+  background: color-mix(in srgb, var(--syn-theme) 18%, transparent);
+  border-color: var(--syn-theme);
+  color: var(--syn-theme);
+}
+
+/* Preview box */
+.dir-preview-box {
+  margin: 18px 0 4px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  border: 1px solid var(--card-border);
+  background: var(--terminal-bg);
+}
+
+.dir-preview-label {
+  font-size: 11px;
+  opacity: 0.5;
+  font-family: var(--monospace-font-family);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.dir-preview-cmd {
+  font-family: var(--monospace-font-family);
+  font-size: 15px;
+  color: var(--syn-cmd);
+  word-break: break-all;
+  margin-bottom: 5px;
+}
+
+.dir-preview-url {
+  font-size: 12px;
+  opacity: 0.6;
+  font-family: var(--monospace-font-family);
+}
+
+/* Open Dir button in :tags footer */
+.tags-dir-btn {
+  margin-right: auto;
+  border-color: color-mix(in srgb, var(--syn-cmd) 40%, var(--card-border)) !important;
+  color: var(--syn-cmd) !important;
+}
+
+.tags-dir-btn:hover {
+  background: color-mix(in srgb, var(--syn-cmd) 12%, transparent) !important;
+}
+
+/* ========================================
+   :dirconfig — Extension Editor Modal
+   ======================================== */
+.dirconfig-content {
+  max-width: 640px;
+}
+
+.dirconfig-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.dirconfig-category {
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: var(--link-background);
+}
+
+.dirconfig-cat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.dirconfig-cat-title {
+  font-family: var(--monospace-font-family);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--syn-search);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.dirconfig-reset-btn {
+  font-size: 15px;
+  transition: opacity 0.15s;
+}
+
+.dirconfig-pills-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+  min-height: 28px;
+}
+
+.dirconfig-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px 3px 10px;
+  border-radius: 20px;
+  border: 1px solid color-mix(in srgb, var(--syn-search) 35%, var(--card-border));
+  background: color-mix(in srgb, var(--syn-search) 10%, transparent);
+  font-family: var(--monospace-font-family);
+  font-size: 12px;
+  color: var(--text-color);
+  user-select: none;
+}
+
+.dirconfig-pill-del {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-color);
+  opacity: 0.45;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0 2px;
+  transition: opacity 0.1s;
+}
+
+.dirconfig-pill-del:hover {
+  opacity: 1;
+  color: var(--color-error);
+}
+
+.dirconfig-add-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.dirconfig-add-input {
+  background: var(--terminal-bg);
+  border: 1px dashed var(--card-border);
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-family: var(--monospace-font-family);
+  font-size: 12px;
+  color: var(--text-color);
+  width: 110px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.dirconfig-add-input:focus {
+  border-color: var(--syn-search);
+  border-style: solid;
+}
+
+.dirconfig-add-input::placeholder {
+  opacity: 0.4;
+}
