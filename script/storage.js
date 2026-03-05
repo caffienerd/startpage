@@ -197,8 +197,45 @@ function saveAiRouteBadgeMode(mode) {
 }
 
 // ========================================
-// Default Search Engine
+// Search Overrides — per-prefix URL overrides
 // ========================================
+const OVERRIDEABLE_PREFIXES = {
+  'yt':     { label: 'YouTube',       default: 'https://www.youtube.com/results?search_query=' },
+  'r':      { label: 'Reddit',        default: 'https://google.com/search?q=site:reddit.com ' },
+  'ddg':    { label: 'DuckDuckGo',    default: 'https://duckduckgo.com/?q=' },
+  'bing':   { label: 'Bing',          default: 'https://www.bing.com/search?q=' },
+  'ggl':    { label: 'Google',        default: 'https://www.google.com/search?q=' },
+  'amazon': { label: 'Amazon',        default: 'https://www.amazon.com/s?k=' },
+  'imdb':   { label: 'IMDb',          default: 'https://www.imdb.com/find?q=' },
+  'alt':    { label: 'AlternativeTo', default: 'https://alternativeto.net/browse/search/?q=' },
+  'maps':   { label: 'Maps',          default: 'https://www.google.com/maps/search/' },
+};
+
+function getStoredSearchOverrides() {
+  try {
+    const stored = localStorage.getItem('searchOverrides');
+    return stored ? JSON.parse(stored) : {};
+  } catch (e) { return {}; }
+}
+function saveSearchOverrides(overrides) {
+  try { localStorage.setItem('searchOverrides', JSON.stringify(overrides)); }
+  catch (e) { console.error('Failed to save search overrides:', e); }
+}
+
+// ========================================
+// Custom Tags — user-defined prefix:url pairs
+// ========================================
+function getStoredCustomTags() {
+  try {
+    const stored = localStorage.getItem('customTags');
+    return stored ? JSON.parse(stored) : [];
+    // Format: [{ prefix: 'gh', url: 'https://github.com/search?q=' }, ...]
+  } catch (e) { return []; }
+}
+function saveCustomTags(tags) {
+  try { localStorage.setItem('customTags', JSON.stringify(tags)); }
+  catch (e) { console.error('Failed to save custom tags:', e); }
+}
 function getStoredSearchEngine() {
   const stored = localStorage.getItem('searchEngine') || DEFAULT_SEARCH_ENGINE;
   return ['google', 'ddg', 'bing'].includes(stored) ? stored : DEFAULT_SEARCH_ENGINE;

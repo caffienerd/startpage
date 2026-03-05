@@ -35,92 +35,16 @@ function initPlaceholders() {
 const TIME_UPDATE_INTERVAL = 60 * 1000;
 const WEATHER_UPDATE_INTERVAL = 30 * 60 * 1000;
 
-function focusTerminalInput() {
-  const input = document.getElementById('terminal-input');
-  if (!input) return;
-  if (document.querySelector('.config-modal.active')) return;
-  input.focus({ preventScroll: true });
-}
-
-function ensureInitialTerminalFocus() {
-  const retryDelays = [0, 60, 180, 400, 900];
-  retryDelays.forEach((delay) => {
-    setTimeout(() => {
-      if (document.activeElement?.id !== 'terminal-input') focusTerminalInput();
-    }, delay);
-  });
-
-  window.addEventListener('focus', () => {
-    setTimeout(() => {
-      if (document.activeElement?.id !== 'terminal-input') focusTerminalInput();
-    }, 0);
-  });
-
-  document.addEventListener('visibilitychange', () => {
-    if (document.visibilityState !== 'visible') return;
-    if (document.activeElement?.id !== 'terminal-input') focusTerminalInput();
-  });
-
-  // Chrome new-tab can keep focus away from page input. As soon as the page
-  // receives interaction, reclaim focus.
-  ['mousedown', 'pointerdown', 'touchstart'].forEach((evt) => {
-    document.addEventListener(evt, () => {
-      if (document.activeElement?.id !== 'terminal-input') focusTerminalInput();
-    }, { capture: true, passive: true });
-  });
-
-  document.addEventListener('keydown', (e) => {
-    if (document.querySelector('.config-modal.active')) return;
-    const active = document.activeElement;
-    const input = document.getElementById('terminal-input');
-    if (!input) return;
-    if (active === input) return;
-    if (active && (active.tagName === 'INPUT' || active.tagName === 'TEXTAREA' || active.isContentEditable)) return;
-    if (e.ctrlKey || e.metaKey || e.altKey) return;
-
-    const isPrintable = e.key.length === 1;
-    const isBackspace = e.key === 'Backspace';
-    if (!isPrintable && !isBackspace) return;
-
-    e.preventDefault();
-    focusTerminalInput();
-    if (isPrintable) {
-      input.value += e.key;
-    } else if (isBackspace) {
-      input.value = input.value.slice(0, -1);
-    }
-    input.dispatchEvent(new Event('input', { bubbles: true }));
-  }, true);
-}
-
-function bindButtonAction(id, handler) {
-  const el = document.getElementById(id);
-  if (!el || typeof handler !== 'function') return;
-  el.addEventListener('click', handler);
-}
-
-function bindStaticButtonActions() {
-  bindButtonAction('btn-edit-bookmarks', openBookmarksModal);
-  bindButtonAction('btn-config-customize', () => { closeConfig(); openCustomizeModal(); });
-  bindButtonAction('btn-config-cancel', closeConfig);
-  bindButtonAction('btn-config-save', saveConfig);
-  bindButtonAction('btn-help-close', closeHelp);
-  bindButtonAction('btn-ip-close', closeIPInfo);
-  bindButtonAction('btn-speed-close', closeSpeedTest);
-  bindButtonAction('btn-spell-close', closeSpellModal);
-  bindButtonAction('toggle-editor-btn', toggleEditorMode);
-  bindButtonAction('btn-bookmarks-cancel', closeBookmarksModal);
-  bindButtonAction('btn-bookmarks-save', saveBookmarksFromModal);
-  bindButtonAction('btn-gemini-copy', copyGeminiResponse);
-  bindButtonAction('btn-gemini-close', closeGeminiModal);
-  bindButtonAction('btn-customize-reset', resetAllSyntaxColors);
-  bindButtonAction('btn-customize-cancel', closeCustomizeModal);
-  bindButtonAction('btn-customize-save', saveCustomize);
-}
+// Hide loading overlay if user navigates back (bfcache restore)
+window.addEventListener('pageshow', (e) => {
+  const el = document.getElementById('loading-overlay');
+  if (!el) return;
+  el.classList.remove('visible');
+  el.classList.add('hiding');
+  setTimeout(() => el.classList.remove('hiding'), 300);
+});
 
 document.addEventListener("DOMContentLoaded", () => {
-  bindStaticButtonActions();
-  ensureInitialTerminalFocus();
   initPlaceholders();
   loadTheme();
   applySyntaxColors(getStoredSyntaxColors());
@@ -132,6 +56,29 @@ document.addEventListener("DOMContentLoaded", () => {
   setInterval(updateTime, TIME_UPDATE_INTERVAL);
   setInterval(updateWeather, WEATHER_UPDATE_INTERVAL);
 
+  // Dir modal — category + engine button interactivity
+  document.querySelectorAll('#dir-cat-grid .dir-cat-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#dir-cat-grid .dir-cat-btn').forEach(b => b.classList.remove('active-cat'));
+      btn.classList.add('active-cat');
+      if (typeof _updateDirPreview === 'function') _updateDirPreview();
+    });
+  });
+  document.querySelectorAll('#dir-engine-grid .dir-engine-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#dir-engine-grid .dir-engine-btn').forEach(b => b.classList.remove('active-engine'));
+      btn.classList.add('active-engine');
+      if (typeof _updateDirPreview === 'function') _updateDirPreview();
+    });
+  });
+  const dirKwInput = document.getElementById('dir-keyword-input');
+  if (dirKwInput) {
+    dirKwInput.addEventListener('input', () => { if (typeof _updateDirPreview === 'function') _updateDirPreview(); });
+    dirKwInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); if (typeof fireDirSearch === 'function') fireDirSearch(); }
+    });
+  }
+
   // Click-outside closes modals
   [
     ['config-modal', closeConfig],
@@ -141,6 +88,10 @@ document.addEventListener("DOMContentLoaded", () => {
     ['spell-modal', closeSpellModal],
     ['gemini-modal', closeGeminiModal],
     ['customize-modal', closeCustomizeModal],
+    ['tags-modal',      closeTagsModal],
+    ['dir-modal',       closeDirModal],
+    ['dirconfig-modal', closeDirConfigModal],
+    ['prompts-modal',   closePromptsModal],
   ].forEach(([id, fn]) => {
     if (typeof fn === 'function') {
       const el = document.getElementById(id);
@@ -169,6 +120,10 @@ document.addEventListener('keydown', (e) => {
     if (typeof closeGeminiModal === 'function') closeGeminiModal();
     if (typeof closeBookmarksModal === 'function') closeBookmarksModal();
     if (typeof closeCustomizeModal === 'function') closeCustomizeModal();
+    if (typeof closeTagsModal === 'function') closeTagsModal();
+    if (typeof closeDirModal === 'function') closeDirModal();
+    if (typeof closeDirConfigModal === 'function') closeDirConfigModal();
+    if (typeof closePromptsModal === 'function') closePromptsModal();
     return;
   }
 

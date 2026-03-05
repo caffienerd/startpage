@@ -1,0 +1,17 @@
+{
+  "_version": 1,
+  "_exported": "2026-02-26T08:57:00.812Z",
+  "username": "turtle",
+  "theme": "dark",
+  "weatherLocation": "Gurgaon",
+  "timezone": "UTC+5:30",
+  "geminiApiKey": "AIzaSyChduczJaw__Tg7O6-_DuCxY98YlnLyA8E",
+  "geminiModel": "gemini-1.5-flash-lite",
+  "geminiSystemPrompt": "Never use stars asterisks dashes or any markdown symbols.\nNever use bold italics underline or code blocks.\nNever use bullet points numbered lists or headings.\nComplete every sentence properly.\nKeep the vocabulary simple and understandable.\nDo not add extra flair humor emojis or humorous concluding phrases.\nKeep the conversation as if it's only gonna happen once and user cannot have a follow-up for it.\nKeep a good balance of the conversation between powerful, informative explanatory, and the amount of words used.",
+  "aiModeEnabled": "false",
+  "aiRouteBadgeMode": "live",
+  "bookmarks": "[{\"title\":\"Bhindi\",\"href\":\"https://bhindi.io/c/new\"},{\"title\":\"Perplexity\",\"href\":\"https://www.perplexity.ai/\"},{\"title\":\"Gemini\",\"href\":\"https://gemini.google.com/app\"},{\"title\":\"Grok\",\"href\":\"https://grok.com\"},{\"title\":\"Copilot\",\"href\":\"https://copilot.microsoft.com/\"},{\"title\":\"claude\",\"href\":\"https://claude.ai/new\"},{\"title\":\"DeepSeek\",\"href\":\"https://chat.deepseek.com/\"},{\"title\":\"Deepsite\",\"href\":\"https://deepsite.hf.co/\"},{\"title\":\"OpenBuilder\",\"href\":\"https://theopenbuilder.com/\"},{\"title\":\"DevDocs\",\"href\":\"https://devdocs.io/\"},{\"title\":\"Reddit\",\"href\":\"https://www.reddit.com/\"},{\"title\":\"Instagram\",\"href\":\"https://www.instagram.com/\"},{\"title\":\"YouTube\",\"href\":\"https://www.youtube.com/\"},{\"title\":\"WhatsApp\",\"href\":\"https://web.whatsapp.com/\"},{\"title\":\"Gmail\",\"href\":\"https://mail.google.com/mail/u/0/#inbox\"},{\"title\":\"FMHY\",\"href\":\"https://fmhy.net/\"},{\"title\":\"OpenDIRs\",\"href\":\"https://ewasion.github.io/opendirectory-finder/\"},{\"title\":\"IT-Tools\",\"href\":\"https://it-tools.tech/\"},{\"title\":\"Github\",\"href\":\"https://github.com/caffienerd\"},{\"title\":\"FilePizza\",\"href\":\"https://file.pizza/\"}]",
+  "syntaxColors": "{\"cmd\":\"#76b792\",\"theme\":\"#999999\",\"search\":\"#00ffff\",\"version\":\"#20fe79\",\"url\":\"#8442ff\",\"unknown\":\"#e74c3c\"}",
+  "searchOverrides": "{\"amazon\":\"https://www.amazon.in/s?k=\"}",
+  "customTags": "[{\"prefix\":\"meet\",\"url\":\"https://meet.google.com/\"}]"
+}

@@ -322,6 +322,7 @@ ul {
 
 ul li {
   font-size: 17px;
+  transition: opacity 0.2s ease, filter 0.2s ease;
 }
 
 ul li a {
@@ -335,7 +336,7 @@ ul li a {
   padding: 11px 14px;
   border-radius: 7px;
   background: var(--link-background);
-  transition: all 0.15s ease;
+  transition: background 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease, opacity 0.18s ease;
   opacity: 1;
   position: relative;
   z-index: var(--z-base);
@@ -758,6 +759,29 @@ ul li a span {
   opacity: 1;
 }
 
+.btn-backup {
+  background: transparent;
+  border: 1px solid var(--card-border);
+  color: var(--text-color);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-family: var(--monospace-font-family);
+  cursor: pointer;
+  opacity: 0.5;
+  transition: opacity 0.15s, border-color 0.15s;
+}
+
+.btn-backup:hover {
+  opacity: 1;
+  border-color: var(--text-color);
+}
+
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateX(-50%) translateY(8px); }
+  to   { opacity: 1; transform: translateX(-50%) translateY(0); }
+}
+
 .config-buttons button {
   padding: 11px 24px;
   border: none;
@@ -1167,24 +1191,27 @@ ul li a span {
 }
 
 /* Bookmark Matching Styles */
-.bookmark-match {
+.bookmark-match a {
   background: rgba(255, 255, 255, 0.08) !important;
+  border-radius: 7px;
 }
 
-.primary-match {
-  background: rgba(255, 255, 255, 0.22) !important;
+.primary-match a {
+  background: rgba(255, 255, 255, 0.18) !important;
   transform: translateX(5px) !important;
   box-shadow: 0 4px 16px rgba(0, 0, 0, 0.25), 0 0 12px rgba(255, 255, 255, 0.08) !important;
+  border-radius: 7px;
   z-index: 20;
 }
 
-.primary-match span {
+.primary-match a span {
   font-weight: 600 !important;
 }
 
 .bookmark-nomatch {
-  opacity: 0.4 !important;
+  opacity: 0.35 !important;
   filter: grayscale(70%) !important;
+  transition: opacity 0.2s ease, filter 0.2s ease;
 }
 
 .bookmark-nomatch span {
@@ -1416,10 +1443,454 @@ html:not(.dark-mode):not(.black-mode):not(.nord-mode):not(.coffee-mode):not(.roo
   font-weight: 700;
 }
 
+/* ---- Tags Modal ---- */
+.tags-content {
+  max-width: 700px !important;
+  width: 92% !important;
+}
+
+.tags-overrides-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.tags-override-row {
+  display: grid;
+  grid-template-columns: 110px 52px 1fr 28px;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--terminal-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 7px;
+}
+
+.tags-override-label {
+  font-size: 13px;
+  font-weight: 600;
+  opacity: 0.75;
+  font-family: var(--monospace-font-family);
+  white-space: nowrap;
+}
+
+.tags-override-prefix {
+  font-family: var(--monospace-font-family);
+  font-size: 13px;
+  color: var(--syn-search, #f39c12);
+  font-weight: 700;
+}
+
+.tags-override-input {
+  width: 100%;
+  box-sizing: border-box;
+  font-family: var(--monospace-font-family);
+  font-size: 12px;
+  padding: 5px 8px;
+}
+
+.tags-custom-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+
+.tags-custom-row {
+  display: grid;
+  grid-template-columns: 90px 14px 1fr 28px;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  background: var(--terminal-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 7px;
+}
+
+.tags-custom-prefix {
+  font-family: var(--monospace-font-family);
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--syn-search, #f39c12);
+  width: 100%;
+  box-sizing: border-box;
+  padding: 5px 8px;
+  text-align: center;
+}
+
+.tags-colon {
+  font-family: var(--monospace-font-family);
+  font-size: 14px;
+  font-weight: 700;
+  opacity: 0.5;
+  text-align: center;
+}
+
+.tags-custom-url {
+  font-family: var(--monospace-font-family);
+  font-size: 12px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 5px 8px;
+}
+
+.tags-reset-btn {
+  background: transparent;
+  border: 1px solid var(--card-border);
+  color: var(--text-color);
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  font-size: 13px;
+  cursor: pointer;
+  opacity: 0.45;
+  transition: opacity 0.15s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.tags-reset-btn:hover { opacity: 1; border-color: var(--text-color); }
+
+.tags-delete-btn:hover { opacity: 1; border-color: #e74c3c; color: #e74c3c; }
+
+.tags-add-btn {
+  background: transparent;
+  border: 1px dashed var(--card-border);
+  color: var(--text-color);
+  border-radius: 7px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-family: var(--monospace-font-family);
+  cursor: pointer;
+  opacity: 0.55;
+  width: 100%;
+  transition: opacity 0.15s, border-color 0.15s;
+}
+
+.tags-add-btn:hover { opacity: 1; border-color: var(--text-color); }
+
 .config-hint {
   font-size: 12px;
   opacity: 0.5;
   margin-top: 6px;
   line-height: 1.5;
   font-family: var(--monospace-font-family);
+}
+
+/* ---- Loading Overlay ---- */
+#loading-overlay {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 99999;
+  background: var(--background-color);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+}
+
+#loading-overlay.visible {
+  display: flex;
+  opacity: 1;
+}
+
+#loading-overlay.hiding {
+  opacity: 0;
+}
+
+#loading-ring {
+  width: 52px;
+  height: 52px;
+  border-radius: 50%;
+  border: 2px solid transparent;
+  border-top-color: var(--text-color);
+  opacity: 0.35;
+  animation: loading-spin 0.9s cubic-bezier(0.4, 0, 0.2, 1) infinite;
+}
+
+@keyframes loading-spin {
+  to { transform: rotate(360deg); }
+}
+/* ========================================
+   Open Directory — Syntax Highlight Tokens
+   dir uses cmd color, cat uses search color,
+   engine uses theme color (reusing existing palette)
+   ======================================== */
+
+/* input-dir: partial dir command (no colon yet) */
+input.input-dir {
+  color: var(--syn-cmd) !important;
+}
+
+/* input-dir-active: dir command with colon + keyword */
+input.input-dir-active {
+  color: var(--text-color);
+}
+
+/* Hint overlay tokens */
+.command-hint .syn-dir     { color: var(--syn-cmd); }
+.command-hint .syn-dir-cat { color: var(--syn-search); }
+.command-hint .syn-dir-eng { color: var(--syn-theme); }
+.command-hint .syn-dir-sep { color: var(--text-color); opacity: 0.45; }
+.command-hint .syn-dir-kw  { color: transparent; } /* hidden — input shows this */
+
+/* ========================================
+   Open Directory Modal
+   ======================================== */
+.dir-content {
+  max-width: 600px;
+}
+
+.dir-cat-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.dir-cat-btn {
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  background: var(--link-background);
+  color: var(--text-color);
+  font-family: var(--monospace-font-family);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.dir-cat-btn:hover {
+  background: var(--link-hover);
+  border-color: var(--syn-search);
+}
+
+.dir-cat-btn.active-cat {
+  background: color-mix(in srgb, var(--syn-search) 18%, transparent);
+  border-color: var(--syn-search);
+  color: var(--syn-search);
+}
+
+.dir-cat-hint {
+  font-size: 10px;
+  opacity: 0.55;
+  font-style: italic;
+}
+
+.dir-engine-grid {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 8px;
+}
+
+.dir-engine-btn {
+  padding: 7px 14px;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  background: var(--link-background);
+  color: var(--text-color);
+  font-family: var(--monospace-font-family);
+  font-size: 13px;
+  cursor: pointer;
+  transition: background 0.15s, border-color 0.15s, color 0.15s;
+}
+
+.dir-engine-btn:hover {
+  background: var(--link-hover);
+  border-color: var(--syn-theme);
+}
+
+.dir-engine-btn.active-engine {
+  background: color-mix(in srgb, var(--syn-theme) 18%, transparent);
+  border-color: var(--syn-theme);
+  color: var(--syn-theme);
+}
+
+/* Preview box */
+.dir-preview-box {
+  margin: 18px 0 4px;
+  padding: 14px 18px;
+  border-radius: 10px;
+  border: 1px solid var(--card-border);
+  background: var(--terminal-bg);
+}
+
+.dir-preview-label {
+  font-size: 11px;
+  opacity: 0.5;
+  font-family: var(--monospace-font-family);
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+}
+
+.dir-preview-cmd {
+  font-family: var(--monospace-font-family);
+  font-size: 15px;
+  color: var(--syn-cmd);
+  word-break: break-all;
+  margin-bottom: 5px;
+}
+
+.dir-preview-url {
+  font-size: 12px;
+  opacity: 0.6;
+  font-family: var(--monospace-font-family);
+}
+
+/* Open Dir button in :tags footer */
+.tags-dir-btn {
+  margin-right: auto;
+  border-color: color-mix(in srgb, var(--syn-cmd) 40%, var(--card-border)) !important;
+  color: var(--syn-cmd) !important;
+}
+
+.tags-dir-btn:hover {
+  background: color-mix(in srgb, var(--syn-cmd) 12%, transparent) !important;
+}
+
+/* ========================================
+   :dirconfig — Extension Editor Modal
+   ======================================== */
+.dirconfig-content {
+  max-width: 640px;
+}
+
+.dirconfig-categories {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.dirconfig-category {
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  background: var(--link-background);
+}
+
+.dirconfig-cat-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+
+.dirconfig-cat-title {
+  font-family: var(--monospace-font-family);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--syn-search);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.dirconfig-reset-btn {
+  font-size: 15px;
+  transition: opacity 0.15s;
+}
+
+.dirconfig-pills-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 10px;
+  min-height: 28px;
+}
+
+.dirconfig-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 8px 3px 10px;
+  border-radius: 20px;
+  border: 1px solid color-mix(in srgb, var(--syn-search) 35%, var(--card-border));
+  background: color-mix(in srgb, var(--syn-search) 10%, transparent);
+  font-family: var(--monospace-font-family);
+  font-size: 12px;
+  color: var(--text-color);
+  user-select: none;
+}
+
+.dirconfig-pill-del {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-color);
+  opacity: 0.45;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0 2px;
+  transition: opacity 0.1s;
+}
+
+.dirconfig-pill-del:hover {
+  opacity: 1;
+  color: var(--color-error);
+}
+
+.dirconfig-add-wrap {
+  display: flex;
+  align-items: center;
+}
+
+.dirconfig-add-input {
+  background: var(--terminal-bg);
+  border: 1px dashed var(--card-border);
+  border-radius: 20px;
+  padding: 3px 12px;
+  font-family: var(--monospace-font-family);
+  font-size: 12px;
+  color: var(--text-color);
+  width: 110px;
+  outline: none;
+  transition: border-color 0.15s;
+}
+
+.dirconfig-add-input:focus {
+  border-color: var(--syn-search);
+  border-style: solid;
+}
+
+.dirconfig-add-input::placeholder {
+  opacity: 0.4;
+}
+
+/* ========================================
+   :prompts — Placeholder Suggestions Editor
+   ======================================== */
+.prompts-content {
+  max-width: 520px;
+}
+
+.prompts-textarea {
+  width: 100%;
+  min-height: 260px;
+  background: var(--terminal-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  padding: 14px 16px;
+  font-family: var(--monospace-font-family);
+  font-size: 13px;
+  color: var(--text-color);
+  resize: vertical;
+  outline: none;
+  line-height: 1.7;
+  transition: border-color 0.15s;
+}
+
+.prompts-textarea:focus {
+  border-color: var(--syn-cmd);
+}
+
+.prompts-textarea::placeholder {
+  opacity: 0.35;
 }
