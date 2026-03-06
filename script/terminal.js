@@ -80,11 +80,12 @@ function getDirSyntaxHtml(value) {
 function getDirAutocompleteSuggestion(value) {
   const lower = value.toLowerCase();
 
-  // Suggest 'dir:' when user types 'd' or 'di', 'dir/' when they type 'dir'
-  if ((lower === 'd' || lower === 'di') && 'dir:'.startsWith(lower)) return 'dir:';
-  if (lower === 'dir') return 'dir/';
+  // Suggest 'dir/' when user types 'd', 'di', or 'dir' (no slash yet)
+  if (/^di?r?$/.test(lower)) {
+    return 'dir/';
+  }
 
-  // After 'dir/' — suggest categories
+  // After 'dir/' — suggest category + colon (e.g. dir/media:)
   const afterDirSlash = lower.match(/^dir\/([a-z]*)$/);
   if (afterDirSlash) {
     const typed = afterDirSlash[1];
@@ -93,18 +94,23 @@ function getDirAutocompleteSuggestion(value) {
       allOptions.push(key);
       def.aliases.forEach(a => allOptions.push(a));
     }
-    // If typed exactly matches a valid category, suggest the trailing slash
-    if (typed && allOptions.includes(typed)) return `dir/${typed}/`;
-    // Otherwise suggest first prefix match
+    // Exact match (e.g. 'dir/media' → 'dir/media:')
+    const exact = allOptions.find(c => c === typed);
+    if (exact) return `dir/${exact}:`;
+    // Partial match (e.g. 'dir/me' → 'dir/media:')
     const match = allOptions.find(c => c.startsWith(typed) && c !== typed);
-    if (match) return `dir/${match}/`;
+    if (match) return `dir/${match}:`;
   }
 
-  // After 'dir/cat/' — suggest engines
+  // After 'dir/cat/' — suggest engine + colon (e.g. dir/media/ggl:)
   const afterCatSlash = lower.match(/^dir\/([a-z]+)\/([a-z]*)$/);
   if (afterCatSlash) {
     const typedEng = afterCatSlash[2];
     const engines = ['ggl', 'ddg', 'bing'];
+    // Exact match (e.g. 'dir/media/ggl' → 'dir/media/ggl:')
+    const exact = engines.find(e => e === typedEng);
+    if (exact) return `dir/${afterCatSlash[1]}/${exact}:`;
+    // Partial match (e.g. 'dir/media/g' → 'dir/media/ggl:')
     const match = engines.find(e => e.startsWith(typedEng) && e !== typedEng);
     if (match) return `dir/${afterCatSlash[1]}/${match}:`;
   }
@@ -114,11 +120,66 @@ function getDirAutocompleteSuggestion(value) {
   if (afterDoubleSlash) {
     const typedEng = afterDoubleSlash[1];
     const engines = ['ggl', 'ddg', 'bing'];
+    const exact = engines.find(e => e === typedEng);
+    if (exact) return `dir//${exact}:`;
     const match = engines.find(e => e.startsWith(typedEng) && e !== typedEng);
     if (match) return `dir//${match}:`;
   }
 
   return null;
+}
+
+// ---- Build hint HTML for dir ghost-text cases (partial coloring) ----
+// Input text will be transparent (input-dir-composing); hint renders everything.
+// Completed segments get their token color; partial/incomplete segments get plain text color.
+function getDirGhostHintHtml(value, suggestion) {
+  const remaining = suggestion.substring(value.length);
+  const ghostSpan = remaining ? `<span class="suggestion">${escapeHTML(remaining)}</span>` : '';
+
+  // No slash yet (d, di, dir) — no coloring at all, just hide value + ghost
+  if (!value.includes('/')) {
+    return `<span style="visibility:hidden">${escapeHTML(value)}</span>${ghostSpan}`;
+  }
+
+  // Has colon — delegate to getDirSyntaxHtml for the prefix, plain for keyword
+  const colonIdx = value.indexOf(':');
+  if (colonIdx !== -1) {
+    const prefix = value.slice(0, colonIdx + 1);
+    const kw = value.slice(colonIdx + 1);
+    return getDirSyntaxHtml(prefix) + `<span class="syn-dir-plain">${escapeHTML(kw)}</span>${ghostSpan}`;
+  }
+
+  // Has slash(es), no colon
+  const parts = value.split('/');
+  // parts[0]='dir', parts[1]=cat (may be empty), parts[2]=eng (may be undefined/empty)
+
+  let html = `<span class="syn-dir">${escapeHTML(parts[0])}</span>`;
+
+  if (parts.length === 2) {
+    const catSeg = parts[1];
+    if (!catSeg) {
+      // 'dir/' — separator done, nothing partial
+      html += `<span class="syn-dir-sep">/</span>`;
+    } else {
+      // 'dir/partial' — cat not yet complete, show as plain
+      html += `<span class="syn-dir-plain">/${escapeHTML(catSeg)}</span>`;
+    }
+  } else if (parts.length >= 3) {
+    const catSeg = parts[1];
+    const engSeg = parts[2];
+    // cat is complete (followed by '/')
+    html += `<span class="syn-dir-sep">/</span><span class="syn-dir-cat">${escapeHTML(catSeg)}</span>`;
+    if (!engSeg) {
+      // 'dir/cat/' — separator done, nothing partial
+      html += `<span class="syn-dir-sep">/</span>`;
+    } else {
+      // 'dir/cat/partial' — engine not yet complete, show as plain
+      html += `<span class="syn-dir-plain">/${escapeHTML(engSeg)}</span>`;
+    }
+  }
+
+  html += ghostSpan;
+  return html;
 }
 
 // ---- Syntax highlighting + autocomplete ghost ----
@@ -131,7 +192,7 @@ function updateSyntaxHighlight(value) {
     'y': 'yt:',
     'a': 'alt:',
     'am': 'amazon:',
-    'd': 'dir:',      // dir takes priority over def: — type 'de' for def:
+    'd': 'dir/',      // dir takes priority over def: — type 'de' for def:
     'de': 'def:',
     'dd': 'ddg:',
     'i': 'imdb:',
@@ -166,8 +227,6 @@ function updateSyntaxHighlight(value) {
     ':w': ':weather',
     ':ti': ':time',
     ':ve': ':version',
-    ':ex': ':export',
-    ':im': ':import',
     ':no': ':nord',
     ':ne': ':newspaper',
     ':co': ':coffee',
@@ -185,46 +244,60 @@ function updateSyntaxHighlight(value) {
   const customTagPrefixes = customTags.map(t => t.prefix).filter(Boolean);
 
   const themeCommands = [':dark', ':black', ':amoled', ':light', ':nord', ':newspaper', ':coffee', ':root', ':neon'];
-  const knownCommands = [':help', ':help_ai_router', ':aimode', ':bookmarks', ':bm', ':ipconfig', ':ip', ':netspeed', ':speed', ':config', ':customize', ':custom', ':tags', ':dir', ':dirconfig', ':prompts', ':export', ':import', ':weather', ':time', ':gemini', ':hacker', ':cyberpunk', ...themeCommands];
-  const versionCommands = [':version', ':ver', ':export', ':import'];
+  const knownCommands = [':help', ':help_ai_router', ':aimode', ':bookmarks', ':bm', ':ipconfig', ':ip', ':netspeed', ':speed', ':config', ':customize', ':custom', ':tags', ':dir', ':dirconfig', ':prompts', ':weather', ':time', ':gemini', ':hacker', ':cyberpunk', ...themeCommands];
+  const versionCommands = [':version', ':ver'];
   const knownSearch = /^(r|yt|alt|def|ddg|ggl|bing|amazon|imdb|the|syn|quote|maps|cws|spell|gem|gemini|ai):/;
   const knownSearchDynamic = customTagPrefixes.length
     ? new RegExp(`^(r|yt|alt|def|ddg|ggl|bing|amazon|imdb|the|syn|quote|maps|cws|spell|gem|gemini|ai|${customTagPrefixes.map(p => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')}):`)
     : knownSearch;
 
-  // ---- DIR syntax: check first before generic suggestions ----
-  if (/^dir/i.test(value)) {
-    // Check for a dir-specific autocomplete suggestion
+  // ---- DIR syntax: only match valid dir patterns (not 'directory', 'dir is broken', etc.) ----
+  if (/^di?r?$/.test(value) || /^dir[/:]/.test(value)) {
     const dirSuggest = getDirAutocompleteSuggestion(value);
+
     if (dirSuggest && dirSuggest !== value) {
+      // Has an autocomplete suggestion — show ghost text with partial coloring
       input.setAttribute('data-suggestion', dirSuggest);
-      const remaining = dirSuggest.substring(value.length);
-      const dirHtml = getDirSyntaxHtml(value);
-      hintEl.innerHTML = `<span style="visibility:hidden">${escapeHTML(value)}</span><span class="suggestion">${escapeHTML(remaining)}</span>`;
-      input.className = 'input-dir';
+
+      if (value.includes('/')) {
+        // Has slash: render partial coloring via hint, input text transparent
+        hintEl.innerHTML = getDirGhostHintHtml(value, dirSuggest);
+        input.className = 'input-dir-composing';
+      } else {
+        // Just 'd', 'di', 'dir' — no color yet, plain ghost text
+        const remaining = dirSuggest.substring(value.length);
+        hintEl.innerHTML = `<span style="visibility:hidden">${escapeHTML(value)}</span><span class="suggestion">${escapeHTML(remaining)}</span>`;
+        input.className = '';
+      }
       return;
     }
 
-    // Completed dir command (has colon) — render full syntax highlight
-    if (/^dir(\/[a-z]*)?(\/[a-z]*)?:/i.test(value)) {
-      input.removeAttribute('data-suggestion');
-      const dirHtml = getDirSyntaxHtml(value);
-      if (dirHtml) {
-        // Use hint overlay for colorized prefix, hide actual input text via transparent color
-        const colonIdx = value.indexOf(':');
-        const prefix = value.slice(0, colonIdx + 1);
-        const rest = value.slice(colonIdx + 1);
-        const prefixHtml = getDirSyntaxHtml(prefix + ' ').replace(/<span class="syn-dir-kw">.*<\/span>/, '');
-        hintEl.innerHTML = `${getDirSyntaxHtml(prefix)}<span style="visibility:hidden">${escapeHTML(rest)}</span>`;
-        input.className = 'input-dir-active';
-        return;
-      }
+    // No suggestion available
+    input.removeAttribute('data-suggestion');
+
+    const colonIdx = value.indexOf(':');
+    if (colonIdx !== -1) {
+      // Has colon — render full syntax coloring
+      const prefix = value.slice(0, colonIdx + 1);
+      const kw = value.slice(colonIdx + 1);
+      // Bright (phase 3) only when keyword has started (space or text after colon)
+      const isBright = kw.length > 0;
+
+      hintEl.innerHTML = getDirSyntaxHtml(prefix) + `<span style="visibility:hidden">${escapeHTML(kw)}</span>`;
+      // isBright → input-dir-active: input text-color, keyword shows through transparent syn-dir-kw
+      // not bright → input-dir-composing: input transparent, hint covers everything
+      input.className = isBright ? 'input-dir-active' : 'input-dir-composing';
+      return;
     }
 
-    // Partial dir (no colon yet)
-    input.removeAttribute('data-suggestion');
-    hintEl.textContent = '';
-    input.className = 'input-dir';
+    // No colon, no suggestion — partial coloring for whatever is typed
+    if (value.includes('/')) {
+      hintEl.innerHTML = getDirGhostHintHtml(value, value); // no ghost span
+      input.className = 'input-dir-composing';
+    } else {
+      hintEl.textContent = '';
+      input.className = '';
+    }
     return;
   }
 
@@ -403,7 +476,8 @@ function handleKeyboardEvents(input, elements) {
       const suggestion = input.getAttribute('data-suggestion');
       input.value = suggestion;
       updateSyntaxHighlight(suggestion.toLowerCase());
-      input.removeAttribute('data-suggestion');
+      // Note: do NOT removeAttribute here — updateSyntaxHighlight may have already
+      // set a new data-suggestion for the next ghost (e.g. dir/ → dir/media:)
       input.placeholder = '';
       return;
     }

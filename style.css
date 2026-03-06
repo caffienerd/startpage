@@ -1626,6 +1626,12 @@ input.input-dir {
   color: var(--syn-cmd) !important;
 }
 
+/* input-dir-composing: hint renders all tokens; input text is hidden but cursor stays visible */
+input.input-dir-composing {
+  color: transparent !important;
+  caret-color: var(--terminal-text) !important;
+}
+
 /* input-dir-active: dir command with colon + keyword */
 input.input-dir-active {
   color: var(--text-color);
@@ -1637,6 +1643,7 @@ input.input-dir-active {
 .command-hint .syn-dir-eng { color: var(--syn-theme); }
 .command-hint .syn-dir-sep { color: var(--text-color); opacity: 0.45; }
 .command-hint .syn-dir-kw  { color: transparent; } /* hidden — input shows this */
+.command-hint .syn-dir-plain { color: var(--terminal-text); } /* partial/incomplete segment */
 
 /* ========================================
    Open Directory Modal
