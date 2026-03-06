@@ -183,7 +183,8 @@ function getDirGhostHintHtml(value, suggestion) {
 }
 
 // ---- Syntax highlighting + autocomplete ghost ----
-function updateSyntaxHighlight(value) {
+function updateSyntaxHighlight(rawValue) {
+  const value = rawValue.toLowerCase(); // use for matching only; rawValue for rendering
   const hintEl = document.getElementById('command-hint');
   const input = document.getElementById('terminal-input');
 
@@ -260,13 +261,13 @@ function updateSyntaxHighlight(value) {
       input.setAttribute('data-suggestion', dirSuggest);
 
       if (value.includes('/')) {
-        // Has slash: render partial coloring via hint, input text transparent
-        hintEl.innerHTML = getDirGhostHintHtml(value, dirSuggest);
+        // Has slash: render partial coloring via hint using rawValue, input text transparent
+        hintEl.innerHTML = getDirGhostHintHtml(rawValue, dirSuggest);
         input.className = 'input-dir-composing';
       } else {
         // Just 'd', 'di', 'dir' — no color yet, plain ghost text
         const remaining = dirSuggest.substring(value.length);
-        hintEl.innerHTML = `<span style="visibility:hidden">${escapeHTML(value)}</span><span class="suggestion">${escapeHTML(remaining)}</span>`;
+        hintEl.innerHTML = `<span style="visibility:hidden">${escapeHTML(rawValue)}</span><span class="suggestion">${escapeHTML(remaining)}</span>`;
         input.className = '';
       }
       return;
@@ -277,22 +278,23 @@ function updateSyntaxHighlight(value) {
 
     const colonIdx = value.indexOf(':');
     if (colonIdx !== -1) {
-      // Has colon — render full syntax coloring
-      const prefix = value.slice(0, colonIdx + 1);
+      const rawPrefix = rawValue.slice(0, colonIdx + 1);
       const kw = value.slice(colonIdx + 1);
-      // Bright (phase 3) only when keyword has started (space or text after colon)
       const isBright = kw.length > 0;
 
-      hintEl.innerHTML = getDirSyntaxHtml(prefix) + `<span style="visibility:hidden">${escapeHTML(kw)}</span>`;
-      // isBright → input-dir-active: input text-color, keyword shows through transparent syn-dir-kw
-      // not bright → input-dir-composing: input transparent, hint covers everything
-      input.className = isBright ? 'input-dir-active' : 'input-dir-composing';
+      if (isBright) {
+        hintEl.innerHTML = getDirSyntaxHtml(rawPrefix);
+        input.className = 'input-dir-active';
+      } else {
+        hintEl.innerHTML = getDirSyntaxHtml(rawPrefix);
+        input.className = 'input-dir-composing';
+      }
       return;
     }
 
     // No colon, no suggestion — partial coloring for whatever is typed
     if (value.includes('/')) {
-      hintEl.innerHTML = getDirGhostHintHtml(value, value); // no ghost span
+      hintEl.innerHTML = getDirGhostHintHtml(rawValue, rawValue); // no ghost span
       input.className = 'input-dir-composing';
     } else {
       hintEl.textContent = '';
@@ -306,7 +308,8 @@ function updateSyntaxHighlight(value) {
     if (value && full.startsWith(value) && value !== full) {
       input.setAttribute('data-suggestion', full);
       const remaining = full.substring(value.length);
-      hintEl.innerHTML = `<span style="visibility:hidden">${escapeHTML(value)}</span><span class="suggestion">${escapeHTML(remaining)}</span>`;
+      // Use rawValue (not lowercase) for hidden spacer — exact width match regardless of caps
+      hintEl.innerHTML = `<span style="visibility:hidden">${escapeHTML(rawValue)}</span><span class="suggestion">${escapeHTML(remaining)}</span>`;
 
       if (value.startsWith(':')) {
         if (versionCommands.some(c => c.startsWith(value))) input.className = 'input-version';
@@ -326,11 +329,13 @@ function updateSyntaxHighlight(value) {
   // No autocomplete — clear hint, color input itself
   input.removeAttribute('data-suggestion');
 
-  // For search prefixes with content after colon: show colored prefix in hint, white input
-  const searchMatch = value.match(/^([a-z]+:)(.+)$/);
-  if (searchMatch && knownSearchDynamic.test(value)) {
-    const [, prefix, rest] = searchMatch;
-    hintEl.innerHTML = `<span class="search">${escapeHTML(prefix)}</span><span style="visibility:hidden">${escapeHTML(rest)}</span>`;
+  // For search prefixes with content after colon: color prefix via hint overlay,
+  // leave input class empty so query shows in normal terminal text color.
+  // Use rawValue so the hidden spacer matches actual input width regardless of caps.
+  const rawPrefixMatch = rawValue.match(/^([^:\s]+:)(.+)$/);
+  if (rawPrefixMatch && knownSearchDynamic.test(value)) {
+    const [, rawPrefix, rawRest] = rawPrefixMatch;
+    hintEl.innerHTML = `<span class="search">${escapeHTML(rawPrefix)}</span><span style="visibility:hidden">${escapeHTML(rawRest)}</span>`;
     input.className = '';
     return;
   }
@@ -394,10 +399,30 @@ function findFirstBookmarkMatch(elements, rawValue) {
 
 // ---- Input handler (bookmark filtering) ----
 function handleInput(input, elements) {
+  // Hide the hint overlay once the input scrolls horizontally (prefix would overlap)
+  input.addEventListener("scroll", () => {
+    const hintEl = document.getElementById('command-hint');
+    if (!hintEl) return;
+    if (input.scrollLeft > 0) {
+      hintEl.style.visibility = 'hidden';
+      // If input text was transparent (composing), make it visible so it doesn't disappear
+      if (input.classList.contains('input-dir-composing')) {
+        input.classList.remove('input-dir-composing');
+        input.classList.add('input-dir-active');
+      }
+    } else {
+      hintEl.style.visibility = '';
+    }
+  });
+
   input.addEventListener("input", () => {
+    // Reset hint visibility on each keystroke (scroll resets when text shortens)
+    const hintEl = document.getElementById('command-hint');
+    if (hintEl) hintEl.style.visibility = '';
+
     const rawValue = input.value;
     const value = rawValue.toLowerCase();
-    updateSyntaxHighlight(value);
+    updateSyntaxHighlight(rawValue);
 
     // 1. Determine the best bookmark match
     const bookmarkMatch = findFirstBookmarkMatch(elements, rawValue);
@@ -475,7 +500,7 @@ function handleKeyboardEvents(input, elements) {
       e.preventDefault();
       const suggestion = input.getAttribute('data-suggestion');
       input.value = suggestion;
-      updateSyntaxHighlight(suggestion.toLowerCase());
+      updateSyntaxHighlight(suggestion);
       // Note: do NOT removeAttribute here — updateSyntaxHighlight may have already
       // set a new data-suggestion for the next ghost (e.g. dir/ → dir/media:)
       input.placeholder = '';
@@ -503,11 +528,11 @@ function handleKeyboardEvents(input, elements) {
     if (e.key === "ArrowUp" && historyIndex > 0) {
       e.preventDefault();
       input.value = history[--historyIndex];
-      updateSyntaxHighlight(input.value.toLowerCase());
+      updateSyntaxHighlight(input.value);
     } else if (e.key === "ArrowDown" && historyIndex < history.length - 1) {
       e.preventDefault();
       input.value = history[++historyIndex];
-      updateSyntaxHighlight(input.value.toLowerCase());
+      updateSyntaxHighlight(input.value);
     } else if (e.key === "Enter") {
       handleEnterKey(rawValue, value, elements, history);
       historyIndex = history.length;
