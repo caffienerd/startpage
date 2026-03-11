@@ -2,7 +2,7 @@
 // Defaults
 // ========================================
 const DEFAULT_BOOKMARKS = [
-  { href: "https://mail.google.com/", title: "Gmail" },
+  { href: "https://stuffifound.pages.dev/", title: "StuffIFound" },
   { href: "https://huggingface.co/spaces", title: "HuggingFace" },
   { href: "https://youtube.com", title: "YouTube" },
   { href: "https://drive.google.com/", title: "Drive" },
@@ -10,16 +10,16 @@ const DEFAULT_BOOKMARKS = [
   { href: "https://deepsite.hf.co/", title: "Deepsite" },
   { href: "https://web.whatsapp.com/", title: "WhatsApp" },
   { href: "https://www.reddit.com/", title: "Reddit" },
-  { href: "https://x.com/home", title: "X" },
+  { href: "https://stuffifound.pages.dev/", title: "StuffIFound" },
   { href: "https://pinterest.com/", title: "Pinterest" },
   { href: "https://chat.deepseek.com/", title: "DeepSeek" },
   { href: "https://grok.com/", title: "Grock" },
-  { href: "https://www.perplexity.ai/", title: "Perplexity" },
-  { href: "https://chatgpt.com/", title: "ChatGPT" },
+  { href: "https://stuffifound.pages.dev/", title: "StuffIFound" },
   { href: "https://alternativeto.net/", title: "AlternativeTo" },
-  { href: "https://github.com/", title: "Github" },
+  { href: "https://stuffifound.pages.dev/", title: "StuffIFound" },
   { href: "https://gemini.google.com/app", title: "Gemini" },
   { href: "https://www.instagram.com/", title: "Instagram" },
+    { href: "https://stuffifound.pages.dev/", title: "StuffIFound" },
   { href: "https://fmhy.net/", title: "FMHY" },
   { href: "https://claude.ai/new", title: "Claude" }
 ];
