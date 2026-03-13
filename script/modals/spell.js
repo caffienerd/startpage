@@ -7,7 +7,13 @@ const spellState = {
   abortController: null
 };
 
-// Keyboard nav 
+// Minimum Zipf frequency score to trust a word as "correct".
+// Zipf scale: 0 = nonexistent, 3 = rare, 5 = common, 7 = very common.
+// "asthetics" scores ~0; "aesthetics" scores ~3.5.
+// Anything below this threshold gets flagged even if it's an exact phonetic match.
+const MIN_ZIPF_SCORE = 1.5;
+
+// ---- Keyboard nav ----
 const handleSpellKeydown = (e) => {
   const modal = document.getElementById('spell-modal');
   if (!modal?.classList.contains('active')) return;
@@ -34,9 +40,7 @@ let spellTypingTimeout = null;
 function openSpellModal(query) {
   spellState.suggestions = [];
   spellState.selectedIndex = 0;
-  if (spellState.abortController) {
-    spellState.abortController.abort();
-  }
+  if (spellState.abortController) spellState.abortController.abort();
   spellState.abortController = new AbortController();
 
   document.getElementById('spell-query-word').textContent = query;
@@ -51,18 +55,32 @@ function openSpellModal(query) {
   clearTimeout(spellTypingTimeout);
   spellTypingTimeout = setTimeout(() => {
     words.length === 1 ? checkSingleWord(words[0]) : checkMultipleWords(words);
-  }, 300); // basic debounce
+  }, 300);
 }
 
 function handleSpellCheck(query) {
   openSpellModal(query);
 }
 
+// ---- Extract Zipf frequency from Datamuse tags ----
+// Returns a number (0 if not present)
+function _zipf(result) {
+  if (!result?.tags) return 0;
+  const tag = result.tags.find(t => t.startsWith('f:'));
+  return tag ? parseFloat(tag.slice(2)) : 0;
+}
+
 // ---- Single word ----
 function checkSingleWord(word) {
-  const timeoutId = setTimeout(() => { if (spellState.abortController) spellState.abortController.abort(); }, 5000);
+  const timeoutId = setTimeout(() => {
+    if (spellState.abortController) spellState.abortController.abort();
+  }, 5000);
 
-  fetch(`https://api.datamuse.com/words?sp=${encodeURIComponent(word)}&max=5`, { signal: spellState.abortController.signal })
+  // Request frequency metadata (md=f) alongside phonetic suggestions
+  fetch(
+    `https://api.datamuse.com/words?sp=${encodeURIComponent(word)}&md=f&max=8`,
+    { signal: spellState.abortController.signal }
+  )
     .then(r => r.json())
     .then(results => {
       clearTimeout(timeoutId);
@@ -75,19 +93,36 @@ function checkSingleWord(word) {
         return;
       }
 
-      const isCorrect = results[0].word.toLowerCase() === word.toLowerCase();
-      if (isCorrect) {
+      const topResult = results[0];
+      const exactMatch = topResult.word.toLowerCase() === word.toLowerCase();
+      const freq = _zipf(topResult);
+      const trustedCorrect = exactMatch && freq >= MIN_ZIPF_SCORE;
+
+      if (trustedCorrect) {
         area.innerHTML = '<span class="spell-correct">✓ Looks correct!</span>';
         hint.textContent = '';
         return;
       }
 
-      spellState.suggestions = results.map(r => r.word);
+      // Either not an exact match, or frequency too low to trust —
+      // filter out the input itself from suggestions so we don't echo it back
+      const filtered = results
+        .filter(r => r.word.toLowerCase() !== word.toLowerCase())
+        .slice(0, 5);
+
+      if (!filtered.length) {
+        // Word exists but is very rare — flag it
+        area.innerHTML = '<span class="spell-unknown">word not recognised — check spelling</span>';
+        hint.textContent = '';
+        return;
+      }
+
+      spellState.suggestions = filtered.map(r => r.word);
       spellState.selectedIndex = 0;
       renderSpellSuggestions();
       hint.textContent = '↑ ↓ navigate  ·  Enter to copy  ·  Esc to close';
     })
-    .catch((err) => {
+    .catch(err => {
       if (err.name === 'AbortError') return;
       const area = document.getElementById('spell-result-area');
       if (area) area.innerHTML = '<span class="spell-unknown">offline or error</span>';
@@ -99,19 +134,35 @@ function checkMultipleWords(words) {
   const area = document.getElementById('spell-result-area');
   const hint = document.getElementById('spell-hint');
 
-  const timeoutId = setTimeout(() => { if (spellState.abortController) spellState.abortController.abort(); }, 5000);
+  const timeoutId = setTimeout(() => {
+    if (spellState.abortController) spellState.abortController.abort();
+  }, 5000);
 
   Promise.all(
     words.map(word => {
       const clean = word.replace(/^[^a-zA-Z']+|[^a-zA-Z']+$/g, '');
       if (!clean) return Promise.resolve({ word, clean, correct: true, suggestion: null });
 
-      return fetch(`https://api.datamuse.com/words?sp=${encodeURIComponent(clean)}&max=5`, { signal: spellState.abortController.signal })
+      return fetch(
+        `https://api.datamuse.com/words?sp=${encodeURIComponent(clean)}&md=f&max=8`,
+        { signal: spellState.abortController.signal }
+      )
         .then(r => r.json())
         .then(results => {
-          const exactMatch = results.some(r => r.word.toLowerCase() === clean.toLowerCase());
-          const topSuggestion = results[0]?.word ?? null;
-          return { word, clean, correct: exactMatch, suggestion: exactMatch ? null : topSuggestion };
+          const topResult = results[0];
+          const exactMatch = topResult && topResult.word.toLowerCase() === clean.toLowerCase();
+          const freq = exactMatch ? _zipf(topResult) : 0;
+          const trustedCorrect = exactMatch && freq >= MIN_ZIPF_SCORE;
+
+          // Best suggestion = highest-frequency result that isn't the input itself
+          const best = results.find(r => r.word.toLowerCase() !== clean.toLowerCase());
+
+          return {
+            word,
+            clean,
+            correct: trustedCorrect,
+            suggestion: trustedCorrect ? null : (best?.word ?? null)
+          };
         })
         .catch(() => ({ word, clean, correct: false, suggestion: null }));
     })
@@ -160,9 +211,9 @@ function renderSpellSuggestions() {
 
   area.setAttribute('role', 'listbox');
   area.innerHTML = spellState.suggestions.map((word, i) => `
-    <div class="spell-suggestion-item ${i === spellState.selectedIndex ? 'spell-selected' : ''}" 
-         role="option" 
-         aria-selected="${i === spellState.selectedIndex}" 
+    <div class="spell-suggestion-item ${i === spellState.selectedIndex ? 'spell-selected' : ''}"
+         role="option"
+         aria-selected="${i === spellState.selectedIndex}"
          data-index="${i}">
       <span class="spell-index">${i === spellState.selectedIndex ? '▶' : ' '}</span>
       <span class="spell-word">${word}</span>
@@ -195,7 +246,7 @@ function fallbackCopyTextToClipboard(text) {
   ta.style.cssText = 'position:fixed;opacity:0';
   document.body.appendChild(ta);
   ta.focus(); ta.select();
-  try { document.execCommand('copy'); } catch (e) { }
+  try { document.execCommand('copy'); } catch (e) {}
   document.body.removeChild(ta);
 }
 
