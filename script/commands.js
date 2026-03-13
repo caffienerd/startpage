@@ -10,6 +10,33 @@ function openVersion() {
   showAlert('Version: ' + ver, { title: 'Start Page', type: 'info' });
 }
 
+async function checkForUpdate() {
+  const REMOTE_URL = 'https://raw.githubusercontent.com/caffienerd/startpage/refs/heads/master/version/version.js';
+  const local = window.APP_VERSION || 'unknown';
+
+  showToast('Checking for updates...', 'info', 2500);
+
+  try {
+    const res = await fetch(REMOTE_URL + '?_=' + Date.now(), { cache: 'no-store' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const text = await res.text();
+    const match = text.match(/APP_VERSION\s*=\s*['"]([^'"]+)['"]/);
+    if (!match) throw new Error('Could not parse remote version');
+    const remote = match[1];
+
+    if (remote === local) {
+      showAlert(`You're up to date!\n\nCurrent version: v${local}`, { title: 'No Updates', type: 'success' });
+    } else {
+      showAlert(
+        `New version available!\n\nInstalled:  v${local}\nLatest:     v${remote}\n\ngithub.com/caffienerd/startpage`,
+        { title: 'Update Available', type: 'warning' }
+      );
+    }
+  } catch (err) {
+    showAlert(`Could not reach GitHub.\n\n${err.message}`, { title: 'Update Check Failed', type: 'error' });
+  }
+}
+
 const AI_ROUTE_BADGE_NAV_DELAY_MS = 550;
 const AI_ROUTE_BADGE_HIDE_MS = 2600;
 
@@ -60,6 +87,7 @@ function handleSpecialCommands(value) {
     return;
   }
   if (normalized === ":version" || normalized === ":ver") { openVersion(); clear(); return; }
+  if (normalized === ":update") { checkForUpdate(); clear(); return; }
   if (normalized === ":export") { exportBackup(); clear(); return; }
   if (normalized === ":import") { importBackup(); clear(); return; }
   if (normalized === ":ipconfig" || normalized === ":ip") { openIPInfo(); clear(); return; }
