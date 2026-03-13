@@ -48,5 +48,5 @@ function saveConfig() {
   closeConfig();
   if (typeof hideAiRouteBadge === 'function') hideAiRouteBadge();
   document.getElementById('username').textContent = getStoredUsername();
-  alert('Configuration saved successfully!');
+  showToast('Configuration saved', 'success');
 }

@@ -50,7 +50,6 @@ function renderGridEditor(bookmarks) {
     grid.innerHTML = '';
 
     const columns = 4;
-    // Calculate required rows, ensuring at least 5 to maintain some UI stability
     const rows = Math.max(5, Math.ceil(bookmarks.length / columns));
 
     for (let c = 0; c < columns; c++) {
@@ -101,7 +100,7 @@ function toggleEditorMode() {
             btn.textContent = 'Edit as JSON';
         } catch (e) {
             console.error('Failed to parse bookmarks JSON:', e);
-            alert('Invalid JSON format. Please fix any syntax errors before switching to grid view.');
+            showAlert('Invalid JSON format. Please fix any syntax errors before switching to grid view.', { type: 'error', title: 'Invalid JSON' });
         }
     } else {
         // Switching to JSON
@@ -151,9 +150,10 @@ function saveBookmarksFromModal() {
 
     if (bookmarks && !bookmarkError) {
         saveBookmarks(bookmarks);
-        generateBookmarks(); // Update the UI
+        generateBookmarks();
         closeBookmarksModal();
+        showToast('Bookmarks saved', 'success');
     } else if (bookmarkError) {
-        alert('Invalid JSON! Please fix it or switch back to grid mode.');
+        showAlert('Invalid JSON! Please fix it or switch back to grid mode.', { type: 'error', title: 'Invalid JSON' });
     }
 }

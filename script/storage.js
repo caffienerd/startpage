@@ -19,7 +19,7 @@ const DEFAULT_BOOKMARKS = [
   { href: "https://stuffifound.pages.dev/", title: "StuffIFound" },
   { href: "https://gemini.google.com/app", title: "Gemini" },
   { href: "https://www.instagram.com/", title: "Instagram" },
-    { href: "https://stuffifound.pages.dev/", title: "StuffIFound" },
+  { href: "https://stuffifound.pages.dev/", title: "StuffIFound" },
   { href: "https://fmhy.net/", title: "FMHY" },
   { href: "https://claude.ai/new", title: "Claude" }
 ];
@@ -88,7 +88,7 @@ function saveBookmarks(bookmarks) {
     localStorage.setItem('bookmarks', JSON.stringify(bookmarks));
   } catch (e) {
     console.error('Failed to save bookmarks:', e);
-    alert('Could not save bookmarks. Storage may be full.');
+    showToast('Could not save bookmarks. Storage may be full.', 'error', 4000);
   }
 }
 
@@ -229,7 +229,6 @@ function getStoredCustomTags() {
   try {
     const stored = localStorage.getItem('customTags');
     return stored ? JSON.parse(stored) : [];
-    // Format: [{ prefix: 'gh', url: 'https://github.com/search?q=' }, ...]
   } catch (e) { return []; }
 }
 function saveCustomTags(tags) {

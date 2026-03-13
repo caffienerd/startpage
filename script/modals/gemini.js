@@ -27,7 +27,10 @@ function closeGeminiModal() {
 
 async function handleGeminiPrompt(prompt) {
   if (window.location.protocol === 'file:') {
-    alert('Gemini API requires HTTPS or localhost HTTP. Please host this page on a local web server (e.g., using `python3 -m http.server`) for Gemini execution privileges to bypass CORS restrictions.');
+    showAlert(
+      'Gemini API requires HTTPS or localhost HTTP.\n\nPlease serve this page via a local web server:\n  python3 -m http.server',
+      { type: 'warning', title: 'HTTPS Required' }
+    );
     return;
   }
 
@@ -41,7 +44,7 @@ async function handleGeminiPrompt(prompt) {
   const systemState = document.getElementById('gemini-system-state');
 
   if (!responseArea || !queryText || !statusText || !modelBadge || !systemState) {
-    alert('Gemini UI is missing required elements. Please refresh.');
+    showAlert('Gemini UI is missing required elements. Please refresh.', { type: 'error', title: 'UI Error' });
     return;
   }
 
@@ -123,7 +126,7 @@ async function handleGeminiPrompt(prompt) {
     modelBadge.textContent = usedModel || primaryModel;
     responseArea.textContent = text || 'No text response returned.';
   } catch (err) {
-    if (err.name === 'AbortError') return; // Expected upon closing modal mid-request
+    if (err.name === 'AbortError') return;
 
     statusText.textContent = 'Network error';
     responseArea.textContent = `Request failed: ${err?.message || 'Unknown error.'}`;
@@ -140,9 +143,9 @@ function copyGeminiResponse() {
 
   navigator.clipboard.writeText(area.textContent).then(() => {
     if (statusText) statusText.textContent = 'Copied to clipboard';
+    showToast('Copied to clipboard', 'success', 2000);
   }).catch(() => {
     if (statusText) statusText.textContent = 'Copy failed';
+    showToast('Copy failed', 'error', 2000);
   });
 }
-
-

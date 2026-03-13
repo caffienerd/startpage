@@ -26,7 +26,6 @@ const THEME_DEFS = [
 function openCustomizeModal() {
   _renderCustomizeModal();
   document.getElementById('customize-modal').classList.add('active');
-  // Focus first hex input
   const first = document.querySelector('#customize-modal .customize-hex');
   if (first) first.focus();
 }
@@ -61,7 +60,6 @@ function _renderCustomizeModal() {
       <button class="customize-reset-btn" data-key="${key}" title="Reset">↺</button>
     `;
 
-    // Swatch → hex + preview live
     const swatch = row.querySelector('.customize-swatch');
     const hex    = row.querySelector('.customize-hex');
     const preview = row.querySelector('.customize-preview');
@@ -83,7 +81,6 @@ function _renderCustomizeModal() {
     });
 
     hex.addEventListener('blur', () => {
-      // Normalise: ensure starts with #, 6 hex digits
       let v = hex.value.trim();
       if (!v.startsWith('#')) v = '#' + v;
       if (/^#[0-9a-f]{6}$/i.test(v)) {
@@ -92,7 +89,6 @@ function _renderCustomizeModal() {
         preview.style.color = v;
         _applyLiveColor(key, v);
       } else {
-        // revert to current stored
         const stored = getStoredSyntaxColors();
         hex.value = (stored[key] || DEFAULT_SYNTAX_COLORS[key]).toUpperCase();
         swatch.value = stored[key] || DEFAULT_SYNTAX_COLORS[key];
@@ -100,7 +96,6 @@ function _renderCustomizeModal() {
       }
     });
 
-    // Reset button
     row.querySelector('.customize-reset-btn').addEventListener('click', () => {
       const def = DEFAULT_SYNTAX_COLORS[key];
       swatch.value = def;
@@ -122,7 +117,6 @@ function _renderCustomizeModal() {
     btn.textContent = label;
     btn.addEventListener('click', () => {
       _applyTheme(value);
-      // Update active styling
       themeGrid.querySelectorAll('.customize-theme-btn').forEach(b => b.classList.remove('active-theme'));
       btn.classList.add('active-theme');
     });
@@ -130,12 +124,10 @@ function _renderCustomizeModal() {
   });
 }
 
-// ---- Live color preview (CSS variable only, not saved yet) ----
 function _applyLiveColor(key, value) {
   document.documentElement.style.setProperty(`--syn-${key}`, value);
 }
 
-// ---- Apply theme (mirrors commands.js logic) ----
 function _applyTheme(theme) {
   THEMES.forEach(t => {
     document.body.classList.remove(`${t}-mode`);
@@ -162,12 +154,19 @@ function saveCustomize() {
   saveSyntaxColors(colors);
   applySyntaxColors(colors);
   closeCustomizeModal();
+  showToast('Customization saved', 'success');
 }
 
 // ---- Reset all syntax colors ----
-function resetAllSyntaxColors() {
-  if (!confirm('Reset all syntax colors to defaults?')) return;
+async function resetAllSyntaxColors() {
+  const confirmed = await showConfirm('Reset all syntax colors to defaults?', {
+    title: 'Reset Colors',
+    confirmLabel: 'Reset',
+    cancelLabel: 'Cancel'
+  });
+  if (!confirmed) return;
   saveSyntaxColors({ ...DEFAULT_SYNTAX_COLORS });
   applySyntaxColors(DEFAULT_SYNTAX_COLORS);
-  _renderCustomizeModal(); // re-render pickers with defaults
+  _renderCustomizeModal();
+  showToast('Colors reset to defaults', 'info');
 }

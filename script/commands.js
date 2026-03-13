@@ -7,21 +7,22 @@
 // ========================================
 function openVersion() {
   const ver = window.APP_VERSION || 'unknown';
-  alert('v' + ver);
+  showAlert('Version: ' + ver, { title: 'Start Page', type: 'info' });
 }
 
 const AI_ROUTE_BADGE_NAV_DELAY_MS = 550;
 const AI_ROUTE_BADGE_HIDE_MS = 2600;
 
 function openAiRouterHelp() {
-  alert(
+  showAlert(
     'ai: is a semantic intent router.\n\n' +
     'How it works:\n' +
     '1) You type a natural-language intent.\n' +
     '2) It detects likely destination (maps, YouTube, Reddit, settings, etc.).\n' +
     '3) It navigates there directly.\n' +
     '4) If no clear match exists, it falls back to Google search.\n\n' +
-    'Use gem: or gemini: for direct Gemini prompting.'
+    'Use gem: or gemini: for direct Gemini prompting.',
+    { title: 'AI Router', type: 'info' }
   );
 }
 
@@ -48,7 +49,13 @@ function handleSpecialCommands(value) {
     const next = action === 'toggle' ? !current : action === 'on';
     saveAiModeEnabled(next);
     if (!next) hideAiRouteBadge();
-    alert(`AI mode ${next ? 'enabled' : 'disabled'}. ${next ? 'Plain text can route without ai: after bookmark check.' : 'Use ai: prefix for routing.'}`);
+    showToast(
+      next
+        ? 'AI mode enabled — plain text routes without ai: prefix'
+        : 'AI mode disabled — use ai: prefix for routing',
+      next ? 'success' : 'info',
+      3500
+    );
     clear();
     return;
   }
@@ -67,7 +74,6 @@ function handleSpecialCommands(value) {
   if (normalized === ":config" || normalized === ":weather" || normalized === ":time") { openConfig(); clear(); return; }
 
   // ---- Open Directory search ----
-  // Matches: dir: kw  /  dir/cat: kw  /  dir/cat/eng: kw  /  dir//eng: kw
   if (/^dir(\/[a-z]*)?(\/[a-z]*)?:/i.test(rawValue)) {
     if (handleDirCommand(rawValue)) { clear(); return; }
   }
@@ -180,7 +186,6 @@ function navigate(url) {
   } catch (e) { console.error('Navigation failed', e); }
 }
 
-// Shorthand: strip prefix and encode
 function encodeSearchQuery(value, prefix) {
   return encodeURIComponent(value.startsWith(prefix) ? value.slice(prefix.length).trim() : value.trim());
 }
@@ -259,57 +264,44 @@ function matchCommandIntent(lowerQuery) {
 }
 
 function matchWebIntent(cleanedQuery, lowerQuery, options = {}) {
-  const allowSideEffects = options.allowSideEffects !== false;
-
   if (includesAny(lowerQuery, [/\b(map|maps|directions?|navigate|route|near me|nearby|where is|distance to)\b/])) {
     return `https://www.google.com/maps/search/${encodeURIComponent(cleanedQuery)}`;
   }
-
   if (includesAny(lowerQuery, [/\b(reddit|subreddit|r\/)\b/])) {
     return `https://google.com/search?q=${encodeURIComponent(`site:reddit.com ${cleanedQuery}`)}`;
   }
-
   if (includesAny(lowerQuery, [/\b(youtube|yt|video|watch|trailer|playlist|music video)\b/])) {
     return `https://www.youtube.com/results?search_query=${encodeURIComponent(cleanedQuery)}`;
   }
-
   if (includesAny(lowerQuery, [/\b(movie|film|tv show|series|actor|actress|cast|imdb|rating)\b/])) {
     return `https://www.imdb.com/find?q=${encodeURIComponent(cleanedQuery)}`;
   }
-
   if (includesAny(lowerQuery, [/\b(define|definition|meaning)\b/])) {
     return `https://onelook.com/?w=${encodeURIComponent(cleanedQuery)}`;
   }
-
   if (includesAny(lowerQuery, [/\b(thesaurus|another word for)\b/])) {
     return `https://onelook.com/thesaurus/?s=${encodeURIComponent(cleanedQuery)}`;
   }
-
   if (includesAny(lowerQuery, [/\b(synonym|similar word)\b/])) {
     return `https://onelook.com/?related=1&w=${encodeURIComponent(cleanedQuery)}`;
   }
-
   if (includesAny(lowerQuery, [/\b(quote|quotation|who said)\b/])) {
     return `https://onelook.com/?mentions=1&w=${encodeURIComponent(cleanedQuery)}`;
   }
-
   if (includesAny(lowerQuery, [/\b(extension|addon|add-on|plugin)\b/])) {
     return getBrowser() === "firefox"
       ? `https://addons.mozilla.org/en-US/firefox/search/?q=${encodeURIComponent(cleanedQuery)}`
       : `https://chromewebstore.google.com/search/${encodeURIComponent(cleanedQuery)}`;
   }
-
   if (includesAny(lowerQuery, [/\b(alternative to|replace|substitute)\b/])) {
     return `https://alternativeto.net/browse/search/?q=${encodeURIComponent(cleanedQuery)}`;
   }
-
   if (includesAny(lowerQuery, [/\b(spell|spelling)\b/])) {
     const candidate = cleanedQuery.replace(/\b(spell|spelling|how do you spell)\b/gi, '').trim();
     if (candidate && !candidate.includes(' ')) {
       return `spell://${candidate}`;
     }
   }
-
   return '';
 }
 

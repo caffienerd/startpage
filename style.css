@@ -1901,3 +1901,165 @@ input.input-dir-active {
 .prompts-textarea::placeholder {
   opacity: 0.35;
 }
+/* ========================================
+   Themed Toast & Alert/Confirm Modals
+   (replaces native alert / confirm)
+   ======================================== */
+
+/* ---- Toast ---- */
+.sp-toast {
+  position: fixed;
+  bottom: 32px;
+  left: 50%;
+  transform: translateX(-50%) translateY(12px);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background: var(--terminal-bg);
+  color: var(--text-color);
+  border: 1px solid var(--card-border);
+  padding: 10px 18px;
+  border-radius: 10px;
+  font-family: var(--monospace-font-family);
+  font-size: 13px;
+  z-index: 99999;
+  box-shadow: 0 6px 28px rgba(0,0,0,0.25);
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.18s ease, transform 0.18s ease;
+  white-space: nowrap;
+  max-width: calc(100vw - 48px);
+  cursor: pointer;
+  user-select: none;
+}
+
+.sp-toast.sp-toast-show {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+  pointer-events: auto;
+}
+
+.sp-toast-icon {
+  font-size: 14px;
+  flex-shrink: 0;
+}
+
+.sp-toast-success { border-color: color-mix(in srgb, var(--syn-version) 50%, var(--card-border)); }
+.sp-toast-success .sp-toast-icon { color: var(--syn-version); }
+
+.sp-toast-error { border-color: color-mix(in srgb, var(--syn-unknown) 50%, var(--card-border)); }
+.sp-toast-error .sp-toast-icon { color: var(--syn-unknown); }
+
+.sp-toast-info .sp-toast-icon { color: var(--syn-cmd); }
+.sp-toast-info { border-color: color-mix(in srgb, var(--syn-cmd) 40%, var(--card-border)); }
+
+/* ---- Overlay ---- */
+.sp-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.45);
+  backdrop-filter: blur(4px);
+  -webkit-backdrop-filter: blur(4px);
+  z-index: 99998;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.15s ease;
+}
+
+.sp-overlay.sp-overlay-show {
+  opacity: 1;
+}
+
+/* ---- Modal card ---- */
+.sp-modal {
+  background: var(--terminal-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 14px;
+  padding: 28px 28px 22px;
+  min-width: 300px;
+  max-width: min(460px, calc(100vw - 40px));
+  box-shadow: 0 12px 48px rgba(0,0,0,0.35);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  animation: sp-modal-in 0.15s ease;
+}
+
+@keyframes sp-modal-in {
+  from { transform: scale(0.94) translateY(6px); opacity: 0; }
+  to   { transform: scale(1)    translateY(0);   opacity: 1; }
+}
+
+.sp-modal-icon {
+  font-size: 28px;
+  line-height: 1;
+  margin-bottom: 2px;
+}
+
+.sp-modal-icon-success { color: var(--syn-version); }
+.sp-modal-icon-error   { color: var(--syn-unknown); }
+.sp-modal-icon-warning { color: var(--syn-theme); }
+.sp-modal-icon-info    { color: var(--syn-cmd); }
+
+.sp-modal-title {
+  font-family: var(--monospace-font-family);
+  font-size: 15px;
+  font-weight: 600;
+  color: var(--text-color);
+  margin: 0;
+  text-align: center;
+}
+
+.sp-modal-body {
+  font-family: var(--monospace-font-family);
+  font-size: 13px;
+  color: var(--text-color);
+  opacity: 0.85;
+  text-align: center;
+  line-height: 1.65;
+  margin: 0;
+  white-space: pre-wrap;
+  word-break: break-word;
+}
+
+.sp-modal-buttons {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+/* sp-btn — monospace terminal-style button, no dependency on .config-buttons */
+.sp-btn {
+  font-family: var(--monospace-font-family);
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  padding: 7px 20px;
+  border-radius: 6px;
+  border: 1px solid var(--card-border);
+  background: transparent;
+  color: var(--text-color);
+  cursor: pointer;
+  transition: border-color 0.15s, opacity 0.15s, background 0.15s;
+  opacity: 0.75;
+}
+
+.sp-btn:hover {
+  opacity: 1;
+  border-color: var(--text-color);
+}
+
+.sp-btn:not(.sp-btn-ghost) {
+  background: var(--text-color);
+  color: var(--background-color, #fff);
+  opacity: 1;
+  border-color: transparent;
+}
+
+.sp-btn:not(.sp-btn-ghost):hover {
+  opacity: 0.85;
+}
