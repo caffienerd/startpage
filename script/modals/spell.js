@@ -4,7 +4,8 @@
 const spellState = {
   suggestions: [],
   selectedIndex: 0,
-  abortController: null
+  abortController: null,
+  correctWord: null
 };
 
 // Minimum Zipf frequency score to trust a word as "correct".
@@ -18,10 +19,21 @@ const handleSpellKeydown = (e) => {
   const modal = document.getElementById('spell-modal');
   if (!modal?.classList.contains('active')) return;
 
-  if (['ArrowDown', 'ArrowUp', 'Enter'].includes(e.key)) {
+  if (['ArrowDown', 'ArrowUp', 'Enter', 'd', 'D'].includes(e.key)) {
     e.preventDefault();
     e.stopImmediatePropagation();
   }
+  
+  // D key — define the selected suggestion or the correct word
+  if (e.key === 'd' || e.key === 'D') {
+    if (spellState.suggestions.length) {
+      _defineWord(spellState.suggestions[spellState.selectedIndex]);
+    } else if (spellState.correctWord) {
+      _defineWord(spellState.correctWord);
+    }
+    return;
+  }
+
   if (!spellState.suggestions.length) return;
 
   if (e.key === 'ArrowDown') {
@@ -70,6 +82,12 @@ function _zipf(result) {
   return tag ? parseFloat(tag.slice(2)) : 0;
 }
 
+// ---- Define a word via OneLook (reuses existing def: routing) ----
+function _defineWord(word) {
+  closeSpellModal();
+  navigate(`https://onelook.com/?w=${encodeURIComponent(word)}`);
+}
+
 // ---- Single word ----
 function checkSingleWord(word) {
   const timeoutId = setTimeout(() => {
@@ -99,10 +117,20 @@ function checkSingleWord(word) {
       const trustedCorrect = exactMatch && freq >= MIN_ZIPF_SCORE;
 
       if (trustedCorrect) {
-        area.innerHTML = '<span class="spell-correct">✓ Looks correct!</span>';
-        hint.textContent = '';
+        area.innerHTML = `
+          <div class="spell-correct-row">
+            <span class="spell-correct">✓ Looks correct!</span>
+            <button class="spell-define-btn" data-word="${topResult.word}">define</button>
+          </div>`;
+        area.querySelector('.spell-define-btn').addEventListener('click', (e) => {
+          _defineWord(e.target.dataset.word);
+        });
+        hint.textContent = 'D → define word';
+        // Store word for D key
+        spellState.correctWord = topResult.word;
         return;
       }
+      spellState.correctWord = null;
 
       // Either not an exact match, or frequency too low to trust —
       // filter out the input itself from suggestions so we don't echo it back
@@ -171,8 +199,16 @@ function checkMultipleWords(words) {
     if (!area) return;
 
     if (wordResults.every(r => r.correct)) {
-      area.innerHTML = '<span class="spell-correct">✓ All words look correct!</span>';
-      hint.textContent = '';
+      const defineButtons = wordResults
+        .map(r => `<button class="spell-define-btn spell-define-word" data-word="${r.clean}">${r.clean}</button>`)
+        .join('');
+      area.innerHTML = `
+        <span class="spell-correct">✓ All words look correct!</span>
+        <div class="spell-define-row">${defineButtons}</div>`;
+      area.querySelectorAll('.spell-define-word').forEach(btn => {
+        btn.addEventListener('click', () => _defineWord(btn.dataset.word));
+      });
+      hint.textContent = 'Click a word above to define it';
       return;
     }
 
@@ -218,10 +254,15 @@ function renderSpellSuggestions() {
       <span class="spell-index">${i === spellState.selectedIndex ? '▶' : ' '}</span>
       <span class="spell-word">${word}</span>
       ${i === 0 ? '<span class="spell-badge">best match</span>' : ''}
+      <button class="spell-define-btn" data-word="${word}">define</button>
     </div>`).join('');
 
   area.querySelectorAll('.spell-suggestion-item').forEach(el => {
-    el.addEventListener('click', () => {
+    el.addEventListener('click', (e) => {
+      if (e.target.classList.contains('spell-define-btn')) {
+        _defineWord(e.target.dataset.word);
+        return;
+      }
       spellState.selectedIndex = parseInt(el.dataset.index);
       copySpellSuggestion();
     });
@@ -259,6 +300,7 @@ function closeSpellModal() {
   document.getElementById('spell-modal').classList.remove('active');
   spellState.suggestions = [];
   spellState.selectedIndex = 0;
+  spellState.correctWord = null;
   if (spellState.abortController) {
     spellState.abortController.abort();
     spellState.abortController = null;

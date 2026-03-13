@@ -2063,3 +2063,47 @@ input.input-dir-active {
 .sp-btn:not(.sp-btn-ghost):hover {
   opacity: 0.85;
 }
+
+/* ---- Spell Check — Define button ---- */
+.spell-correct-row {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+}
+
+.spell-define-btn {
+  font-family: var(--monospace-font-family);
+  font-size: 11px;
+  font-weight: 500;
+  letter-spacing: 0.05em;
+  padding: 3px 10px;
+  border-radius: 5px;
+  border: 1px solid var(--card-border);
+  background: transparent;
+  color: var(--text-color);
+  opacity: 0.45;
+  cursor: pointer;
+  transition: opacity 0.12s, border-color 0.12s;
+  flex-shrink: 0;
+}
+
+.spell-define-btn:hover {
+  opacity: 1;
+  border-color: var(--syn-url);
+  color: var(--syn-url);
+}
+
+.spell-suggestion-item .spell-define-btn {
+  margin-left: auto;
+}
+
+.spell-define-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+.spell-define-row .spell-define-btn {
+  opacity: 0.55;
+}
