@@ -109,7 +109,7 @@ document.addEventListener('keydown', (e) => {
   // Ignore modifiers unless it's a specific combination we care about
   if (e.ctrlKey || e.altKey || e.metaKey) return;
 
-  const activeModal = document.querySelector('.config-modal.active');
+  const activeModal = document.querySelector('.config-modal.active') || document.getElementById('sp-modal-overlay');
 
   if (e.key === 'Escape') {
     if (typeof closeConfig === 'function') closeConfig();

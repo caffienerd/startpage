@@ -417,6 +417,9 @@ function handleInput(input, elements) {
   });
 
   input.addEventListener("input", () => {
+    // Don't process input while any modal is open
+    if (document.querySelector('.config-modal.active, #sp-modal-overlay')) return;
+
     // Reset hint visibility on each keystroke (scroll resets when text shortens)
     const hintEl = document.getElementById('command-hint');
     if (hintEl) hintEl.style.visibility = '';
@@ -469,6 +472,7 @@ function handleKeyboardEvents(input, elements) {
 
     // Handle keyboard scrolling for active modals
     const activeModal = document.querySelector('.config-modal.active');
+    const anyModalOpen = activeModal || document.getElementById('sp-modal-overlay');
     if (activeModal) {
       const content = activeModal.querySelector('.config-content') || activeModal;
       const scrollAmount = 40;
@@ -495,6 +499,9 @@ function handleKeyboardEvents(input, elements) {
         return;
       }
     }
+
+    // Block all other terminal input processing while any modal is open
+    if (anyModalOpen) return;
 
     // Tab / → accepts autocomplete suggestion
     if ((e.key === "Tab" || e.key === "ArrowRight") && input.hasAttribute('data-suggestion')) {
