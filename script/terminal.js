@@ -208,6 +208,7 @@ function updateSyntaxHighlight(rawValue) {
     'bi': 'bing:',
     'ai': 'ai:',
     'sp': 'spell:',
+    'pr': 'pronounce:',
     ':c': ':config',
     ':cu': ':customize',
     ':ta': ':tags',
@@ -246,11 +247,11 @@ function updateSyntaxHighlight(rawValue) {
   const customTagPrefixes = customTags.map(t => t.prefix).filter(Boolean);
 
   const themeCommands = [':dark', ':black', ':amoled', ':light', ':nord', ':newspaper', ':coffee', ':root', ':neon'];
-  const knownCommands = [':help', ':help_ai_router', ':aimode', ':bookmarks', ':bm', ':ipconfig', ':ip', ':netspeed', ':speed', ':config', ':customize', ':custom', ':tags', ':dir', ':dirconfig', ':prompts', ':weather', ':time', ':gemini', ':update', ':hacker', ':cyberpunk', ...themeCommands];
+  const knownCommands = [':help', ':help_ai_router', ':aimode', ':bookmarks', ':bm', ':ipconfig', ':ip', ':netspeed', ':speed', ':config', ':customize', ':custom', ':tags', ':dir', ':dirconfig', ':prompts', ':weather', ':time', ':gemini', ':update', ':history', ':hacker', ':cyberpunk', ...themeCommands];
   const versionCommands = [':version', ':ver', ':update'];
-  const knownSearch = /^(r|yt|alt|def|ddg|ggl|bing|amazon|imdb|the|syn|quote|maps|cws|spell|gem|gemini|ai):/;
+  const knownSearch = /^(r|yt|alt|def|ddg|ggl|bing|amazon|imdb|the|syn|quote|maps|cws|spell|pronounce|gem|gemini|ai):/;
   const knownSearchDynamic = customTagPrefixes.length
-    ? new RegExp(`^(r|yt|alt|def|ddg|ggl|bing|amazon|imdb|the|syn|quote|maps|cws|spell|gem|gemini|ai|${customTagPrefixes.map(p => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')}):`)
+    ? new RegExp(`^(r|yt|alt|def|ddg|ggl|bing|amazon|imdb|the|syn|quote|maps|cws|spell|pronounce|gem|gemini|ai|${customTagPrefixes.map(p => p.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')).join('|')}):`)
     : knownSearch;
 
   // ---- DIR syntax: only match valid dir patterns (not 'directory', 'dir is broken', etc.) ----
@@ -462,8 +463,34 @@ function handleInput(input, elements) {
   });
 }
 
+// ---- Persistent command history (localStorage, max 30 entries) ----
+const HISTORY_KEY = 'terminal-history-v1';
+const HISTORY_MAX = 30;
+
+function loadHistory() {
+  try {
+    return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]');
+  } catch { return []; }
+}
+
+function saveHistory(history) {
+  try { localStorage.setItem(HISTORY_KEY, JSON.stringify(history)); } catch {}
+}
+
+function pushHistory(entry) {
+  if (!entry || !entry.trim()) return;
+  const h = loadHistory();
+  // Remove duplicate if already exists (move to end)
+  const deduped = h.filter(e => e !== entry.trim());
+  deduped.push(entry.trim());
+  // Keep last 30
+  if (deduped.length > HISTORY_MAX) deduped.splice(0, deduped.length - HISTORY_MAX);
+  saveHistory(deduped);
+}
+
 function handleKeyboardEvents(input, elements) {
-  const history = [];
+  // historyIndex: -1 = not browsing, otherwise index into loadHistory()
+  // We use a local browsing index; the persisted array is source of truth
   let historyIndex = -1;
 
   input.addEventListener("keydown", (e) => {
@@ -509,8 +536,6 @@ function handleKeyboardEvents(input, elements) {
       const suggestion = input.getAttribute('data-suggestion');
       input.value = suggestion;
       updateSyntaxHighlight(suggestion);
-      // Note: do NOT removeAttribute here — updateSyntaxHighlight may have already
-      // set a new data-suggestion for the next ghost (e.g. dir/ → dir/media:)
       input.placeholder = '';
       return;
     }
@@ -532,18 +557,34 @@ function handleKeyboardEvents(input, elements) {
       return;
     }
 
-    // History
-    if (e.key === "ArrowUp" && historyIndex > 0) {
+    // History navigation
+    if (e.key === "ArrowUp") {
+      const h = loadHistory();
+      if (!h.length) return;
       e.preventDefault();
-      input.value = history[--historyIndex];
-      updateSyntaxHighlight(input.value);
-    } else if (e.key === "ArrowDown" && historyIndex < history.length - 1) {
+      if (historyIndex === -1) historyIndex = h.length;
+      if (historyIndex > 0) {
+        historyIndex--;
+        input.value = h[historyIndex];
+        updateSyntaxHighlight(input.value);
+      }
+    } else if (e.key === "ArrowDown") {
+      const h = loadHistory();
       e.preventDefault();
-      input.value = history[++historyIndex];
-      updateSyntaxHighlight(input.value);
+      if (historyIndex === -1) return;
+      if (historyIndex < h.length - 1) {
+        historyIndex++;
+        input.value = h[historyIndex];
+        updateSyntaxHighlight(input.value);
+      } else {
+        // Past the end — clear input
+        historyIndex = -1;
+        input.value = '';
+        updateSyntaxHighlight('');
+      }
     } else if (e.key === "Enter") {
-      handleEnterKey(rawValue, value, elements, history);
-      historyIndex = history.length;
+      handleEnterKey(rawValue, value, elements);
+      historyIndex = -1;
     }
   });
 }
@@ -611,15 +652,15 @@ function openInNewTab(url, focus) {
 }
 
 // ---- Enter key routing ----
-function handleEnterKey(rawValue, value, elements, history) {
-  const isSearch = value.match(/^(r|yt|alt|ddg|imdb|def|the|syn|quote|maps|cws|spell|gem|gemini|ai):/);
+function handleEnterKey(rawValue, value, elements) {
+  const isSearch = value.match(/^(r|yt|alt|ddg|imdb|def|the|syn|quote|maps|cws|spell|pronounce|gem|gemini|ai):/);
   const isCommand = value.startsWith(':');
   const isDirCmd = /^dir(\/[a-z]*)?(\/[a-z]*)?:/i.test(rawValue);
   const hasTrailingSpace = /\s$/.test(rawValue);
 
   if (isDirCmd || isSearch || isCommand) {
     handleSpecialCommands(rawValue.trim());
-    if (rawValue.trim()) history.push(rawValue.trim());
+    pushHistory(rawValue.trim());
     return;
   }
 
@@ -629,7 +670,7 @@ function handleEnterKey(rawValue, value, elements, history) {
     if (engine === 'ddg') navigate(`https://duckduckgo.com/?q=${q}`);
     else if (engine === 'bing') navigate(`https://www.bing.com/search?q=${q}`);
     else navigate(`https://google.com/search?q=${q}`);
-    if (rawValue.trim()) history.push(rawValue.trim());
+    pushHistory(rawValue.trim());
     return;
   }
 
@@ -655,7 +696,7 @@ function handleEnterKey(rawValue, value, elements, history) {
   } else if (!matched) {
     handleSpecialCommands(rawValue.trim());
   }
-  if (rawValue.trim()) history.push(rawValue.trim());
+  pushHistory(rawValue.trim());
 }
 
 // ---- Initialize terminal ----

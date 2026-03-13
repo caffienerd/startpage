@@ -88,6 +88,7 @@ function handleSpecialCommands(value) {
   }
   if (normalized === ":version" || normalized === ":ver") { openVersion(); clear(); return; }
   if (normalized === ":update") { checkForUpdate(); clear(); return; }
+  if (normalized === ":history") { openHistory(); clear(); return; }
   if (normalized === ":export") { exportBackup(); clear(); return; }
   if (normalized === ":import") { importBackup(); clear(); return; }
   if (normalized === ":ipconfig" || normalized === ":ip") { openIPInfo(); clear(); return; }
@@ -128,6 +129,13 @@ function handleSpecialCommands(value) {
   if (/^spell\s*:/i.test(rawValue)) {
     const query = rawValue.replace(/^spell\s*:/i, "").trim();
     if (query) { handleSpellCheck(query); clear(); }
+    return;
+  }
+
+  // ---- Pronounce ----
+  if (/^pronounce\s*:/i.test(rawValue)) {
+    const query = rawValue.replace(/^pronounce\s*:/i, "").trim();
+    if (query) { handlePronounce(query); clear(); }
     return;
   }
 
@@ -446,4 +454,48 @@ function getAiUrlDestination(url) {
   } catch (_) {
     return 'Website';
   }
+}
+
+// ---- Command History modal ----
+function openHistory() {
+  const h = loadHistory();
+  const input = document.getElementById('terminal-input');
+
+  const entries = h.length
+    ? [...h].reverse().map((entry, i) => `
+        <div class="history-entry" data-entry="${entry.replace(/"/g, '&quot;')}">
+          <span class="history-index">${i + 1}</span>
+          <span class="history-text">${escapeHTML(entry)}</span>
+        </div>`).join('')
+    : '<span class="history-empty">No history yet.</span>';
+
+  showAlert(
+    `<div class="history-list">${entries}</div>
+     <div class="history-actions">
+       <button class="sp-btn sp-btn-ghost" id="history-clear-btn">Clear history</button>
+     </div>`,
+    { title: 'Command History', type: 'info', raw: true }
+  );
+
+  // Wire click-to-fill
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.history-entry').forEach(el => {
+      el.addEventListener('click', () => {
+        const entry = el.dataset.entry;
+        // Close modal, fill terminal
+        document.getElementById('sp-modal-overlay')?.remove();
+        if (input) {
+          input.value = entry;
+          input.focus();
+          if (typeof updateSyntaxHighlight === 'function') updateSyntaxHighlight(entry);
+        }
+      });
+    });
+
+    document.getElementById('history-clear-btn')?.addEventListener('click', () => {
+      localStorage.removeItem('terminal-history-v1');
+      document.getElementById('sp-modal-overlay')?.remove();
+      showToast('History cleared', 'success');
+    });
+  });
 }

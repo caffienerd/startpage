@@ -92,6 +92,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ['dir-modal',       closeDirModal],
     ['dirconfig-modal', closeDirConfigModal],
     ['prompts-modal',   closePromptsModal],
+    ['pronounce-modal', closePronounceModal],
   ].forEach(([id, fn]) => {
     if (typeof fn === 'function') {
       const el = document.getElementById(id);
@@ -124,6 +125,7 @@ document.addEventListener('keydown', (e) => {
     if (typeof closeDirModal === 'function') closeDirModal();
     if (typeof closeDirConfigModal === 'function') closeDirConfigModal();
     if (typeof closePromptsModal === 'function') closePromptsModal();
+    if (typeof closePronounceModal === 'function') closePronounceModal();
     return;
   }
 

@@ -43,7 +43,7 @@ function showToast(message, type = 'info', duration = 3000) {
 }
 
 // ---- Alert modal (themed, replaces alert()) ----
-function showAlert(message, { title = null, type = 'info' } = {}) {
+function showAlert(message, { title = null, type = 'info', raw = false } = {}) {
   return new Promise((resolve) => {
     _removeSpModal();
 
@@ -52,12 +52,13 @@ function showAlert(message, { title = null, type = 'info' } = {}) {
     overlay.className = 'sp-overlay';
 
     const icon = { success: '✓', error: '✕', info: 'ℹ', warning: '⚠' }[type] || 'ℹ';
+    const bodyContent = raw ? message : `<p class="sp-modal-body">${_formatMessage(message)}</p>`;
 
     overlay.innerHTML = `
       <div class="sp-modal" role="alertdialog" aria-modal="true">
         <div class="sp-modal-icon sp-modal-icon-${type}">${icon}</div>
         ${title ? `<h3 class="sp-modal-title">${_uiEscape(title)}</h3>` : ''}
-        <p class="sp-modal-body">${_formatMessage(message)}</p>
+        ${bodyContent}
         <div class="sp-modal-buttons">
           <button class="sp-btn sp-modal-ok">Dismiss</button>
         </div>

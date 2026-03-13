@@ -2107,3 +2107,216 @@ input.input-dir-active {
 .spell-define-row .spell-define-btn {
   opacity: 0.55;
 }
+
+/* ========================================
+   Pronounce Modal
+   ======================================== */
+.pronounce-content {
+  max-width: 560px;
+  width: 90vw;
+  /* Let height grow naturally with content, scroll only when very tall */
+  max-height: 75vh;
+  overflow-y: auto;
+}
+
+.pronounce-result-area {
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-height: 48px;
+}
+
+.pronounce-word-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 12px 16px;
+  background: var(--card-background);
+  border: 1px solid var(--card-border);
+  border-radius: 10px;
+  /* Grow with content, never force horizontal scroll */
+  min-width: 0;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.pronounce-word-label {
+  font-family: var(--monospace-font-family);
+  font-size: 12px;
+  color: var(--text-color);
+  opacity: 0.4;
+  min-width: 60px;
+  max-width: 120px;
+  flex-shrink: 0;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.pronounce-phonetic-wrap {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  flex: 1;
+  min-width: 0; /* allow flex child to shrink */
+}
+
+.pronounce-readable {
+  font-family: var(--monospace-font-family);
+  font-size: 20px;
+  font-weight: 500;
+  color: var(--text-color);
+  letter-spacing: 0.02em;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
+
+.pronounce-ipa-small {
+  font-family: var(--monospace-font-family);
+  font-size: 11px;
+  opacity: 0.3;
+  letter-spacing: 0.01em;
+  word-break: break-all;
+}
+
+.pronounce-no-phonetic {
+  opacity: 0.25;
+  font-size: 18px;
+  font-family: var(--monospace-font-family);
+}
+
+/* Play button row — centered below the word rows */
+.pronounce-play-row {
+  display: flex;
+  justify-content: center;
+  margin-top: 8px;
+}
+
+.pronounce-play-btn {
+  font-family: var(--monospace-font-family);
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  padding: 9px 24px;
+  border-radius: 8px;
+  border: 1px solid var(--card-border);
+  background: transparent;
+  color: var(--text-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  transition: border-color 0.15s, background 0.15s, color 0.15s;
+  opacity: 0.7;
+}
+
+.pronounce-play-btn:hover {
+  opacity: 1;
+  border-color: var(--syn-version);
+  color: var(--syn-version);
+}
+
+.pronounce-play-btn.pronounce-playing {
+  background: color-mix(in srgb, var(--syn-version) 12%, transparent);
+  border-color: var(--syn-version);
+  color: var(--syn-version);
+  opacity: 1;
+}
+
+.pronounce-play-icon {
+  font-size: 11px;
+}
+
+.pronounce-no-tts {
+  font-family: var(--monospace-font-family);
+  font-size: 12px;
+  opacity: 0.3;
+  text-align: center;
+  padding: 8px 0;
+}
+
+.pronounce-loading,
+.pronounce-unknown {
+  font-family: var(--monospace-font-family);
+  font-size: 14px;
+  opacity: 0.4;
+}
+
+.pronounce-hint {
+  font-size: 12px;
+  opacity: 0.4;
+  margin-top: 16px;
+  font-family: var(--monospace-font-family);
+  letter-spacing: 0.3px;
+}
+
+/* ---- Command History Modal ---- */
+.history-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 360px;
+  overflow-y: auto;
+  margin: 4px 0 12px;
+  padding-right: 4px;
+}
+
+.history-list::-webkit-scrollbar { width: 4px; }
+.history-list::-webkit-scrollbar-track { background: transparent; }
+.history-list::-webkit-scrollbar-thumb { background: var(--card-border); border-radius: 2px; }
+
+.history-entry {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  cursor: pointer;
+  transition: background 0.1s, border-color 0.1s;
+}
+
+.history-entry:hover {
+  background: color-mix(in srgb, var(--syn-cmd) 10%, transparent);
+  border-color: color-mix(in srgb, var(--syn-cmd) 25%, transparent);
+}
+
+.history-index {
+  font-family: var(--monospace-font-family);
+  font-size: 11px;
+  opacity: 0.3;
+  min-width: 18px;
+  text-align: right;
+  flex-shrink: 0;
+}
+
+.history-text {
+  font-family: var(--monospace-font-family);
+  font-size: 13px;
+  color: var(--text-color);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.history-empty {
+  font-family: var(--monospace-font-family);
+  font-size: 13px;
+  opacity: 0.4;
+  padding: 8px 12px;
+}
+
+.history-actions {
+  display: flex;
+  justify-content: flex-end;
+  padding-top: 4px;
+  border-top: 1px solid var(--card-border);
+  margin-top: 4px;
+}
+
+/* Wider sp-modal for history list */
+.sp-modal:has(.history-list) {
+  max-width: 480px;
+  width: 90vw;
+}

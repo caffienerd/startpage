@@ -1,6 +1,6 @@
 # Professional Terminal Start Page
 
-A sleek, fast, and feature-rich browser start page driven by an interactive terminal. Boost your productivity with semantic AI routing, direct Gemini integration, open directory search, and a suite of built-in utility tools—all wrapped in a premium, modern aesthetic.
+A sleek, fast, and feature-rich browser start page driven by an interactive terminal. Boost your productivity with semantic AI routing, direct Gemini integration, open directory search, and a growing suite of built-in utility tools — all wrapped in a premium, modern aesthetic.
 
 **→ Try it live: [caffienerd.github.io/startpage](https://caffienerd.github.io/startpage/)**
 
@@ -25,19 +25,21 @@ A sleek, fast, and feature-rich browser start page driven by an interactive term
 
 ## Features
 
-- **Interactive Terminal**: Command-driven interface with autocomplete (`Tab`), syntax highlighting per command type, and command history (`Up`/`Down`).
-- **Semantic AI Router**: Use the `ai:` prefix to navigate based on intent. Intelligently routes you to YouTube, Maps, Reddit, or search.
-- **Gemini Integration**: Direct AI prompting via `gem:` or `gemini:`. View responses in a clean, non-intrusive modal.
-- **Open Directory Search**: Power-user Google dorking via `dir/<category>/<engine>: keyword`. Search public open directory indexes filtered by file type, with full autocomplete and an interactive builder (`:dir`).
-- **Rich Aesthetics**: Premium design with support for **Light**, **Dark**, **AMOLED (Black)**, **Nord**, **Newspaper**, **Coffee**, **Root (Hacker)**, and **Neon (Cyberpunk)** themes.
-- **Syntax Highlighting**: Color-coded input for commands, themes, search prefixes, open directory tokens, URLs, and more — fully customizable via `:customize`.
-- **Live Dashboard**: Instant access to local time and real-time weather updates.
+- **Interactive Terminal** — Command-driven interface with autocomplete (`Tab`), syntax highlighting per command type, and command history (`↑`/`↓`).
+- **Semantic AI Router** — Use `ai:` to navigate by intent. Intelligently routes to YouTube, Maps, Reddit, or search.
+- **Gemini Integration** — Direct AI prompting via `gem:` or `gemini:`. Responses appear in a clean, non-intrusive modal.
+- **Open Directory Search** — Power-user Google dorking via `dir/<category>/<engine>: keyword`. Search public open directory indexes filtered by file type, with full autocomplete and an interactive builder (`:dir`).
+- **8 Themes** — Light, Dark, AMOLED Black, Nord, Newspaper, Coffee, Root (Hacker), and Neon (Cyberpunk).
+- **Syntax Highlighting** — Color-coded input for commands, themes, search prefixes, directory tokens, URLs, and more — fully customizable via `:customize`.
+- **Live Dashboard** — Local time and real-time weather at a glance.
 - **Utility Suite**:
-  - **IP Info**: Detailed network information via `:ipconfig`.
-  - **Speed Test**: Integrated network performance testing via `:netspeed`.
-  - **Spell Check**: Smart spelling suggestions via `spell:`.
-- **Bookmark Management**: Fully customizable bookmark categories via visual grid editor or raw JSON.
-- **Default Search Engine**: Choose between Google, DuckDuckGo, or Bing for plain-text searches.
+  - **Spell Check** — Smart spelling suggestions via `spell:`. Press `D` to define the selected word.
+  - **Pronunciation** — Human-readable syllable breakdown + audio playback via `pronounce:`. Works on any word, including scientific and technical terms.
+  - **IP Info** — Detailed network info (IPv4, IPv6, ISP, ASN, location) via `:ipconfig`.
+  - **Speed Test** — Integrated network performance testing via `:netspeed`.
+- **Bookmark Management** — Fully customizable bookmark categories via visual grid editor or raw JSON.
+- **Custom Tags** — Override built-in search prefixes or define entirely new ones via `:tags`.
+- **Backup & Restore** — Export and import all settings as a single JSON file.
 
 ---
 
@@ -45,7 +47,7 @@ A sleek, fast, and feature-rich browser start page driven by an interactive term
 
 ### Prerequisites
 
-You need a way to serve the static files locally. While you can open `index.html` directly, some features (like API requests) work better when served.
+You need a static file server to serve the page locally. Opening `index.html` directly works for most features, but serving it properly is recommended for API requests.
 
 #### Option 1: Python (Quickest)
 ```bash
@@ -53,13 +55,13 @@ python -m http.server 6174
 ```
 
 #### Option 2: Caddy
-Copy `Caddyfile.example` to `Caddyfile`, set your directory path inside it, then:
+Copy `Caddyfile.example` to `Caddyfile`, set your directory path, then:
 ```bash
 caddy run --config Caddyfile
 ```
 
 #### Other options
-Any static file server works — `npx serve`, nginx, etc.
+Any static server works — `npx serve`, nginx, etc.
 
 Visit `http://localhost:6174` in your browser.
 
@@ -67,22 +69,20 @@ Visit `http://localhost:6174` in your browser.
 
 ## Configuration
 
-Run `:config` in the terminal to open the settings modal.
+Run `:config` to open the settings modal.
 
-1. **Identity**: Customize your terminal `username`.
-2. **Weather**: Set your location (e.g., `New York`, `London`, `Jerusalem`, `Delhi`).
-3. **Gemini AI**:
-   - **API Key**: Get one from [Google AI Studio](https://aistudio.google.com/app/apikey).
-   - **Model**: Default is `gemini-2.5-flash-lite`.
-   - **System Prompt**: Optional personality for your AI assistant.
-4. **AI Mode**: Toggle between explicit (`ai:`) and automatic intent routing.
-5. **AI Route Badge**: Control when the route preview badge is shown.
-6. **Default Search Engine**: Set Google, DuckDuckGo, or Bing as your fallback search. Also used as the default engine for `dir:` searches.
+| Setting | Description |
+| :--- | :--- |
+| **Identity** | Customize your terminal `username` |
+| **Weather** | Set your location (e.g. `New York`, `London`, `Delhi`) |
+| **Gemini API Key** | Get one from [Google AI Studio](https://aistudio.google.com/app/apikey) |
+| **Gemini Model** | Default is `gemini-2.5-flash-lite` |
+| **System Prompt** | Optional personality for your Gemini assistant |
+| **AI Mode** | Toggle between explicit (`ai:`) and automatic intent routing |
+| **AI Route Badge** | Control when the route preview badge is shown |
+| **Default Search Engine** | Google, DuckDuckGo, or Bing — also used as the fallback for `dir:` searches |
 
-Run `:customize` to open the customization modal.
-
-1. **Theme**: Switch between all 8 themes with a single click.
-2. **Syntax Colors**: Independently customize the highlight color for each input type (commands, themes, search prefixes, URLs, version, unknown). Colors persist across all themes.
+Run `:customize` to change the active theme and independently adjust the syntax highlight color for each input type. Colors persist across theme changes.
 
 ---
 
@@ -90,35 +90,36 @@ Run `:customize` to open the customization modal.
 
 ### Search Prefixes
 
-| Prefix | Usage | Destination |
+| Prefix | Example | Destination |
 | :--- | :--- | :--- |
-| `yt:` | `yt: youtube search` | YouTube Search |
-| `r:` | `r: something to find in reddit` | Reddit Search |
-| `maps:` | `maps: location` | Google Maps |
-| `ddg:` | `ddg: search with DuckDuckGo` | DuckDuckGo |
-| `ggl:` | `ggl: search with Google` | Google (explicit) |
-| `bing:` | `bing: search with bing` | Bing Search |
+| `yt:` | `yt: lo-fi beats` | YouTube Search |
+| `r:` | `r: mechanical keyboards` | Reddit Search |
+| `maps:` | `maps: central park` | Google Maps |
+| `ddg:` | `ddg: privacy tools` | DuckDuckGo |
+| `ggl:` | `ggl: something` | Google (explicit) |
+| `bing:` | `bing: something` | Bing Search |
 | `amazon:` | `amazon: mechanical keyboards` | Amazon Search |
 | `imdb:` | `imdb: Breaking Bad` | IMDb Search |
-| `alt:` | `alt: alternative of something` | AlternativeTo |
-| `def:` | `def: definition of something` | Dictionary (OneLook) |
-| `the:` | `the: a phrase to get the thesaurus of` | Thesaurus (OneLook) |
-| `syn:` | `syn: synonyms of something` | Synonyms (OneLook) |
-| `quote:` | `quote: quotes containing keywords` | Quotes (OneLook) |
-| `spell:` | `spell: word / phrase to check` | Built-in Spell Checker |
-| `cws:` | `cws: extension` | Chrome/Firefox Extension Store |
-| `gem:` | `gem: talk to gemini` | Gemini Direct Prompt |
+| `alt:` | `alt: notion` | AlternativeTo |
+| `def:` | `def: ephemeral` | Dictionary (OneLook) |
+| `the:` | `the: happy` | Thesaurus (OneLook) |
+| `syn:` | `syn: fast` | Synonyms (OneLook) |
+| `quote:` | `quote: time` | Quotes (OneLook) |
+| `spell:` | `spell: recieve` | Built-in Spell Checker |
+| `pronounce:` | `pronounce: ephemeral` | Built-in Pronunciation |
+| `cws:` | `cws: ublock origin` | Chrome/Firefox Extension Store |
+| `gem:` | `gem: explain black holes` | Gemini Direct Prompt |
 | `ai:` | `ai: directions to central park` | Semantic AI Router |
 
 ### Open Directory Prefixes
 
-Search for public open directory indexes using Google dorking (`intitle:index.of`). The syntax is:
+Search public open directory indexes using Google dorking (`intitle:index.of`). Syntax:
 
 ```
 dir/<category>/<engine>: keyword
 ```
 
-Both `<category>` and `<engine>` are optional. If no engine is specified, your configured default search engine is used.
+Both `<category>` and `<engine>` are optional. Omitting the engine uses your configured default.
 
 | Prefix | Example | Description |
 | :--- | :--- | :--- |
@@ -138,7 +139,7 @@ dir/books/bing: operating systems pdf
 dir//ggl: keyword        ← no category, explicit Google
 ```
 
-**Category aliases** (shorter to type):
+**Category aliases:**
 
 | Category | Aliases |
 | :--- | :--- |
@@ -148,7 +149,7 @@ dir//ggl: keyword        ← no category, explicit Google
 | `software` | `soft`, `iso`, `app` |
 | `images` | `img`, `pics` |
 
-> Tab autocomplete works after `dir/` (suggests categories) and after `dir/category/` (suggests engines).
+> `Tab` autocomplete works after `dir/` (suggests categories) and after `dir/category/` (suggests engines).
 
 ### System Commands
 
@@ -156,14 +157,15 @@ dir//ggl: keyword        ← no category, explicit Google
 | :--- | :--- |
 | `:help` | Show all commands |
 | `:config` | Open settings |
-| `:customize` / `:custom` | Open customization (colors & theme) |
+| `:customize` / `:custom` | Open customization (theme & syntax colors) |
 | `:bookmarks` / `:bm` | Edit bookmarks |
 | `:dir` | Open interactive directory search builder |
 | `:dirconfig` | Customize file extensions per `dir/` category |
-| `:ipconfig` / `:ip` | Show network info |
+| `:ipconfig` / `:ip` | Show detailed network info |
 | `:netspeed` / `:speed` | Run speed test |
 | `:aimode` | Toggle automatic AI routing |
-| `:version` | Show app version |
+| `:update` | Check for a newer version on GitHub |
+| `:version` | Show current app version |
 | `:export` | Export all settings to a JSON backup file |
 | `:import` | Import settings from a JSON backup file |
 | `:gemini` | Open Gemini website |
@@ -187,6 +189,8 @@ dir//ggl: keyword        ← no category, explicit Google
 
 ## Keyboard Shortcuts
 
+### Terminal
+
 | Shortcut | Action |
 | :--- | :--- |
 | `Tab` or `→` | Accept autocomplete suggestion |
@@ -197,37 +201,85 @@ dir//ggl: keyword        ← no category, explicit Google
 
 > `Ctrl+Enter` and `Ctrl+Shift+Enter` work for bookmarks, search prefixes, direct URLs, plain-text searches, and `dir:` queries.
 
+### Spell Check (`spell:`)
+
+| Key | Action |
+| :--- | :--- |
+| `↑` / `↓` | Navigate suggestions |
+| `Enter` | Copy selected suggestion to terminal |
+| `D` | Define the selected (or confirmed) word via OneLook |
+| `Esc` | Close |
+
+### Pronunciation (`pronounce:`)
+
+| Key | Action |
+| :--- | :--- |
+| `Space` | Play / stop audio |
+| `D` | Define the word via OneLook |
+| `Esc` | Close |
+
+---
+
+## Utility Tools
+
+### Spell Check — `spell:word`
+
+Checks spelling using the Datamuse phonetic API with frequency scoring to eliminate false positives. Works on single words and multi-word phrases.
+
+- `↑` / `↓` to navigate suggestions, `Enter` to copy the selected correction to the terminal.
+- Click or press `D` on any suggestion — or on a confirmed-correct word — to open its definition in OneLook.
+
+### Pronunciation — `pronounce:word`
+
+Displays a human-readable syllable breakdown (e.g. `nyoo·muh·noh·uhl·truh...`) with the original IPA below it for reference. Plays audio using real MP3 recordings where available, falling back to browser speech synthesis for any word that lacks one — including scientific, chemical, and technical terms.
+
+- Works on single words and multi-word phrases. Each word is fetched independently and played in sequence.
+- Press `Space` or click **Play** to hear the pronunciation.
+- Press `D` to jump to the OneLook definition.
+
+### IP Info — `:ipconfig`
+
+Shows your IPv4 and IPv6 addresses fetched from separate protocol-locked endpoints, plus ISP, ASN, timezone, location, and VPN detection from ipapi.co.
+
+### Speed Test — `:netspeed`
+
+Runs an in-browser download/upload speed test and displays latency.
+
 ---
 
 ## Customization
 
 ### Bookmarks
 
-The start page features a 4-column layout. You can customize bookmarks in two ways:
+The start page uses a 4-column layout. Customize bookmarks two ways:
 
-1. **Visual Editor (Recommended)**: Run `:bookmarks` to use the grid-based editor. It maps directly to the 4-column layout, letting you organize links by column and row.
-2. **JSON Mode**: Toggle "Edit as JSON" in the bookmarks modal for bulk edits or sharing your setup.
+1. **Visual Editor** (`:bookmarks`) — drag-and-drop grid editor that maps directly to the 4-column layout.
+2. **JSON Mode** — toggle "Edit as JSON" inside the bookmarks modal for bulk edits or to share your setup.
 
 ### Search Overrides & Custom Tags
 
-Run `:tags` to override built-in search prefix URLs (e.g. point `amazon:` to `amazon.in` instead of `amazon.com`) or define entirely new prefixes. Custom tag prefixes get full syntax highlighting and autocomplete automatically.
-
-From `:tags` you can also open **⊞ Dir Extensions** to customize the file extensions used by each `dir/` category.
+Run `:tags` to override built-in search prefix URLs (e.g. point `amazon:` to `amazon.in`) or define entirely new prefixes. Custom prefixes get full syntax highlighting and autocomplete automatically.
 
 ### Open Directory Extensions
 
-Run `:dirconfig` (or open it via the **⊞ Dir Extensions** button in `:tags`) to customize which file extensions each `dir/` category searches for. Each category shows pill-style tags — click `×` to remove an extension, type a new one and press Enter to add it. Use `↺` to reset any category back to its defaults. Changes are saved per-category and persist across sessions.
+Run `:dirconfig` to customize which file extensions each `dir/` category searches for. Click `×` on a pill to remove an extension, type a new one and press `Enter` to add it, or use `↺` to reset to defaults.
 
 ### Syntax Colors
 
-Run `:customize` to independently set the highlight color for each input type. Colors are stored separately from themes — changing themes won't reset your colors.
+Run `:customize` to set the highlight color for each input type independently. Colors are stored separately from themes — switching themes never resets your color choices.
 
 ### Backup & Restore
 
-Use the **↓ Export** and **↑ Import** buttons in `:config` to save all settings (bookmarks, colors, API keys, custom tags, dir extensions) to a JSON file and restore them anytime.
+Use **↓ Export** and **↑ Import** in `:config` to save all settings (bookmarks, colors, API keys, custom tags, dir extensions) to a single JSON file and restore them anytime.
 
 ---
 
 ## Privacy
 
-All settings, including your **Gemini API Key**, are stored locally in your browser's `localStorage`. No data is sent to external servers except for necessary API calls to Google Gemini and Open-Meteo (weather).
+All settings, including your **Gemini API Key**, are stored locally in your browser's `localStorage`. No data is sent to any external server except for:
+
+- **Google Gemini** — when using `gem:` or `ai:` prompts
+- **Open-Meteo** — for real-time weather
+- **Wiktionary / Free Dictionary API** — for `pronounce:` IPA lookup (no key, no tracking)
+- **Datamuse** — for `spell:` suggestions (no key, no tracking)
+- **ipapi.co / ident.me** — for `:ipconfig` (your IP is sent by nature of the request)
