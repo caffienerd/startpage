@@ -489,9 +489,23 @@ function pushHistory(entry) {
 }
 
 function handleKeyboardEvents(input, elements) {
-  // historyIndex: -1 = not browsing, otherwise index into loadHistory()
-  // We use a local browsing index; the persisted array is source of truth
-  let historyIndex = -1;
+  // History browsing state
+  // filteredHistory: the filtered slice being browsed (most-recent-first)
+  // historyIndex: position within filteredHistory (-1 = not browsing)
+  // historyPrefix: the prefix that was active when browsing started
+  let filteredHistory = [];
+  let historyIndex    = -1;
+  let historyPrefix   = '';
+
+  // Build a most-recent-first list of history entries that start with `prefix`.
+  // If prefix is empty, return the full history (most-recent-first).
+  function buildFilteredHistory(prefix) {
+    const h = loadHistory(); // oldest-first
+    const reversed = [...h].reverse(); // most-recent-first
+    if (!prefix) return reversed;
+    const lp = prefix.toLowerCase();
+    return reversed.filter(e => e.toLowerCase().startsWith(lp));
+  }
 
   input.addEventListener("keydown", (e) => {
     const rawValue = input.value;
@@ -557,34 +571,58 @@ function handleKeyboardEvents(input, elements) {
       return;
     }
 
-    // History navigation
+    // ---- History navigation (prefix-filtered) ----
     if (e.key === "ArrowUp") {
-      const h = loadHistory();
-      if (!h.length) return;
       e.preventDefault();
-      if (historyIndex === -1) historyIndex = h.length;
-      if (historyIndex > 0) {
-        historyIndex--;
-        input.value = h[historyIndex];
-        updateSyntaxHighlight(input.value);
+
+      if (historyIndex === -1) {
+        // Start a new browse session — snapshot the current input as the prefix filter
+        historyPrefix   = input.value;
+        filteredHistory = buildFilteredHistory(historyPrefix);
+        if (!filteredHistory.length) return;
+        historyIndex = 0;
+      } else {
+        // Already browsing — go further back
+        if (historyIndex < filteredHistory.length - 1) {
+          historyIndex++;
+        } else {
+          return; // already at oldest match
+        }
       }
+
+      input.value = filteredHistory[historyIndex];
+      updateSyntaxHighlight(input.value);
+
     } else if (e.key === "ArrowDown") {
-      const h = loadHistory();
       e.preventDefault();
       if (historyIndex === -1) return;
-      if (historyIndex < h.length - 1) {
-        historyIndex++;
-        input.value = h[historyIndex];
+
+      if (historyIndex > 0) {
+        historyIndex--;
+        input.value = filteredHistory[historyIndex];
         updateSyntaxHighlight(input.value);
       } else {
-        // Past the end — clear input
-        historyIndex = -1;
-        input.value = '';
-        updateSyntaxHighlight('');
+        // Back to the original prefix the user had typed
+        historyIndex    = -1;
+        filteredHistory = [];
+        input.value     = historyPrefix;
+        updateSyntaxHighlight(historyPrefix);
       }
+
     } else if (e.key === "Enter") {
       handleEnterKey(rawValue, value, elements);
-      historyIndex = -1;
+      // Reset history state after executing
+      historyIndex    = -1;
+      filteredHistory = [];
+      historyPrefix   = '';
+    } else {
+      // Any other key resets the browsing session so the next ↑ re-filters
+      // from whatever the user just typed
+      if (historyIndex !== -1) {
+        historyIndex    = -1;
+        filteredHistory = [];
+        historyPrefix   = '';
+      }
     }
   });
 }
