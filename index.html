@@ -574,6 +574,19 @@
     </div>
   </div>
 
+  <!-- History Modal -->
+  <div class="config-modal" id="history-modal" lang="en" role="dialog" aria-labelledby="history-modal-title">
+    <div class="config-content history-content">
+      <h2 id="history-modal-title">Command History</h2>
+      <p class="config-hint" style="margin-bottom: 12px;">Click or press Enter on an entry to fill the terminal. Use ↑ ↓ to navigate, PgUp / PgDn to scroll fast.</p>
+      <div id="history-list" class="history-list"></div>
+      <div class="config-buttons">
+        <button class="btn-cancel" style="margin-right:auto;" onclick="clearHistory()">Clear history</button>
+        <button class="btn-save" onclick="closeHistoryModal()">Close</button>
+      </div>
+    </div>
+  </div>
+
   <!-- Loading Overlay -->
   <div id="loading-overlay">
     <div id="loading-ring"></div>

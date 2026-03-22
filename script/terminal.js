@@ -223,6 +223,7 @@ function updateSyntaxHighlight(rawValue) {
     ':l': ':light',
     ':h': ':help',
     ':ha': ':help_ai_router',
+    ':hi': ':history',
     ':aim': ':aimode',
     ':ge': ':gemini',
     ':n': ':netspeed',

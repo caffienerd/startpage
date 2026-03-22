@@ -2252,14 +2252,19 @@ input.input-dir-active {
 }
 
 /* ---- Command History Modal ---- */
+.history-content {
+  max-width: 560px;
+}
+
 .history-list {
   display: flex;
   flex-direction: column;
-  gap: 4px;
-  max-height: 360px;
+  gap: 3px;
+  max-height: 420px;
   overflow-y: auto;
   margin: 4px 0 12px;
   padding-right: 4px;
+  scroll-behavior: smooth;
 }
 
 .history-list::-webkit-scrollbar { width: 4px; }
@@ -2275,18 +2280,24 @@ input.input-dir-active {
   border: 1px solid transparent;
   cursor: pointer;
   transition: background 0.1s, border-color 0.1s;
+  outline: none;
 }
 
-.history-entry:hover {
+.history-entry:hover,
+.history-entry:focus {
   background: color-mix(in srgb, var(--syn-cmd) 10%, transparent);
-  border-color: color-mix(in srgb, var(--syn-cmd) 25%, transparent);
+  border-color: color-mix(in srgb, var(--syn-cmd) 30%, transparent);
+}
+
+.history-entry:focus {
+  border-color: color-mix(in srgb, var(--syn-cmd) 55%, transparent);
 }
 
 .history-index {
   font-family: var(--monospace-font-family);
   font-size: 11px;
   opacity: 0.3;
-  min-width: 18px;
+  min-width: 22px;
   text-align: right;
   flex-shrink: 0;
 }
@@ -2315,7 +2326,7 @@ input.input-dir-active {
   margin-top: 4px;
 }
 
-/* Wider sp-modal for history list */
+/* Wider sp-modal for history list (legacy, kept for compat) */
 .sp-modal:has(.history-list) {
   max-width: 480px;
   width: 90vw;

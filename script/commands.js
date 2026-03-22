@@ -457,45 +457,109 @@ function getAiUrlDestination(url) {
 }
 
 // ---- Command History modal ----
+let _historySelectedIndex = -1;
+
 function openHistory() {
-  const h = loadHistory();
-  const input = document.getElementById('terminal-input');
+  _renderHistoryModal();
+  document.getElementById('history-modal').classList.add('active');
+  _historySelectedIndex = -1;
 
-  const entries = h.length
-    ? [...h].reverse().map((entry, i) => `
-        <div class="history-entry" data-entry="${entry.replace(/"/g, '&quot;')}">
-          <span class="history-index">${i + 1}</span>
-          <span class="history-text">${escapeHTML(entry)}</span>
-        </div>`).join('')
-    : '<span class="history-empty">No history yet.</span>';
+  // Keyboard nav within the list
+  const modal = document.getElementById('history-modal');
+  modal._historyKeydown = (e) => {
+    const entries = [...document.querySelectorAll('#history-list .history-entry')];
 
-  showAlert(
-    `<div class="history-list">${entries}</div>
-     <div class="history-actions">
-       <button class="sp-btn sp-btn-ghost" id="history-clear-btn">Clear history</button>
-     </div>`,
-    { title: 'Command History', type: 'info', raw: true }
-  );
+    if (e.key === 'Escape') {
+      e.preventDefault();
+      e.stopPropagation();
+      closeHistoryModal();
+      return;
+    }
 
-  // Wire click-to-fill
+    if (!entries.length) return;
+
+    const LIST_SCROLL_PAGE = 5; // entries per PgUp/PgDn jump
+
+    if (e.key === 'ArrowDown') {
+      e.preventDefault();
+      _historySelectedIndex = Math.min(_historySelectedIndex + 1, entries.length - 1);
+      if (_historySelectedIndex < 0) _historySelectedIndex = 0;
+      entries[_historySelectedIndex].focus();
+    } else if (e.key === 'ArrowUp') {
+      e.preventDefault();
+      _historySelectedIndex = Math.max(_historySelectedIndex - 1, 0);
+      entries[_historySelectedIndex].focus();
+    } else if (e.key === 'PageDown') {
+      e.preventDefault();
+      _historySelectedIndex = Math.min(_historySelectedIndex + LIST_SCROLL_PAGE, entries.length - 1);
+      if (_historySelectedIndex < 0) _historySelectedIndex = 0;
+      entries[_historySelectedIndex].focus();
+    } else if (e.key === 'PageUp') {
+      e.preventDefault();
+      _historySelectedIndex = Math.max(_historySelectedIndex - LIST_SCROLL_PAGE, 0);
+      entries[_historySelectedIndex].focus();
+    }
+  };
+  modal.addEventListener('keydown', modal._historyKeydown);
+
+  // Focus first entry if any
   requestAnimationFrame(() => {
-    document.querySelectorAll('.history-entry').forEach(el => {
-      el.addEventListener('click', () => {
-        const entry = el.dataset.entry;
-        // Close modal, fill terminal
-        document.getElementById('sp-modal-overlay')?.remove();
-        if (input) {
-          input.value = entry;
-          input.focus();
-          if (typeof updateSyntaxHighlight === 'function') updateSyntaxHighlight(entry);
-        }
-      });
+    const first = document.querySelector('#history-list .history-entry');
+    if (first) { _historySelectedIndex = 0; first.focus(); }
+  });
+}
+
+function closeHistoryModal() {
+  const modal = document.getElementById('history-modal');
+  if (modal._historyKeydown) {
+    modal.removeEventListener('keydown', modal._historyKeydown);
+    delete modal._historyKeydown;
+  }
+  modal.classList.remove('active');
+  document.getElementById('terminal-input')?.focus();
+}
+
+function _renderHistoryModal() {
+  const h = loadHistory();
+  const list = document.getElementById('history-list');
+  list.innerHTML = '';
+
+  if (!h.length) {
+    list.innerHTML = '<div class="history-empty">No history yet.</div>';
+    return;
+  }
+
+  // Most-recent first
+  [...h].reverse().forEach((entry, i) => {
+    const el = document.createElement('div');
+    el.className = 'history-entry';
+    el.tabIndex = 0;
+    el.dataset.entry = entry;
+    el.innerHTML =
+      `<span class="history-index">${i + 1}</span>` +
+      `<span class="history-text">${escapeHTML(entry)}</span>`;
+
+    el.addEventListener('click', () => _fillFromHistory(entry));
+    el.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') { e.preventDefault(); _fillFromHistory(entry); }
     });
 
-    document.getElementById('history-clear-btn')?.addEventListener('click', () => {
-      localStorage.removeItem('terminal-history-v1');
-      document.getElementById('sp-modal-overlay')?.remove();
-      showToast('History cleared', 'success');
-    });
+    list.appendChild(el);
   });
+}
+
+function _fillFromHistory(entry) {
+  closeHistoryModal();
+  const input = document.getElementById('terminal-input');
+  if (input) {
+    input.value = entry;
+    input.focus();
+    if (typeof updateSyntaxHighlight === 'function') updateSyntaxHighlight(entry);
+  }
+}
+
+function clearHistory() {
+  localStorage.removeItem('terminal-history-v1');
+  _renderHistoryModal();
+  showToast('History cleared', 'success');
 }
