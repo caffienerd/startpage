@@ -89,6 +89,7 @@ function handleSpecialCommands(value) {
   if (normalized === ":version" || normalized === ":ver") { openVersion(); clear(); return; }
   if (normalized === ":update") { checkForUpdate(); clear(); return; }
   if (normalized === ":history") { openHistory(); clear(); return; }
+  if (normalized === ":tour") { openTour(true); clear(); return; }
   if (normalized === ":export") { exportBackup(); clear(); return; }
   if (normalized === ":import") { importBackup(); clear(); return; }
   if (normalized === ":ipconfig" || normalized === ":ip") { openIPInfo(); clear(); return; }

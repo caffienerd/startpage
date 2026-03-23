@@ -2331,3 +2331,108 @@ input.input-dir-active {
   max-width: 480px;
   width: 90vw;
 }
+
+/* ========================================
+   Tour
+   ======================================== */
+
+#tour-card {
+  position: fixed;
+  bottom: 28px;
+  right: 28px;
+  z-index: 10002;
+  width: 300px;
+  background: var(--background-color);
+  border: 1px solid color-mix(in srgb, var(--color-primary) 40%, var(--card-border));
+  border-radius: 10px;
+  box-shadow: 0 8px 28px rgba(0,0,0,0.28);
+  animation: tour-in 0.22s ease;
+  overflow: hidden;
+}
+
+@keyframes tour-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.tour-tip {
+  font-family: var(--font-family);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-color);
+  margin: 0;
+  padding: 14px 16px 10px;
+  opacity: 0.9;
+}
+
+.tour-star {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 7px 14px;
+  background: var(--color-primary);
+  color: #fff;
+  border-radius: 6px;
+  font-size: 12.5px;
+  font-weight: 600;
+  text-decoration: none;
+  transition: filter 0.15s;
+}
+.tour-star:hover { filter: brightness(1.1); }
+
+.tour-foot {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 7px 10px 9px;
+  border-top: 1px solid var(--card-border);
+}
+
+.tour-skip {
+  background: none;
+  border: none;
+  cursor: pointer;
+  color: var(--text-color);
+  font-family: var(--font-family);
+  font-size: 11.5px;
+  opacity: 0.3;
+  padding: 2px 4px;
+  transition: opacity 0.15s;
+}
+.tour-skip:hover { opacity: 0.75; }
+
+.tour-nav {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.tour-counter {
+  font-family: var(--monospace-font-family);
+  font-size: 11px;
+  color: var(--color-primary);
+  opacity: 0.65;
+  min-width: 30px;
+  text-align: center;
+}
+
+.tour-arrow {
+  background: none;
+  border: 1px solid var(--card-border);
+  border-radius: 5px;
+  cursor: pointer;
+  color: var(--text-color);
+  font-size: 13px;
+  padding: 3px 9px;
+  transition: background 0.15s;
+  font-family: var(--monospace-font-family);
+  line-height: 1.4;
+}
+.tour-arrow:hover { background: color-mix(in srgb, var(--text-color) 8%, transparent); }
+
+.tour-arrow-next {
+  background: var(--color-primary);
+  border-color: var(--color-primary);
+  color: #fff;
+  font-weight: 700;
+}
+.tour-arrow-next:hover { filter: brightness(1.1); background: var(--color-primary); }

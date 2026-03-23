@@ -224,6 +224,7 @@ function updateSyntaxHighlight(rawValue) {
     ':h': ':help',
     ':ha': ':help_ai_router',
     ':hi': ':history',
+    ':to': ':tour',
     ':aim': ':aimode',
     ':ge': ':gemini',
     ':n': ':netspeed',
@@ -248,7 +249,7 @@ function updateSyntaxHighlight(rawValue) {
   const customTagPrefixes = customTags.map(t => t.prefix).filter(Boolean);
 
   const themeCommands = [':dark', ':black', ':amoled', ':light', ':nord', ':newspaper', ':coffee', ':root', ':neon'];
-  const knownCommands = [':help', ':help_ai_router', ':aimode', ':bookmarks', ':bm', ':ipconfig', ':ip', ':netspeed', ':speed', ':config', ':customize', ':custom', ':tags', ':dir', ':dirconfig', ':prompts', ':weather', ':time', ':gemini', ':update', ':history', ':hacker', ':cyberpunk', ...themeCommands];
+  const knownCommands = [':help', ':help_ai_router', ':aimode', ':bookmarks', ':bm', ':ipconfig', ':ip', ':netspeed', ':speed', ':config', ':customize', ':custom', ':tags', ':dir', ':dirconfig', ':prompts', ':weather', ':time', ':gemini', ':update', ':history', ':tour', ':hacker', ':cyberpunk', ...themeCommands];
   const versionCommands = [':version', ':ver', ':update'];
   const knownSearch = /^(r|yt|alt|def|ddg|ggl|bing|amazon|imdb|the|syn|quote|maps|cws|spell|pronounce|gem|gemini|ai):/;
   const knownSearchDynamic = customTagPrefixes.length

@@ -22,6 +22,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
   // ---- Help modal ----
   on('btn-close-help',         () => closeHelp());
+  on('btn-restart-tour',        () => { closeHelp(); localStorage.removeItem('tour-seen-v1'); openTour(true); });
 
   // ---- IP modal ----
   on('btn-close-ip',           () => closeIPInfo());

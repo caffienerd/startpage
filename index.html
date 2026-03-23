@@ -8,7 +8,7 @@
   <meta property="og:title" content="Start Page" />
   <meta property="og:description" content="A minimal, keyboard-centric start page." />
   <meta name="theme-color" content="#ffffff" id="meta-theme-color" />
-  <link rel="icon" type="image/png" href="icon/favicon.png">
+  <link rel="icon" type="image/png" href="icon/icon128.png">
   <title>Start Page</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -165,6 +165,7 @@
           <div class="help-cmd"><span>:version</span> → Show app version</div>
           <div class="help-cmd"><span>:update</span> → Check for updates on GitHub</div>
           <div class="help-cmd"><span>:history</span> → Browse &amp; recall command history</div>
+          <div class="help-cmd"><span>:tour</span> → Replay the onboarding tour</div>
           <div class="help-cmd"><span>:export</span> → Export all settings to JSON</div>
           <div class="help-cmd"><span>:import</span> → Import settings from JSON</div>
           <div class="help-cmd"><span>:help</span> → Show this help</div>
@@ -247,6 +248,7 @@
       </div>
 
       <div class="config-buttons">
+        <button class="btn-cancel" id="btn-restart-tour" style="margin-right:auto;">↺ Take the tour</button>
         <button class="btn-save" id="btn-close-help">Got it</button>
       </div>
     </div>
@@ -603,6 +605,7 @@
   <script src="script/modals/dir.js"></script>
   <script src="script/modals/prompts.js"></script>
   <script src="script/modals/pronounce.js"></script>
+  <script src="script/modals/tour.js"></script>
   <script src="script/commands.js"></script>
   <script src="script/terminal.js"></script>
   <script src="script/script.js"></script>
