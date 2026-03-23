@@ -3,12 +3,6 @@
 
 <head>
   <meta charset="UTF-8" />
-  <script>
-    // Apply theme instantly before render to prevent flash
-    const initialTheme = localStorage.getItem('theme');
-    if (initialTheme === 'dark') document.documentElement.classList.add('dark-mode');
-    if (initialTheme === 'black') document.documentElement.classList.add('black-mode');
-  </script>
   <meta name="viewport" content="width=device-width" />
   <meta name="description" content="A minimal, keyboard-centric start page with dynamic themes and AI routing." />
   <meta property="og:title" content="Start Page" />
@@ -16,16 +10,12 @@
   <meta name="theme-color" content="#ffffff" id="meta-theme-color" />
   <link rel="icon" type="image/png" href="icon/favicon.png">
   <title>Start Page</title>
+
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap"
-    rel="stylesheet" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap"
-    rel="stylesheet" />
-  <link
-    href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap"
-    rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Source+Code+Pro:ital,wght@0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&family=Playfair+Display:ital,wght@0,400..900;1,400..900&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="style.css" />
 
 </head>
@@ -60,7 +50,7 @@
       <p><span id="username">user</span>@<span id="browser-info">browser</span><span>$</span></p>
       <div class="terminal-input-wrapper">
         <div class="command-hint" id="command-hint"></div>
-        <input id="terminal-input" type="text" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off" aria-label="Terminal Input" />
+        <input id="terminal-input" type="text" autocomplete="off" spellcheck="false" autocorrect="off" autocapitalize="off" aria-label="Terminal Input" autofocus />
       </div>
       <div class="ai-route-badge" id="ai-route-badge" aria-live="polite"></div>
     </section>
@@ -77,11 +67,11 @@
       </div>
 
       <div class="config-section">
-        <button class="btn-save btn-edit-bookmarks" onclick="openBookmarksModal()">Edit Bookmarks</button>
+        <button class="btn-save btn-edit-bookmarks" id="btn-edit-bookmarks">Edit Bookmarks</button>
       </div>
 
       <div class="config-section">
-        <button class="btn-save btn-edit-bookmarks" onclick="closeConfig(); openTagsModal()" style="background: var(--terminal-bg); color: var(--text-color); border: 1px solid var(--card-border);">Search Overrides &amp; Custom Tags</button>
+        <button class="btn-save btn-edit-bookmarks" id="btn-tags-from-config" style="background: var(--terminal-bg); color: var(--text-color); border: 1px solid var(--card-border);">Search Overrides &amp; Custom Tags</button>
       </div>
 
       <div class="config-section">
@@ -145,11 +135,11 @@
       </div>
 
       <div class="config-buttons">
-        <button class="btn-customize-link" onclick="closeConfig(); openCustomizeModal()">Customize?</button>
-        <button class="btn-backup" onclick="importBackup()" title="Import backup">↑ Import</button>
-        <button class="btn-backup" onclick="exportBackup()" title="Export backup">↓ Export</button>
-        <button class="btn-cancel" onclick="closeConfig()">Cancel</button>
-        <button class="btn-save" onclick="saveConfig()">Save</button>
+        <button class="btn-customize-link" id="btn-customize-from-config">Customize?</button>
+        <button class="btn-backup" id="btn-import-backup" title="Import backup">↑ Import</button>
+        <button class="btn-backup" id="btn-export-backup" title="Export backup">↓ Export</button>
+        <button class="btn-cancel" id="btn-cancel-config">Cancel</button>
+        <button class="btn-save" id="btn-save-config">Save</button>
       </div>
     </div>
   </div>
@@ -257,7 +247,7 @@
       </div>
 
       <div class="config-buttons">
-        <button class="btn-save" onclick="closeHelp()">Got it</button>
+        <button class="btn-save" id="btn-close-help">Got it</button>
       </div>
     </div>
   </div>
@@ -320,7 +310,7 @@
       </div>
 
       <div class="config-buttons">
-        <button class="btn-save" onclick="closeIPInfo()">Close</button>
+        <button class="btn-save" id="btn-close-ip">Close</button>
       </div>
     </div>
   </div>
@@ -356,7 +346,7 @@
       <div class="speed-status" id="speed-status">Starting test...</div>
 
       <div class="config-buttons">
-        <button class="btn-cancel" onclick="closeSpeedTest()">Close</button>
+        <button class="btn-cancel" id="btn-close-speed">Close</button>
       </div>
     </div>
   </div>
@@ -369,7 +359,7 @@
       <div id="spell-result-area" class="spell-result-area">checking...</div>
       <div class="spell-hint" id="spell-hint"></div>
       <div class="config-buttons">
-        <button class="btn-save" onclick="closeSpellModal()">Close</button>
+        <button class="btn-save" id="btn-close-spell">Close</button>
       </div>
     </div>
   </div>
@@ -379,7 +369,7 @@
     <div class="config-content" style="max-width: 900px;">
       <div class="config-header-row">
         <h2 id="bookmarks-modal-title">Manage Bookmarks</h2>
-        <button class="btn-toggle-editor" id="toggle-editor-btn" onclick="toggleEditorMode()">Edit as JSON</button>
+        <button class="btn-toggle-editor" id="toggle-editor-btn">Edit as JSON</button>
       </div>
 
       <!-- Visual Grid Editor -->
@@ -394,8 +384,8 @@
 ]'></textarea>
 
       <div class="config-buttons">
-        <button class="btn-cancel" onclick="closeBookmarksModal()">Cancel</button>
-        <button class="btn-save" onclick="saveBookmarksFromModal()">Save Bookmarks</button>
+        <button class="btn-cancel" id="btn-cancel-bookmarks">Cancel</button>
+        <button class="btn-save" id="btn-save-bookmarks">Save Bookmarks</button>
       </div>
     </div>
   </div>
@@ -412,8 +402,8 @@
       <div class="gemini-status" id="gemini-status">waiting...</div>
       <div id="gemini-response-area" class="gemini-response-area">waiting...</div>
       <div class="config-buttons">
-        <button class="btn-cancel" onclick="copyGeminiResponse()">Copy</button>
-        <button class="btn-save" onclick="closeGeminiModal()">Close</button>
+        <button class="btn-cancel" id="btn-copy-gemini">Copy</button>
+        <button class="btn-save" id="btn-close-gemini">Close</button>
       </div>
     </div>
   </div>
@@ -435,10 +425,10 @@
       </div>
 
       <div class="config-buttons">
-        <button class="btn-cancel" onclick="resetAllSyntaxColors()" style="margin-right:auto;">Reset colors</button>
-        <button class="btn-cancel" onclick="closeCustomizeModal(); openPromptsModal()" style="border-color: color-mix(in srgb, var(--syn-cmd) 40%, var(--card-border)); color: var(--syn-cmd);">✎ Edit Prompts</button>
-        <button class="btn-cancel" onclick="closeCustomizeModal()">Cancel</button>
-        <button class="btn-save" onclick="saveCustomize()">Save</button>
+        <button class="btn-cancel" id="btn-reset-colors" style="margin-right:auto;">Reset colors</button>
+        <button class="btn-cancel" id="btn-edit-prompts" style="border-color: color-mix(in srgb, var(--syn-cmd) 40%, var(--card-border)); color: var(--syn-cmd);">✎ Edit Prompts</button>
+        <button class="btn-cancel" id="btn-cancel-customize">Cancel</button>
+        <button class="btn-save" id="btn-save-customize">Save</button>
       </div>
     </div>
   </div>
@@ -458,13 +448,13 @@
         <div class="customize-section-title">Custom Tags</div>
         <p class="config-hint" style="margin-bottom: 12px;">Define your own <span class="config-code">prefix:</span> shortcuts. The search query is appended to the URL.</p>
         <div id="tags-custom-list" class="tags-custom-list"></div>
-        <button class="tags-add-btn" onclick="addCustomTag()">+ Add tag</button>
+        <button class="tags-add-btn" id="btn-add-tag">+ Add tag</button>
       </div>
 
       <div class="config-buttons">
-        <button class="btn-cancel tags-dir-btn" onclick="closeTagsModal(); openDirConfigModal()" title="Customize Open Directory file extensions">⊞ Dir Extensions</button>
-        <button class="btn-cancel" onclick="closeTagsModal()">Cancel</button>
-        <button class="btn-save" onclick="saveTagsModal()">Save</button>
+        <button class="btn-cancel tags-dir-btn" id="btn-dir-extensions" title="Customize Open Directory file extensions">⊞ Dir Extensions</button>
+        <button class="btn-cancel" id="btn-cancel-tags">Cancel</button>
+        <button class="btn-save" id="btn-save-tags">Save</button>
       </div>
     </div>
   </div>
@@ -517,9 +507,9 @@
       </div>
 
       <div class="config-buttons">
-        <button class="btn-cancel" id="dir-copy-btn" onclick="copyDirCommand()">Copy Command</button>
-        <button class="btn-cancel" onclick="closeDirModal()">Cancel</button>
-        <button class="btn-save" onclick="fireDirSearch()">Search</button>
+        <button class="btn-cancel" id="dir-copy-btn">Copy Command</button>
+        <button class="btn-cancel" id="btn-cancel-dir">Cancel</button>
+        <button class="btn-save" id="btn-search-dir">Search</button>
       </div>
     </div>
   </div>
@@ -538,9 +528,9 @@
         autocorrect="off"
         placeholder="search anything...&#10;:help → commands&#10;yt:query → youtube"></textarea>
       <div class="config-buttons">
-        <button class="btn-cancel" onclick="resetPromptsModal()" style="margin-right:auto;">Reset to defaults</button>
-        <button class="btn-cancel" onclick="closePromptsModal()">Cancel</button>
-        <button class="btn-save" onclick="savePromptsModal()">Save</button>
+        <button class="btn-cancel" id="btn-reset-prompts" style="margin-right:auto;">Reset to defaults</button>
+        <button class="btn-cancel" id="btn-cancel-prompts">Cancel</button>
+        <button class="btn-save" id="btn-save-prompts">Save</button>
       </div>
     </div>
   </div>
@@ -555,8 +545,8 @@
       </p>
       <div id="dirconfig-categories" class="dirconfig-categories"></div>
       <div class="config-buttons">
-        <button class="btn-cancel" onclick="closeDirConfigModal()">Cancel</button>
-        <button class="btn-save" onclick="saveDirConfig()">Save</button>
+        <button class="btn-cancel" id="btn-cancel-dirconfig">Cancel</button>
+        <button class="btn-save" id="btn-save-dirconfig">Save</button>
       </div>
     </div>
   </div>
@@ -569,7 +559,7 @@
       <div id="pronounce-result-area" class="pronounce-result-area"></div>
       <div class="pronounce-hint" id="pronounce-hint"></div>
       <div class="config-buttons">
-        <button class="btn-save" onclick="closePronounceModal()">Close</button>
+        <button class="btn-save" id="btn-close-pronounce">Close</button>
       </div>
     </div>
   </div>
@@ -581,8 +571,8 @@
       <p class="config-hint" style="margin-bottom: 12px;">Click or press Enter on an entry to fill the terminal. Use ↑ ↓ to navigate, PgUp / PgDn to scroll fast.</p>
       <div id="history-list" class="history-list"></div>
       <div class="config-buttons">
-        <button class="btn-cancel" style="margin-right:auto;" onclick="clearHistory()">Clear history</button>
-        <button class="btn-save" onclick="closeHistoryModal()">Close</button>
+        <button class="btn-cancel" style="margin-right:auto;" id="btn-clear-history">Clear history</button>
+        <button class="btn-save" id="btn-close-history">Close</button>
       </div>
     </div>
   </div>
@@ -592,6 +582,7 @@
     <div id="loading-ring"></div>
   </div>
 
+  <script src="script/ext-storage.js"></script>
   <script src="version/version.js"></script>
   <!-- load order matters: storage → utils → ui → modals → terminal → commands → main -->
   <script src="script/utils.js"></script>
@@ -615,6 +606,7 @@
   <script src="script/commands.js"></script>
   <script src="script/terminal.js"></script>
   <script src="script/script.js"></script>
+  <script src="script/inline-handlers.js"></script>
 </body>
 
 </html>

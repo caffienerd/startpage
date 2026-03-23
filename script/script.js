@@ -35,6 +35,43 @@ function initPlaceholders() {
 const TIME_UPDATE_INTERVAL = 60 * 1000;
 const WEATHER_UPDATE_INTERVAL = 30 * 60 * 1000;
 
+// Firefox / Opera: aggressively reclaim focus from the omnibox.
+// These browsers give omnibox focus on newtab even for extension overrides.
+// Strategy: poll until we own it, and reclaim on any user interaction.
+(function nonChromeFocusGrab() {
+  function grab() {
+    const input = document.getElementById('terminal-input');
+    if (!input) return false;
+    if (document.querySelector('.config-modal.active')) return true; // leave modal alone
+    if (document.activeElement === input) return true;
+    input.focus({ preventScroll: true });
+    return document.activeElement === input;
+  }
+
+  // Poll for up to 3 seconds after page load — Firefox/Opera allow focus()
+  // from page JS once the document is interactive, just not instantly.
+  let attempts = 0;
+  const poll = setInterval(() => {
+    if (grab() || ++attempts > 30) clearInterval(poll);
+  }, 100);
+
+  // Also reclaim on any click on the page body (not inside a modal)
+  document.addEventListener('click', (e) => {
+    if (!document.querySelector('.config-modal.active')) grab();
+  }, { capture: true });
+
+  // Reclaim on keydown so typing always lands in terminal
+  document.addEventListener('keydown', (e) => {
+    const input = document.getElementById('terminal-input');
+    if (!input) return;
+    if (document.activeElement === input) return;
+    if (document.querySelector('.config-modal.active')) return;
+    if (e.key.length === 1 || e.key === 'Backspace') {
+      input.focus({ preventScroll: true });
+    }
+  }, { capture: true });
+})();
+
 // Hide loading overlay if user navigates back (bfcache restore)
 window.addEventListener('pageshow', (e) => {
   const el = document.getElementById('loading-overlay');
@@ -44,7 +81,9 @@ window.addEventListener('pageshow', (e) => {
   setTimeout(() => el.classList.remove('hiding'), 300);
 });
 
-document.addEventListener("DOMContentLoaded", () => {
+document.addEventListener("DOMContentLoaded", async () => {
+  // Wait for extension storage (Gemini API key) to be loaded before init
+  if (window.extStorageReady) await window.extStorageReady;
   initPlaceholders();
   loadTheme();
   applySyntaxColors(getStoredSyntaxColors());
@@ -93,6 +132,7 @@ document.addEventListener("DOMContentLoaded", () => {
     ['dirconfig-modal', closeDirConfigModal],
     ['prompts-modal',   closePromptsModal],
     ['pronounce-modal', closePronounceModal],
+    ['history-modal',   closeHistoryModal],
   ].forEach(([id, fn]) => {
     if (typeof fn === 'function') {
       const el = document.getElementById(id);
@@ -126,6 +166,7 @@ document.addEventListener('keydown', (e) => {
     if (typeof closeDirConfigModal === 'function') closeDirConfigModal();
     if (typeof closePromptsModal === 'function') closePromptsModal();
     if (typeof closePronounceModal === 'function') closePronounceModal();
+    if (typeof closeHistoryModal === 'function') closeHistoryModal();
     return;
   }
 

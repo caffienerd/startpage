@@ -26,7 +26,8 @@ function closeGeminiModal() {
 }
 
 async function handleGeminiPrompt(prompt) {
-  if (window.location.protocol === 'file:') {
+  const proto = window.location.protocol;
+  if (proto === 'file:') {
     showAlert(
       'Gemini API requires HTTPS or localhost HTTP.\n\nPlease serve this page via a local web server:\n  python3 -m http.server',
       { type: 'warning', title: 'HTTPS Required' }

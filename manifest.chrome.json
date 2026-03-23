@@ -1,0 +1,55 @@
+{
+  "manifest_version": 3,
+  "name": "Powerful terminal StartPage",
+  "description": "A sleek, keyboard-driven powerful terminal themed start page with AI routing, Gemini integration, open directory search, 8 themes, vocabulary tools, internet tools, and much more.",
+  "version": "6.8.4",
+  "chrome_url_overrides": {
+    "newtab": "focus/focus.html"
+  },
+  "icons": {
+    "16": "icon/favicon.png",
+    "48": "icon/favicon.png",
+    "128": "icon/favicon.png"
+  },
+  "permissions": [
+    "storage"
+  ],
+  "host_permissions": [
+    "https://generativelanguage.googleapis.com/*",
+    "https://geocoding-api.open-meteo.com/*",
+    "https://api.open-meteo.com/*",
+    "https://ipapi.co/*",
+    "https://v4.ident.me/*",
+    "https://v6.ident.me/*",
+    "https://api.datamuse.com/*",
+    "https://api.dictionaryapi.dev/*",
+    "https://en.wiktionary.org/*",
+    "https://www.cloudflare.com/*",
+    "https://speed.cloudflare.com/*",
+    "https://www.google.com/s2/favicons*",
+    "https://icons.duckduckgo.com/*",
+    "https://*.faviconkit.com/*",
+    "https://icon.horse/*",
+    "https://geticon.io/*",
+    "https://favicon.im/*",
+    "https://raw.githubusercontent.com/*"
+  ],
+  "content_security_policy": {
+    "extension_pages": "script-src 'self'; object-src 'none'; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com; connect-src 'self' https://generativelanguage.googleapis.com https://geocoding-api.open-meteo.com https://api.open-meteo.com https://ipapi.co https://v4.ident.me https://v6.ident.me https://api.datamuse.com https://api.dictionaryapi.dev https://en.wiktionary.org https://www.cloudflare.com https://speed.cloudflare.com https://www.google.com https://icons.duckduckgo.com https://icon.horse https://geticon.io https://favicon.im https://raw.githubusercontent.com;"
+  },
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "index.html",
+        "focus.html",
+        "focus.js",
+        "icon/*",
+        "style.css",
+        "script/*"
+      ],
+      "matches": [
+        "<all_urls>"
+      ]
+    }
+  ]
+}

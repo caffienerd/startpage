@@ -5,7 +5,6 @@ const FAVICON_PROBE_TIMEOUT_MS = 8000;
 const FAVICON_CACHE_KEY = 'favicon-resolved-v1';
 const FAVICON_CACHE_TTL_MS = 7 * 24 * 60 * 60 * 1000; // 7 days
 
-// In-memory cache (hydrated from localStorage on load)
 const _faviconMemCache = {};
 
 (function _hydrateFaviconCache() {
@@ -67,23 +66,14 @@ function _probeIcon(src) {
   });
 }
 
-/**
- * Fires all probes in parallel. First source to respond successfully wins
- * (fastest wins). Result is cached in localStorage for 7 days so subsequent
- * page loads are instant.
- */
 async function _loadFavicon(displayImg, domain, urls) {
-  // Serve from cache instantly
   if (domain in _faviconMemCache) {
     const cached = _faviconMemCache[domain];
     if (cached) displayImg.src = cached;
     else displayImg.style.display = 'none';
     return;
   }
-
   if (!urls.length) { displayImg.style.display = 'none'; return; }
-
-  // Race all probes — fastest successful source wins
   const result = await new Promise((resolve) => {
     let pending = urls.length;
     let won = false;
@@ -95,65 +85,37 @@ async function _loadFavicon(displayImg, domain, urls) {
       });
     });
   });
-
   _faviconMemCache[domain] = result;
   _persistFaviconCache();
-
   if (result) displayImg.src = result;
   else displayImg.style.display = 'none';
 }
 
-
-
 const ITEMS_PER_SECTION = 5;
 
-// ========================================
-// Generate bookmark grid
-// ========================================
 function generateBookmarks() {
   const container = document.getElementById('bookmarks');
   container.innerHTML = '';
-
   const bookmarks = getStoredBookmarks();
   const numSections = Math.ceil(bookmarks.length / ITEMS_PER_SECTION);
-
   for (let i = 0; i < numSections; i++) {
     const section = document.createElement('div');
     section.className = 'bookmark-section';
     const ul = document.createElement('ul');
-
     const slice = bookmarks.slice(i * ITEMS_PER_SECTION, (i + 1) * ITEMS_PER_SECTION);
     slice.forEach(bookmark => {
       if (!bookmark.href || !bookmark.title) return;
-
       const li = document.createElement('li');
       let domain = '';
       try { domain = new URL(bookmark.href).hostname; } catch {}
       const sources = getFaviconSources(bookmark.href);
-
-      li.innerHTML = `
-        <a href="${bookmark.href}" class="bookmark-link">
-          <img alt="${bookmark.title}" class="bookmark-icon">
-          <span>${bookmark.title}</span>
-        </a>`;
-
+      li.innerHTML = `<a href="${bookmark.href}" class="bookmark-link"><img alt="${bookmark.title}" class="bookmark-icon"><span>${bookmark.title}</span></a>`;
       const img = li.querySelector('img');
       _loadFavicon(img, domain, sources);
-
       ul.appendChild(li);
     });
-
     section.appendChild(ul);
     container.appendChild(section);
   }
 }
 
-// ========================================
-// Reset bookmark highlight styles
-// ========================================
-function resetStyles(elements) {
-  elements.forEach(el => {
-    el.classList.remove("bookmark-match", "bookmark-nomatch", "primary-match");
-    el.style.mixBlendMode = "";
-  });
-}

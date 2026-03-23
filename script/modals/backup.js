@@ -11,10 +11,16 @@ const BACKUP_KEYS = [
 
 function exportBackup() {
   const data = { _version: 1, _exported: new Date().toISOString() };
-  BACKUP_KEYS.forEach(key => {
+  // Collect all keys except geminiApiKey (stored in chrome.storage, handled separately)
+  const lsKeys = BACKUP_KEYS.filter(k => k !== 'geminiApiKey');
+  lsKeys.forEach(key => {
     const val = localStorage.getItem(key);
     if (val !== null) data[key] = val;
   });
+
+  // Include geminiApiKey from the in-memory cache (via ext-storage shim)
+  const geminiKey = typeof getStoredGeminiApiKey === 'function' ? getStoredGeminiApiKey() : '';
+  if (geminiKey) data['geminiApiKey'] = geminiKey;
 
   const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
   const url  = URL.createObjectURL(blob);
@@ -47,7 +53,12 @@ function importBackup() {
         let restored = 0;
         BACKUP_KEYS.forEach(key => {
           if (data[key] !== undefined) {
-            localStorage.setItem(key, data[key]);
+            if (key === 'geminiApiKey') {
+              // Route through ext-storage shim → chrome.storage.local
+              if (typeof saveGeminiApiKey === 'function') saveGeminiApiKey(data[key]);
+            } else {
+              localStorage.setItem(key, data[key]);
+            }
             restored++;
           }
         });

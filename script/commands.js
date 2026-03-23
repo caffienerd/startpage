@@ -6,13 +6,13 @@
 // Version
 // ========================================
 function openVersion() {
-  const ver = window.APP_VERSION || 'unknown';
+  const ver = (typeof browser !== 'undefined' && browser.runtime?.getManifest?.()?.version) || (typeof chrome !== 'undefined' && chrome.runtime?.getManifest?.()?.version) || window.APP_VERSION || 'unknown';
   showAlert('Version: ' + ver, { title: 'Start Page', type: 'info' });
 }
 
 async function checkForUpdate() {
   const REMOTE_URL = 'https://raw.githubusercontent.com/caffienerd/startpage/refs/heads/master/version/version.js';
-  const local = window.APP_VERSION || 'unknown';
+  const local = (typeof browser !== 'undefined' && browser.runtime?.getManifest?.()?.version) || (typeof chrome !== 'undefined' && chrome.runtime?.getManifest?.()?.version) || window.APP_VERSION || 'unknown';
 
   showToast('Checking for updates...', 'info', 2500);
 
