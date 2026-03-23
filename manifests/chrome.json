@@ -4,7 +4,7 @@
   "description": "A sleek, keyboard-driven terminal start page with AI routing, Gemini integration, open directory search, and 8 themes.",
   "version": "6.9.3",
   "chrome_url_overrides": {
-    "newtab": "focus.html"
+    "newtab": "focus/focus.html"
   },
   "icons": {
     "16": "icon/16.png",
@@ -40,9 +40,8 @@
   "web_accessible_resources": [
     {
       "resources": [
+        "focus/*",
         "index.html",
-        "focus.html",
-        "focus.js",
         "icon/*",
         "style.css",
         "script/*"
