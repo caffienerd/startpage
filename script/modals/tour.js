@@ -21,7 +21,7 @@ const TOUR_STEPS = [
     tip: "Not a fan of the light theme? Let's switch to dark — watch the terminal.",
     type: ':dark',
     execute: () => {
-      if (typeof _applyTheme === 'function') _applyTheme('dark');
+      if (typeof handleSpecialCommands === 'function') handleSpecialCommands(':dark');
     },
   },
   {
@@ -67,7 +67,7 @@ function openTour(force = false) {
   _showStep(0);
 }
 
-function closeTour(skipCleanup = false) {
+function closeTour() {
   if (!_tourActive) return;
   _stopTyping();
   const s = TOUR_STEPS[_tourStep];
@@ -144,7 +144,7 @@ function _showStep(index) {
     _clearTerminal();
     if (typeof openHelp === 'function') openHelp();
     document.getElementById('tour-tip').innerHTML =
-      `If you find this useful ` +
+      `That's it! If you find this useful — ` +
       `<a href="https://github.com/caffienerd/startpage" target="_blank" rel="noopener" class="tour-star">⭐ Star on GitHub</a>`;
     return;
   }

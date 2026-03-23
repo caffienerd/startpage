@@ -1,21 +1,26 @@
 {
   "manifest_version": 2,
-  "name": "Powerful terminal StartPage",
-  "description": "A sleek, keyboard-driven powerful terminal themed start page with AI routing, Gemini integration, open directory search, 8 themes, vocabulary tools, internet tools, and much more.",
-  "version": "6.8.4",
+  "name": "Terminal Start Page",
+  "description": "A sleek, keyboard-driven terminal start page with AI routing, Gemini integration, open directory search, and 8 themes.",
+  "version": "6.9.2",
   "browser_specific_settings": {
     "gecko": {
       "id": "terminal-startpage@caffienerd",
-      "strict_min_version": "109.0"
+      "strict_min_version": "142.0",
+      "data_collection_permissions": {
+        "required": [
+          "none"
+        ]
+      }
     }
   },
   "chrome_url_overrides": {
-    "newtab": "focus/focus.html"
+    "newtab": "focus.html"
   },
   "icons": {
-    "16": "icon/favicon.png",
-    "48": "icon/favicon.png",
-    "128": "icon/favicon.png"
+    "16": "icon/16.png",
+    "48": "icon/48.png",
+    "128": "icon/128.png"
   },
   "permissions": [
     "storage",

@@ -2,16 +2,6 @@
 // Terminal — input, autocomplete, keyboard
 // ========================================
 
-// ========================================
-// Reset bookmark highlight styles
-// ========================================
-function resetStyles(elements) {
-  elements.forEach(el => {
-    el.classList.remove("bookmark-match", "bookmark-nomatch", "primary-match");
-    el.style.mixBlendMode = "";
-  });
-}
-
 function initializeBrowserInfo() {
   document.getElementById("username").textContent = getStoredUsername();
   document.getElementById("browser-info").textContent = getBrowser();
@@ -491,19 +481,13 @@ function pushHistory(entry) {
 }
 
 function handleKeyboardEvents(input, elements) {
-  // History browsing state
-  // filteredHistory: the filtered slice being browsed (most-recent-first)
-  // historyIndex: position within filteredHistory (-1 = not browsing)
-  // historyPrefix: the prefix that was active when browsing started
   let filteredHistory = [];
   let historyIndex    = -1;
   let historyPrefix   = '';
 
-  // Build a most-recent-first list of history entries that start with `prefix`.
-  // If prefix is empty, return the full history (most-recent-first).
   function buildFilteredHistory(prefix) {
-    const h = loadHistory(); // oldest-first
-    const reversed = [...h].reverse(); // most-recent-first
+    const h = loadHistory();
+    const reversed = [...h].reverse();
     if (!prefix) return reversed;
     const lp = prefix.toLowerCase();
     return reversed.filter(e => e.toLowerCase().startsWith(lp));
@@ -513,40 +497,20 @@ function handleKeyboardEvents(input, elements) {
     const rawValue = input.value;
     const value = rawValue.toLowerCase();
 
-    // Handle keyboard scrolling for active modals
     const activeModal = document.querySelector('.config-modal.active');
     const anyModalOpen = activeModal || document.getElementById('sp-modal-overlay');
     if (activeModal) {
       const content = activeModal.querySelector('.config-content') || activeModal;
       const scrollAmount = 40;
       const pageAmount = 300;
-
-      if (e.key === 'ArrowUp') {
-        content.scrollTop -= scrollAmount;
-        e.preventDefault();
-        return;
-      }
-      if (e.key === 'ArrowDown') {
-        content.scrollTop += scrollAmount;
-        e.preventDefault();
-        return;
-      }
-      if (e.key === 'PageUp') {
-        content.scrollTop -= pageAmount;
-        e.preventDefault();
-        return;
-      }
-      if (e.key === 'PageDown') {
-        content.scrollTop += pageAmount;
-        e.preventDefault();
-        return;
-      }
+      if (e.key === 'ArrowUp')   { content.scrollTop -= scrollAmount; e.preventDefault(); return; }
+      if (e.key === 'ArrowDown') { content.scrollTop += scrollAmount; e.preventDefault(); return; }
+      if (e.key === 'PageUp')    { content.scrollTop -= pageAmount;   e.preventDefault(); return; }
+      if (e.key === 'PageDown')  { content.scrollTop += pageAmount;   e.preventDefault(); return; }
     }
 
-    // Block all other terminal input processing while any modal is open
     if (anyModalOpen) return;
 
-    // Tab / → accepts autocomplete suggestion
     if ((e.key === "Tab" || e.key === "ArrowRight") && input.hasAttribute('data-suggestion')) {
       e.preventDefault();
       const suggestion = input.getAttribute('data-suggestion');
@@ -556,55 +520,41 @@ function handleKeyboardEvents(input, elements) {
       return;
     }
 
-    // Ctrl+Enter or Alt+Enter — open in new background tab
     if ((e.ctrlKey || e.altKey) && !e.shiftKey && e.key === "Enter") {
-      e.preventDefault();
-      e.stopPropagation();
+      e.preventDefault(); e.stopPropagation();
       const url = resolveUrl(input.value, elements);
       if (url) openInNewTab(url, false);
       return;
     }
-    // Ctrl+Shift+Enter or Alt+Shift+Enter — open in new focused tab
     if ((e.ctrlKey || e.altKey) && e.shiftKey && e.key === "Enter") {
-      e.preventDefault();
-      e.stopPropagation();
+      e.preventDefault(); e.stopPropagation();
       const url = resolveUrl(input.value, elements);
       if (url) openInNewTab(url, true);
       return;
     }
 
-    // ---- History navigation (prefix-filtered) ----
     if (e.key === "ArrowUp") {
       e.preventDefault();
-
       if (historyIndex === -1) {
-        // Start a new browse session — snapshot the current input as the prefix filter
         historyPrefix   = input.value;
         filteredHistory = buildFilteredHistory(historyPrefix);
         if (!filteredHistory.length) return;
         historyIndex = 0;
       } else {
-        // Already browsing — go further back
-        if (historyIndex < filteredHistory.length - 1) {
-          historyIndex++;
-        } else {
-          return; // already at oldest match
-        }
+        if (historyIndex < filteredHistory.length - 1) historyIndex++;
+        else return;
       }
-
       input.value = filteredHistory[historyIndex];
       updateSyntaxHighlight(input.value);
 
     } else if (e.key === "ArrowDown") {
       e.preventDefault();
       if (historyIndex === -1) return;
-
       if (historyIndex > 0) {
         historyIndex--;
         input.value = filteredHistory[historyIndex];
         updateSyntaxHighlight(input.value);
       } else {
-        // Back to the original prefix the user had typed
         historyIndex    = -1;
         filteredHistory = [];
         input.value     = historyPrefix;
@@ -613,18 +563,9 @@ function handleKeyboardEvents(input, elements) {
 
     } else if (e.key === "Enter") {
       handleEnterKey(rawValue, value, elements);
-      // Reset history state after executing
-      historyIndex    = -1;
-      filteredHistory = [];
-      historyPrefix   = '';
+      historyIndex = -1; filteredHistory = []; historyPrefix = '';
     } else {
-      // Any other key resets the browsing session so the next ↑ re-filters
-      // from whatever the user just typed
-      if (historyIndex !== -1) {
-        historyIndex    = -1;
-        filteredHistory = [];
-        historyPrefix   = '';
-      }
+      if (historyIndex !== -1) { historyIndex = -1; filteredHistory = []; historyPrefix = ''; }
     }
   });
 }
