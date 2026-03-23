@@ -29,3 +29,5 @@ backups/
 videos/
 dist/
 build/
+
+manifest.json
