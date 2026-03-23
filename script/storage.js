@@ -152,7 +152,15 @@ function saveTimezone(tz) {
 // ========================================
 // Gemini
 // ========================================
+
+// Gemini API key is stored in extension storage (chrome.storage.local /
+// browser.storage.local) when running as an extension, for security.
+// ext-storage.js populates _cachedGeminiApiKey and resolves extStorageReady.
+// On localhost (no extension API), we fall back to localStorage.
+
 function getStoredGeminiApiKey() {
+  // ext-storage.js sets this cache; falls back to localStorage on localhost
+  if (typeof _cachedGeminiApiKey !== 'undefined') return _cachedGeminiApiKey;
   return localStorage.getItem('geminiApiKey') || '';
 }
 
@@ -161,7 +169,28 @@ function normalizeGeminiApiKey(key) {
 }
 
 function saveGeminiApiKey(key) {
-  localStorage.setItem('geminiApiKey', normalizeGeminiApiKey(key));
+  const normalized = normalizeGeminiApiKey(key);
+
+  // Extension: save to chrome.storage.local / browser.storage.local
+  const extStorage = (typeof browser !== 'undefined' && browser?.storage?.local)
+    ? browser.storage.local
+    : (typeof chrome !== 'undefined' && chrome?.storage?.local)
+      ? chrome.storage.local
+      : null;
+
+  if (extStorage) {
+    // Update in-memory cache used by getStoredGeminiApiKey
+    if (typeof _cachedGeminiApiKey !== 'undefined') {
+      // _cachedGeminiApiKey is declared in ext-storage.js — update via its setter
+      window._cachedGeminiApiKey = normalized;
+    }
+    localStorage.removeItem('geminiApiKey'); // never store in localStorage
+    extStorage.set({ geminiApiKey: normalized });
+    return;
+  }
+
+  // Localhost fallback
+  localStorage.setItem('geminiApiKey', normalized);
 }
 function getStoredGeminiModel() {
   return localStorage.getItem('geminiModel') || DEFAULT_GEMINI_MODEL;

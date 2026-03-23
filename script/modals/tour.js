@@ -144,7 +144,7 @@ function _showStep(index) {
     _clearTerminal();
     if (typeof openHelp === 'function') openHelp();
     document.getElementById('tour-tip').innerHTML =
-      `If you find this useful` +
+      `If you find this useful ` +
       `<a href="https://github.com/caffienerd/startpage" target="_blank" rel="noopener" class="tour-star">⭐ Star on GitHub</a>`;
     return;
   }

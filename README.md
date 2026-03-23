@@ -1,4 +1,4 @@
-# Professional Terminal Start Page
+# Terminal Start Page
 
 A sleek, fast, and feature-rich browser start page driven by an interactive terminal. Boost your productivity with semantic AI routing, direct Gemini integration, open directory search, and a growing suite of built-in utility tools — all wrapped in a premium, modern aesthetic.
 
@@ -23,6 +23,50 @@ A sleek, fast, and feature-rich browser start page driven by an interactive term
 
 ---
 
+## Install as Browser Extension
+
+Use Terminal Start Page as your new tab page — works in Chrome, Firefox, Brave, Edge, and more.
+
+| Browser | Status | Link |
+| :--- | :--- | :--- |
+| **Chrome / Brave / Edge** | ✅ Available | *Coming soon to Chrome Web Store* |
+| **Firefox** | ✅ Available | *Coming soon to Firefox Add-ons* |
+| **Opera** | ✅ Available | Load manually (see below) |
+| **Vivaldi** | ❌ Not supported | Vivaldi blocks new tab overrides |
+
+### Load manually (all Chromium browsers)
+
+```bash
+node build.js chrome        # sets manifest.json for Chrome/Brave/Edge
+```
+
+1. Open `chrome://extensions` (or `brave://extensions`, `edge://extensions`)
+2. Enable **Developer mode**
+3. Click **Load unpacked** → select this folder
+
+### Firefox
+
+```bash
+node build.js firefox       # sets manifest.json for Firefox
+```
+
+1. Open `about:debugging` → **This Firefox**
+2. Click **Load Temporary Add-on** → select `manifest.json`
+
+> **Focus tip:** For best experience in Firefox, go to `about:config` and set  
+> `browser.newtabpage.activity-stream.improvesearch.handoffToAwesomebar` → `false`  
+> This lets the terminal receive focus automatically on new tab.
+
+### Opera
+
+```bash
+node build.js opera         # sets manifest.json for Opera
+```
+
+Load via Opera's extension developer mode. The extension uses a background service worker to intercept new tabs since Opera doesn't support `chrome_url_overrides`.
+
+---
+
 ## Features
 
 - **Interactive Terminal** — Command-driven interface with autocomplete (`Tab`), syntax highlighting per command type, and command history (`↑`/`↓`).
@@ -32,6 +76,7 @@ A sleek, fast, and feature-rich browser start page driven by an interactive term
 - **8 Themes** — Light, Dark, AMOLED Black, Nord, Newspaper, Coffee, Root (Hacker), and Neon (Cyberpunk).
 - **Syntax Highlighting** — Color-coded input for commands, themes, search prefixes, directory tokens, URLs, and more — fully customizable via `:customize`.
 - **Live Dashboard** — Local time and real-time weather at a glance.
+- **Onboarding Tour** — Interactive guided tour on first launch. Replay anytime with `:tour`.
 - **Utility Suite**:
   - **Spell Check** — Smart spelling suggestions via `spell:`. Press `D` to define the selected word.
   - **Pronunciation** — Human-readable syllable breakdown + audio playback via `pronounce:`. Works on any word, including scientific and technical terms.
@@ -45,9 +90,9 @@ A sleek, fast, and feature-rich browser start page driven by an interactive term
 
 ## Getting Started
 
-### Prerequisites
+### As a localhost web page
 
-You need a static file server to serve the page locally. Opening `index.html` directly works for most features, but serving it properly is recommended for API requests.
+You need a static file server. Opening `index.html` directly works for most features, but serving it properly is recommended for API requests.
 
 #### Option 1: Python (Quickest)
 ```bash
@@ -64,6 +109,18 @@ caddy run --config Caddyfile
 Any static server works — `npx serve`, nginx, etc.
 
 Visit `http://localhost:6174` in your browser.
+
+### Version management
+
+Version is defined once in `version/version.js` and stamped into all manifests by the build script:
+
+```bash
+# Edit version/version.js, then:
+node build.js chrome     # stamp + set Chrome manifest
+node build.js firefox    # stamp + set Firefox manifest
+node build.js opera      # stamp + set Opera manifest
+node build.js            # stamp only, don't touch manifest.json
+```
 
 ---
 
@@ -170,6 +227,7 @@ dir//ggl: keyword        ← no category, explicit Google
 | `:import` | Import settings from a JSON backup file |
 | `:gemini` | Open Gemini website |
 | `:tags` | Override search URLs & add custom prefix shortcuts |
+| `:tour` | Replay the onboarding tour |
 | `:help_ai_router` | Guide for `ai:` routing |
 
 ### Theme Commands
@@ -253,7 +311,7 @@ Runs an in-browser download/upload speed test and displays latency.
 
 The start page uses a 4-column layout. Customize bookmarks two ways:
 
-1. **Visual Editor** (`:bookmarks`) — drag-and-drop grid editor that maps directly to the 4-column layout.
+1. **Visual Editor** (`:bookmarks`) — grid editor that maps directly to the 4-column layout.
 2. **JSON Mode** — toggle "Edit as JSON" inside the bookmarks modal for bulk edits or to share your setup.
 
 ### Search Overrides & Custom Tags
@@ -276,7 +334,7 @@ Use **↓ Export** and **↑ Import** in `:config` to save all settings (bookmar
 
 ## Privacy
 
-All settings, including your **Gemini API Key**, are stored locally in your browser's `localStorage`. No data is sent to any external server except for:
+All settings, including your **Gemini API Key**, are stored locally in your browser. When running as an extension, the API key is stored in the browser's encrypted extension storage (`chrome.storage.local`) — never in plain `localStorage`. No data is sent to any external server except for:
 
 - **Google Gemini** — when using `gem:` or `ai:` prompts
 - **Open-Meteo** — for real-time weather
