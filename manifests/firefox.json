@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Terminal Start Page",
   "description": "A sleek, keyboard-driven terminal start page with AI routing, Gemini integration, open directory search, and 8 themes.",
-  "version": "6.9.3",
+  "version": "6.9.4",
   "browser_specific_settings": {
     "gecko": {
       "id": "terminal-startpage@caffienerd",
