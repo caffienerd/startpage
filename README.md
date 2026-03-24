@@ -225,6 +225,7 @@ dir//ggl: keyword        ← no category, explicit Google
 | `:version` | Show current app version |
 | `:export` | Export all settings to a JSON backup file |
 | `:import` | Import settings from a JSON backup file |
+| `:reset` | Clear all settings, cache & localStorage (with confirmation) |
 | `:gemini` | Open Gemini website |
 | `:tags` | Override search URLs & add custom prefix shortcuts |
 | `:tour` | Replay the onboarding tour |
@@ -341,3 +342,5 @@ All settings, including your **Gemini API Key**, are stored locally in your brow
 - **Wiktionary / Free Dictionary API** — for `pronounce:` IPA lookup (no key, no tracking)
 - **Datamuse** — for `spell:` suggestions (no key, no tracking)
 - **ipapi.co / ident.me** — for `:ipconfig` (your IP is sent by nature of the request)
+
+[![Star History Chart](https://api.star-history.com/svg?repos=caffienerd/startpage&type=Date)](https://star-history.com/#caffienerd/startpage&Date)

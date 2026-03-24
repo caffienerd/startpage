@@ -92,6 +92,7 @@ function handleSpecialCommands(value) {
   if (normalized === ":tour") { openTour(true); clear(); return; }
   if (normalized === ":export") { exportBackup(); clear(); return; }
   if (normalized === ":import") { importBackup(); clear(); return; }
+  if (normalized === ":reset") { handleResetCommand(); clear(); return; }
   if (normalized === ":ipconfig" || normalized === ":ip") { openIPInfo(); clear(); return; }
   if (normalized === ":netspeed" || normalized === ":speed") { openSpeedTest(); clear(); return; }
   if (normalized === ":gemini") { navigate("https://gemini.google.com/app"); return; }
@@ -455,6 +456,31 @@ function getAiUrlDestination(url) {
   } catch (_) {
     return 'Website';
   }
+}
+
+// ---- :reset — wipe all localStorage + caches ----
+async function handleResetCommand() {
+  const confirmed = await showConfirm(
+    'This will clear ALL settings, bookmarks, API keys, themes, syntax colors, favicon cache, command history, and any other stored data.\n\nThe page will reload with factory defaults.',
+    { title: 'Reset Everything?', confirmLabel: 'Yes, reset', cancelLabel: 'Cancel' }
+  );
+  if (!confirmed) return;
+
+  // Clear extension storage (Gemini API key) if available
+  try {
+    const extStorage = (typeof browser !== 'undefined' && browser?.storage?.local)
+      ? browser.storage.local
+      : (typeof chrome !== 'undefined' && chrome?.storage?.local)
+        ? chrome.storage.local
+        : null;
+    if (extStorage) extStorage.clear();
+  } catch (e) {}
+
+  // Wipe all localStorage
+  localStorage.clear();
+
+  showToast('All data cleared — reloading...', 'success', 1500);
+  setTimeout(() => location.reload(), 1500);
 }
 
 // ---- Command History modal ----
