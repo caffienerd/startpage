@@ -2,7 +2,7 @@
   "manifest_version": 3,
   "name": "Terminal Start Page",
   "description": "A sleek, keyboard-driven terminal start page with AI routing, Gemini integration, open directory search, and 8 themes.",
-  "version": "6.9.6",
+  "version": "6.9.7",
   "icons": {
     "16": "icon/16.png",
     "48": "icon/48.png",
