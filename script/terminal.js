@@ -424,8 +424,33 @@ function handleInput(input, elements) {
     const value = rawValue.toLowerCase();
     updateSyntaxHighlight(rawValue);
 
-    // 1. Determine the best bookmark match
-    const bookmarkMatch = findFirstBookmarkMatch(elements, rawValue);
+    // Re-query live — generateBookmarks() rebuilds the DOM so the static
+    // NodeList captured at init time is stale after first render.
+    const liveElements = document.querySelectorAll("#bookmarks a");
+
+    // 1. Filter bookmarks (upfront + shelf slot-swap).
+    // filterBookmarksWithShelf returns the best match {href, title} or null.
+    let bookmarkMatch = null;
+    if (typeof filterBookmarksWithShelf === 'function') {
+      bookmarkMatch = filterBookmarksWithShelf(rawValue);
+    } else {
+      // Fallback: plain highlight without shelf
+      bookmarkMatch = findFirstBookmarkMatch(liveElements, rawValue);
+      liveElements.forEach(el => {
+        const title = getBookmarkTitle(el).toLowerCase();
+        const href = el.href.toLowerCase();
+        if (!rawValue.trim() || rawValue.startsWith(':') || /^dir/i.test(rawValue)) {
+          el.parentElement?.classList.remove("bookmark-match", "bookmark-nomatch", "primary-match");
+          return;
+        }
+        const isMatch = title.includes(rawValue.toLowerCase()) || href.includes(rawValue.toLowerCase());
+        el.parentElement?.classList.toggle("bookmark-match", isMatch);
+        el.parentElement?.classList.toggle("bookmark-nomatch", !isMatch);
+      });
+      if (bookmarkMatch?.element) {
+        bookmarkMatch.element.parentElement?.classList.add("primary-match");
+      }
+    }
 
     // 2. Update AI badge / route preview
     if (/^ai\s*:/i.test(rawValue)) {
@@ -437,23 +462,6 @@ function handleInput(input, elements) {
       }
     } else {
       hideAiRouteBadge();
-    }
-
-    // 3. Highlight bookmarks
-    elements.forEach(el => {
-      const title = getBookmarkTitle(el).toLowerCase();
-      const href = el.href.toLowerCase();
-      if (!rawValue.trim() || rawValue.startsWith(':') || /^dir/i.test(rawValue)) {
-        el.parentElement?.classList.remove("bookmark-match", "bookmark-nomatch", "primary-match");
-        return;
-      }
-      const isMatch = title.includes(rawValue.toLowerCase()) || href.includes(rawValue.toLowerCase());
-      el.parentElement?.classList.toggle("bookmark-match", isMatch);
-      el.parentElement?.classList.toggle("bookmark-nomatch", !isMatch);
-    });
-
-    if (bookmarkMatch?.element) {
-      bookmarkMatch.element.parentElement?.classList.add("primary-match");
     }
   });
 }
@@ -658,7 +666,7 @@ function handleEnterKey(rawValue, value, elements) {
     return;
   }
 
-  const bookmarkMatch = findFirstBookmarkMatch(elements, rawValue);
+  const bookmarkMatch = findFirstBookmarkMatch(document.querySelectorAll("#bookmarks a"), rawValue);
   let matched = false;
   if (bookmarkMatch) {
     matched = true;

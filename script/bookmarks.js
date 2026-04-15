@@ -32,30 +32,15 @@ function _persistFaviconCache() {
   } catch {}
 }
 
-// ---- Strip subdomains to get root domain ----
-// gemini.google.com → google.com
-// deepsite.hf.co    → hf.co
-// pages.dev subdomain → pages.dev
 function _rootDomain(hostname) {
   const parts = hostname.split('.');
   return parts.length > 2 ? parts.slice(-2).join('.') : hostname;
 }
 
-// ---- Build candidate list ----
-// Returns array of [url, minNaturalWidth].
-// Strategy:
-//   Tier 1 (parallel race)  — fast, reliable services
-//   Tier 2 (sequential)     — direct domain probing, only if Tier 1 fails
 function _buildSources(hostname) {
   const root  = _rootDomain(hostname);
   const isSub = root !== hostname;
 
-  // Tier 1 — aggregator services.
-  // DDG is first: excellent coverage, fast CDN, returns a clean icon or times out — never a misleading placeholder.
-  // favicon.im is second: 404s cleanly for unknown domains.
-  // icon.horse is third: broad fallback.
-  // Google S2 is intentionally LAST in tier 1 — it redirects to faviconV2 which 404s
-  // for uncrawled domains and pollutes the console with noise.
   const tier1 = [
     [`https://icons.duckduckgo.com/ip3/${hostname}.ico`,   16],
     [`https://favicon.im/${hostname}?larger=true`,          16],
@@ -63,7 +48,6 @@ function _buildSources(hostname) {
     [`https://www.google.com/s2/favicons?domain=${hostname}&sz=32`, 16],
   ];
 
-  // For subdomains, also probe the root domain via the same services
   if (isSub) {
     tier1.push(
       [`https://icons.duckduckgo.com/ip3/${root}.ico`,   16],
@@ -73,8 +57,6 @@ function _buildSources(hostname) {
     );
   }
 
-  // Tier 2 — direct domain probing.
-  // Require ≥20px to avoid accepting a 16px default grey-icon placeholder.
   const tier2 = [
     [`https://${hostname}/apple-touch-icon.png`, 20],
     [`https://${hostname}/favicon.ico`,          20],
@@ -86,7 +68,6 @@ function _buildSources(hostname) {
     );
   }
 
-  // Tier 3 — last resort scrapers
   const tier3 = [
     [`https://geticon.io/img?url=${hostname}&size=128`, 16],
     [`https://api.faviconkit.com/${hostname}/256`,       16],
@@ -95,7 +76,6 @@ function _buildSources(hostname) {
   return { tier1, tier2, tier3 };
 }
 
-// ---- Probe a single URL ----
 function _probeIcon(src, minSize) {
   return new Promise((resolve) => {
     const img = new Image();
@@ -108,7 +88,6 @@ function _probeIcon(src, minSize) {
   });
 }
 
-// ---- Race a tier — returns first winner URL or null ----
 async function _raceTier(sources) {
   if (!sources.length) return null;
   return new Promise((resolve) => {
@@ -124,7 +103,6 @@ async function _raceTier(sources) {
   });
 }
 
-// ---- Sequential tier fallback ----
 async function _probeSequential(sources) {
   for (const [src, minSize] of sources) {
     const w = await _probeIcon(src, minSize);
@@ -133,9 +111,7 @@ async function _probeSequential(sources) {
   return null;
 }
 
-// ---- Main loader ----
 async function _loadFavicon(displayImg, domain, sources) {
-  // Serve from memory/disk cache immediately
   if (domain in _faviconMemCache) {
     const cached = _faviconMemCache[domain];
     if (cached) displayImg.src = cached;
@@ -145,13 +121,8 @@ async function _loadFavicon(displayImg, domain, sources) {
 
   if (!sources) { displayImg.style.display = 'none'; return; }
 
-  // Tier 1: race all aggregators — fastest reliable winner
   let winner = await _raceTier(sources.tier1);
-
-  // Tier 2: direct domain probing (sequential, slower)
   if (!winner) winner = await _probeSequential(sources.tier2);
-
-  // Tier 3: last resort scrapers
   if (!winner) winner = await _probeSequential(sources.tier3);
 
   _faviconMemCache[domain] = winner;
@@ -166,9 +137,38 @@ async function _loadFavicon(displayImg, domain, sources) {
 // ========================================
 const ITEMS_PER_SECTION = 5;
 
+// ---- Build a single bookmark <li> element ----
+function _buildBookmarkLi(bookmark) {
+  let domain = '';
+  try { domain = new URL(bookmark.href).hostname; } catch {}
+  const sources = _buildSources(domain);
+  const li = document.createElement('li');
+  li.innerHTML = `<a href="${bookmark.href}" class="bookmark-link"><img alt="${bookmark.title}" class="bookmark-icon"><span>${bookmark.title}</span></a>`;
+  const img = li.querySelector('img');
+  _loadFavicon(img, domain, sources);
+  return li;
+}
+
+// ---- Swap an <li>'s anchor to a new bookmark ----
+function _swapLiBookmark(li, bm) {
+  const a = li.querySelector('a');
+  a.href = bm.href;
+  a.querySelector('span').textContent = bm.title;
+  let domain = '';
+  try { domain = new URL(bm.href).hostname; } catch {}
+  const img = a.querySelector('img');
+  img.style.display = '';
+  _loadFavicon(img, domain, _buildSources(domain));
+}
+
+// Track original upfront bookmarks per slot for reset
+let _upfrontSlots = []; // Array of { li, bookmark }
+
 function generateBookmarks() {
   const container = document.getElementById('bookmarks');
   container.innerHTML = '';
+  _upfrontSlots = [];
+
   const bookmarks = getStoredBookmarks();
   const numSections = Math.ceil(bookmarks.length / ITEMS_PER_SECTION);
 
@@ -180,19 +180,110 @@ function generateBookmarks() {
 
     slice.forEach(bookmark => {
       if (!bookmark.href || !bookmark.title) return;
-      const li = document.createElement('li');
-
-      let domain = '';
-      try { domain = new URL(bookmark.href).hostname; } catch {}
-
-      const sources = _buildSources(domain);
-      li.innerHTML = `<a href="${bookmark.href}" class="bookmark-link"><img alt="${bookmark.title}" class="bookmark-icon"><span>${bookmark.title}</span></a>`;
-      const img = li.querySelector('img');
-      _loadFavicon(img, domain, sources);
+      const li = _buildBookmarkLi(bookmark);
       ul.appendChild(li);
+      _upfrontSlots.push({ li, bookmark });
     });
 
     section.appendChild(ul);
     container.appendChild(section);
   }
+}
+
+// ---- Score a bookmark against a query ----
+// Returns: 2 = startsWith title, 1 = includes title or href, 0 = no match
+// Upfront bookmarks match on title OR href (existing behaviour).
+function _scoreUpfront(title, href, value) {
+  if (title.startsWith(value)) return 2;
+  if (title.includes(value) || href.includes(value)) return 1;
+  return 0;
+}
+
+// Shelf bookmarks match on title ONLY — URLs are often long/noisy search strings.
+function _scoreShelf(title, value) {
+  if (title.startsWith(value)) return 2;
+  if (title.includes(value)) return 1;
+  return 0;
+}
+
+// ---- Main filter function — called from handleInput in terminal.js ----
+// Returns best match { href, title } or null (used by AI badge in terminal.js).
+function filterBookmarksWithShelf(rawValue) {
+  const value = (rawValue || '').trim().toLowerCase();
+
+  // Reset all classes first
+  _upfrontSlots.forEach(({ li }) => {
+    li.classList.remove('bookmark-match', 'bookmark-nomatch', 'primary-match', 'shelf-swapped');
+  });
+
+  // Empty input or command/dir prefix → restore everything to default
+  if (!value || rawValue.startsWith(':') || /^dir/i.test(rawValue)) {
+    _upfrontSlots.forEach(({ li, bookmark }) => {
+      if (li._shelfBookmark) {
+        _swapLiBookmark(li, bookmark);
+        delete li._shelfBookmark;
+      }
+    });
+    return null;
+  }
+
+  const shelfBookmarks = getStoredShelfBookmarks();
+
+  // Score upfront slots (title + href)
+  const upfrontScores = _upfrontSlots.map(({ bookmark }) =>
+    _scoreUpfront(bookmark.title.toLowerCase(), bookmark.href.toLowerCase(), value)
+  );
+
+  // Score + sort shelf bookmarks by title only, best first
+  const scoredShelf = shelfBookmarks
+    .map(bm => ({ bm, score: _scoreShelf(bm.title.toLowerCase(), value) }))
+    .filter(x => x.score > 0)
+    .sort((a, b) => b.score - a.score);
+
+  let shelfIdx = 0;
+  let firstMatchLi = null;
+  let bestMatch = null; // { href, title } for AI badge
+
+  _upfrontSlots.forEach(({ li, bookmark }, i) => {
+    const upfrontScore = upfrontScores[i];
+
+    if (upfrontScore > 0) {
+      // Upfront matches — restore if was swapped, mark as match
+      if (li._shelfBookmark) {
+        _swapLiBookmark(li, bookmark);
+        delete li._shelfBookmark;
+        li.classList.remove('shelf-swapped');
+      }
+      li.classList.add('bookmark-match');
+      if (!firstMatchLi) {
+        firstMatchLi = li;
+        bestMatch = { href: bookmark.href, title: bookmark.title };
+      }
+    } else {
+      // Upfront doesn't match — try shelf
+      if (shelfIdx < scoredShelf.length) {
+        const { bm } = scoredShelf[shelfIdx++];
+        _swapLiBookmark(li, bm);
+        li._shelfBookmark = bm;
+        li.classList.add('bookmark-match', 'shelf-swapped');
+        if (!firstMatchLi) {
+          firstMatchLi = li;
+          bestMatch = { href: bm.href, title: bm.title };
+        }
+      } else {
+        // No shelf item available — restore upfront and fade out
+        if (li._shelfBookmark) {
+          _swapLiBookmark(li, bookmark);
+          delete li._shelfBookmark;
+          li.classList.remove('shelf-swapped');
+        }
+        li.classList.add('bookmark-nomatch');
+      }
+    }
+  });
+
+  // Best match gets primary highlight
+  if (firstMatchLi) firstMatchLi.classList.add('primary-match');
+
+  return bestMatch;
 }

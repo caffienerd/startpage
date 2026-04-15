@@ -1218,6 +1218,46 @@ ul li a span {
   text-decoration: line-through !important;
 }
 
+/* Shelf bookmark swapped in */
+@keyframes shelfSlideIn {
+  from { opacity: 0; transform: translateY(-6px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+.shelf-swapped a {
+  animation: shelfSlideIn 0.18s ease forwards;
+}
+
+/* Bookmarks modal tabs */
+.bm-tabs {
+  display: flex;
+  gap: 6px;
+  margin-bottom: 14px;
+}
+
+.bm-tab-btn {
+  padding: 5px 14px;
+  border-radius: 5px;
+  border: 1px solid var(--card-border);
+  background: transparent;
+  color: var(--text-color);
+  font-family: var(--monospace-font-family);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  opacity: 0.55;
+  transition: all 0.15s ease;
+}
+
+.bm-tab-btn:hover { opacity: 0.85; }
+
+.bm-tab-active {
+  background: rgba(102, 126, 234, 0.15);
+  border-color: rgba(102, 126, 234, 0.4);
+  color: var(--color-primary);
+  opacity: 1;
+}
+
 /* Responsive Design */
 @media (max-width: 1200px) {
   .bookmark-section {

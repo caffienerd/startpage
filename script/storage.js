@@ -34,6 +34,8 @@ const DEFAULT_AI_MODE_ENABLED = false;
 const DEFAULT_AI_ROUTE_BADGE_MODE = "live";
 const DEFAULT_SEARCH_ENGINE = "google"; // "google" | "ddg" | "bing"
 
+const DEFAULT_SHELF_BOOKMARKS = [];
+
 // ========================================
 // Syntax Colors — universal, theme-independent
 // ========================================
@@ -89,6 +91,28 @@ function saveBookmarks(bookmarks) {
   } catch (e) {
     console.error('Failed to save bookmarks:', e);
     showToast('Could not save bookmarks. Storage may be full.', 'error', 4000);
+  }
+}
+
+// ========================================
+// Shelf Bookmarks (hidden, surface on filter)
+// ========================================
+function getStoredShelfBookmarks() {
+  try {
+    const stored = localStorage.getItem('shelfBookmarks');
+    return stored ? JSON.parse(stored) : DEFAULT_SHELF_BOOKMARKS;
+  } catch (e) {
+    console.error('Failed to parse shelf bookmarks:', e);
+    return DEFAULT_SHELF_BOOKMARKS;
+  }
+}
+function saveShelfBookmarks(bookmarks) {
+  if (!Array.isArray(bookmarks)) throw new Error('Invalid shelf bookmarks data');
+  try {
+    localStorage.setItem('shelfBookmarks', JSON.stringify(bookmarks));
+  } catch (e) {
+    console.error('Failed to save shelf bookmarks:', e);
+    showToast('Could not save shelf bookmarks. Storage may be full.', 'error', 4000);
   }
 }
 
