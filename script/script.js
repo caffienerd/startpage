@@ -55,6 +55,26 @@ const WEATHER_UPDATE_INTERVAL = 30 * 60 * 1000;
     if (grab() || ++attempts > 30) clearInterval(poll);
   }, 100);
 
+  // Firefox-specific: the omnibox steals focus AFTER our poll wins.
+  // Watch for the input losing focus to anything outside a modal and yank it back.
+  document.addEventListener('focusin', (e) => {
+    const input = document.getElementById('terminal-input');
+    if (!input) return;
+    if (document.querySelector('.config-modal.active')) return;
+    if (e.target === input) return;
+    // Only reclaim if focus went to body or document (omnibox steal signature)
+    if (e.target === document.body || e.target === document.documentElement) {
+      input.focus({ preventScroll: true });
+    }
+  }, { capture: true });
+
+  // Also reclaim when page becomes visible again (switching back to the tab)
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+      setTimeout(() => grab(), 50);
+    }
+  });
+
   // Also reclaim on any click on the page body (not inside a modal)
   document.addEventListener('click', (e) => {
     if (!document.querySelector('.config-modal.active')) grab();
@@ -70,7 +90,7 @@ const WEATHER_UPDATE_INTERVAL = 30 * 60 * 1000;
       input.focus({ preventScroll: true });
     }
   }, { capture: true });
-})();
+})()
 
 // Hide loading overlay if user navigates back (bfcache restore)
 window.addEventListener('pageshow', (e) => {

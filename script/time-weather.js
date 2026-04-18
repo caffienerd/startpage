@@ -80,14 +80,46 @@ async function updateWeather() {
 }
 
 // ========================================
-// Browser detection (used by commands.js)
+// Browser detection (used by commands.js and terminal.js)
 // ========================================
+
+// Known brands to skip in userAgentData — these are noise, not real browser names
+const _GENERIC_BRANDS = new Set([
+  'chromium', 'google chrome', 'not a brand', 'not;a brand', 'not/a)brand',
+  'not_a brand', 'not?a_brand', 'not-a.brand',
+]);
+
+// UA string rules — most specific first
+const _UA_RULES = [
+  [/Brave/i,            'brave'],
+  [/Helium/i,           'helium'],
+  [/EdgA?\//i,          'edge'],
+  [/OPR\//i,            'opera'],
+  [/YaBrowser\//i,      'yandex'],
+  [/Vivaldi\//i,        'vivaldi'],
+  [/Firefox\//i,        'firefox'],
+  [/SamsungBrowser\//i, 'samsung'],
+  [/Chrome\//i,         'chrome'],
+  [/Safari\//i,         'safari'],
+];
+
 function getBrowser() {
+  // Tier 1: Brave-specific API
+  if (typeof navigator.brave?.isBrave === 'function') return 'brave';
+
+  // Tier 2: userAgentData brands — Chromium forks sometimes expose their real name here
+  const brands = navigator.userAgentData?.brands;
+  if (Array.isArray(brands)) {
+    for (const { brand } of brands) {
+      if (!_GENERIC_BRANDS.has(brand.toLowerCase())) return brand;
+    }
+  }
+
+  // Tier 3: UA string rules
   const ua = navigator.userAgent;
-  if (navigator.brave && navigator.brave.isBrave) return "brave";
-  if (ua.includes("Edg/")) return "edge";
-  if (ua.includes("Firefox")) return "firefox";
-  if (ua.includes("Chrome")) return "chrome";
-  if (ua.includes("Safari") && !ua.includes("Chrome")) return "safari";
-  return "unknown";
+  for (const [re, name] of _UA_RULES) {
+    if (re.test(ua)) return name;
+  }
+
+  return 'browser';
 }

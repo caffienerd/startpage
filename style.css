@@ -1258,6 +1258,91 @@ ul li a span {
   opacity: 1;
 }
 
+/* Shelf list editor */
+#shelf-list-editor {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.shelf-add-btn {
+  align-self: flex-start;
+  background: rgba(102, 126, 234, 0.12);
+  border: 1px dashed rgba(102, 126, 234, 0.4);
+  color: var(--color-primary);
+  border-radius: 6px;
+  padding: 6px 14px;
+  font-family: var(--monospace-font-family);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  width: auto !important;   /* override .config-content input width: 100% */
+  resize: none !important;
+}
+
+.shelf-add-btn:hover {
+  background: rgba(102, 126, 234, 0.22);
+  border-style: solid;
+}
+
+.shelf-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 380px;
+  overflow-y: auto;
+  padding-right: 4px;
+}
+
+.shelf-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.shelf-row input {
+  background: var(--terminal-bg);
+  border: 1px solid var(--card-border);
+  border-radius: 6px;
+  padding: 7px 10px;
+  color: var(--text-color);
+  font-family: var(--monospace-font-family);
+  font-size: 13px;
+  transition: border-color 0.15s ease;
+  width: auto !important;  /* override .config-content input width: 100% */
+}
+
+.shelf-row input:focus {
+  outline: none;
+  border-color: var(--color-primary);
+}
+
+.shelf-title-input { width: 140px; flex-shrink: 0; font-weight: 600; color: var(--color-primary); }
+.shelf-url-input   { flex: 1; }
+
+.shelf-remove-btn {
+  background: transparent;
+  border: 1px solid var(--card-border);
+  color: var(--text-color);
+  border-radius: 5px;
+  width: 28px;
+  height: 28px;
+  font-size: 16px;
+  line-height: 1;
+  cursor: pointer;
+  opacity: 0.45;
+  flex-shrink: 0;
+  transition: all 0.15s ease;
+}
+
+.shelf-remove-btn:hover {
+  opacity: 1;
+  border-color: #e74c3c;
+  color: #e74c3c;
+}
+
 /* Responsive Design */
 @media (max-width: 1200px) {
   .bookmark-section {

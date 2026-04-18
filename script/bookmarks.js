@@ -191,11 +191,11 @@ function generateBookmarks() {
 }
 
 // ---- Score a bookmark against a query ----
-// Returns: 2 = startsWith title, 1 = includes title or href, 0 = no match
-// Upfront bookmarks match on title OR href (existing behaviour).
+// Returns: 2 = startsWith title, 1 = includes title, 0 = no match
+// Match on title only — href matching causes false positives with long URLs.
 function _scoreUpfront(title, href, value) {
   if (title.startsWith(value)) return 2;
-  if (title.includes(value) || href.includes(value)) return 1;
+  if (title.includes(value)) return 1;
   return 0;
 }
 
@@ -241,8 +241,9 @@ function filterBookmarksWithShelf(rawValue) {
     .sort((a, b) => b.score - a.score);
 
   let shelfIdx = 0;
-  let firstMatchLi = null;
-  let bestMatch = null; // { href, title } for AI badge
+  let bestMatchLi = null;
+  let bestMatchScore = 0;
+  let bestMatch = null;
 
   _upfrontSlots.forEach(({ li, bookmark }, i) => {
     const upfrontScore = upfrontScores[i];
@@ -255,19 +256,25 @@ function filterBookmarksWithShelf(rawValue) {
         li.classList.remove('shelf-swapped');
       }
       li.classList.add('bookmark-match');
-      if (!firstMatchLi) {
-        firstMatchLi = li;
+      // Upfront scores: startsWith=2, includes=1
+      const slotScore = upfrontScore; // 2 or 1
+      if (slotScore > bestMatchScore) {
+        bestMatchScore = slotScore;
+        bestMatchLi = li;
         bestMatch = { href: bookmark.href, title: bookmark.title };
       }
     } else {
       // Upfront doesn't match — try shelf
       if (shelfIdx < scoredShelf.length) {
-        const { bm } = scoredShelf[shelfIdx++];
+        const { bm, score } = scoredShelf[shelfIdx++];
         _swapLiBookmark(li, bm);
         li._shelfBookmark = bm;
         li.classList.add('bookmark-match', 'shelf-swapped');
-        if (!firstMatchLi) {
-          firstMatchLi = li;
+        // Shelf scores are lower priority than upfront: startsWith=1.5, includes=0.5
+        const slotScore = score === 2 ? 1.5 : 0.5;
+        if (slotScore > bestMatchScore) {
+          bestMatchScore = slotScore;
+          bestMatchLi = li;
           bestMatch = { href: bm.href, title: bm.title };
         }
       } else {
@@ -283,7 +290,7 @@ function filterBookmarksWithShelf(rawValue) {
   });
 
   // Best match gets primary highlight
-  if (firstMatchLi) firstMatchLi.classList.add('primary-match');
+  if (bestMatchLi) bestMatchLi.classList.add('primary-match');
 
   return bestMatch;
 }

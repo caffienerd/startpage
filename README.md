@@ -1,11 +1,32 @@
 # Terminal Start Page
 
-A sleek, fast, and feature-rich browser start page driven by an interactive terminal. Boost your productivity with semantic AI routing, direct Gemini integration, open directory search, and a growing suite of built-in utility tools — all wrapped in a premium, modern aesthetic.
+A sleek, fast, and feature-rich browser start page driven by an interactive terminal. Boost your productivity with semantic AI routing, direct Gemini integration, open directory search, shelf bookmarks, and a growing suite of built-in utility tools — all wrapped in a premium, modern aesthetic.
 
 **→ Try it live: [caffienerd.github.io/startpage](https://caffienerd.github.io/startpage/)**
 
 > Inspired by [ahmetdem/start-page](https://github.com/ahmetdem/start-page)  
 > Open directory search inspired by [ewasion/opendirectory-finder](https://ewasion.github.io/opendirectory-finder/#)
+
+---
+
+## Index
+
+- [Demo](#demo)
+- [Themes](#themes)
+- [Install as Browser Extension](#install-as-browser-extension)
+- [Getting Started](#getting-started)
+- [Features](#features)
+- [Shelf Bookmarks](#shelf-bookmarks)
+- [Configuration](#configuration)
+- [Command Reference](#command-reference)
+  - [Search Prefixes](#search-prefixes)
+  - [Open Directory Prefixes](#open-directory-prefixes)
+  - [System Commands](#system-commands)
+  - [Theme Commands](#theme-commands)
+- [Keyboard Shortcuts](#keyboard-shortcuts)
+- [Utility Tools](#utility-tools)
+- [Customization](#customization)
+- [Privacy](#privacy)
 
 ---
 
@@ -67,27 +88,6 @@ Load via Opera's extension developer mode. The extension uses a background servi
 
 ---
 
-## Features
-
-- **Interactive Terminal** — Command-driven interface with autocomplete (`Tab`), syntax highlighting per command type, and command history (`↑`/`↓`).
-- **Semantic AI Router** — Use `ai:` to navigate by intent. Intelligently routes to YouTube, Maps, Reddit, or search.
-- **Gemini Integration** — Direct AI prompting via `gem:` or `gemini:`. Responses appear in a clean, non-intrusive modal.
-- **Open Directory Search** — Power-user Google dorking via `dir/<category>/<engine>: keyword`. Search public open directory indexes filtered by file type, with full autocomplete and an interactive builder (`:dir`).
-- **8 Themes** — Light, Dark, AMOLED Black, Nord, Newspaper, Coffee, Root (Hacker), and Neon (Cyberpunk).
-- **Syntax Highlighting** — Color-coded input for commands, themes, search prefixes, directory tokens, URLs, and more — fully customizable via `:customize`.
-- **Live Dashboard** — Local time and real-time weather at a glance.
-- **Onboarding Tour** — Interactive guided tour on first launch. Replay anytime with `:tour`.
-- **Utility Suite**:
-  - **Spell Check** — Smart spelling suggestions via `spell:`. Press `D` to define the selected word.
-  - **Pronunciation** — Human-readable syllable breakdown + audio playback via `pronounce:`. Works on any word, including scientific and technical terms.
-  - **IP Info** — Detailed network info (IPv4, IPv6, ISP, ASN, location) via `:ipconfig`.
-  - **Speed Test** — Integrated network performance testing via `:netspeed`.
-- **Bookmark Management** — Fully customizable bookmark categories via visual grid editor or raw JSON.
-- **Custom Tags** — Override built-in search prefixes or define entirely new ones via `:tags`.
-- **Backup & Restore** — Export and import all settings as a single JSON file.
-
----
-
 ## Getting Started
 
 ### As a localhost web page
@@ -121,6 +121,58 @@ node build.js firefox    # stamp + set Firefox manifest
 node build.js opera      # stamp + set Opera manifest
 node build.js            # stamp only, don't touch manifest.json
 ```
+
+---
+
+## Features
+
+- **Interactive Terminal** — Command-driven interface with autocomplete (`Tab`), syntax highlighting per command type, and command history (`↑`/`↓`).
+- **Semantic AI Router** — Use `ai:` to navigate by intent. Intelligently routes to YouTube, Maps, Reddit, or search.
+- **Gemini Integration** — Direct AI prompting via `gem:` or `gemini:`. Responses appear in a clean, non-intrusive modal.
+- **Open Directory Search** — Power-user Google dorking via `dir/<category>/<engine>: keyword`. Search public open directory indexes filtered by file type, with full autocomplete and an interactive builder (`:dir`).
+- **Shelf Bookmarks** — A hidden second layer of bookmarks that surface dynamically as you type, filling slots vacated by non-matching upfront bookmarks. See [Shelf Bookmarks](#shelf-bookmarks).
+- **8 Themes** — Light, Dark, AMOLED Black, Nord, Newspaper, Coffee, Root (Hacker), and Neon (Cyberpunk).
+- **Syntax Highlighting** — Color-coded input for commands, themes, search prefixes, directory tokens, URLs, and more — fully customizable via `:customize`.
+- **Live Dashboard** — Local time and real-time weather at a glance.
+- **Onboarding Tour** — Interactive guided tour on first launch. Replay anytime with `:tour`.
+- **Utility Suite**:
+  - **Spell Check** — Smart spelling suggestions via `spell:`. Press `D` to define the selected word.
+  - **Pronunciation** — Human-readable syllable breakdown + audio playback via `pronounce:`. Works on any word, including scientific and technical terms.
+  - **IP Info** — Detailed network info (IPv4, IPv6, ISP, ASN, location) via `:ipconfig`.
+  - **Speed Test** — Integrated network performance testing via `:netspeed`.
+- **Bookmark Management** — Fully customizable bookmark grid via visual editor or raw JSON. Includes a separate Shelf tab for hidden bookmarks.
+- **Custom Tags** — Override built-in search prefixes or define entirely new ones via `:tags`.
+- **Backup & Restore** — Export and import all settings (including shelf bookmarks) as a single JSON file.
+
+---
+
+## Shelf Bookmarks
+
+Shelf bookmarks are a hidden second layer that lives behind your main grid. They don't appear on the page — but as soon as you start typing, matching shelf items surface into the slots vacated by non-matching upfront bookmarks.
+
+**How it works:**
+
+- Your main (upfront) bookmarks fill the grid normally when the terminal is empty.
+- As you type, upfront bookmarks that don't match your query fade out.
+- Shelf bookmarks that *do* match slide into those empty slots.
+- Clear the terminal → everything resets to default instantly.
+
+**Matching rules:**
+
+- Matching is by **title only** (not URL) — so short alias titles like `yt`, `gh`, `gpt` work great.
+- Priority: upfront `startsWith` > shelf `startsWith` > upfront `includes` > shelf `includes`.
+- The best match gets the primary highlight and is what `Enter` launches.
+
+**Example:**
+
+Upfront: `YouTube`, `Reddit`, `Discord`, `GitHub`, `Gmail`  
+Shelf: `CyberChef`, `RemoveBG`, `Cobalt`
+
+Type `c` → `Discord` stays (matches), `CyberChef` and `Cobalt` slide into the slots where non-matching upfront items were. Everything else fades out.
+
+**Managing shelf bookmarks:**
+
+Run `:bookmarks` → click the **Shelf** tab. Same grid editor and JSON toggle as upfront bookmarks. Shelf bookmarks are included in `:export` / `:import` backups automatically.
 
 ---
 
@@ -215,7 +267,7 @@ dir//ggl: keyword        ← no category, explicit Google
 | `:help` | Show all commands |
 | `:config` | Open settings |
 | `:customize` / `:custom` | Open customization (theme & syntax colors) |
-| `:bookmarks` / `:bm` | Edit bookmarks |
+| `:bookmarks` / `:bm` | Edit bookmarks (upfront + shelf tabs) |
 | `:dir` | Open interactive directory search builder |
 | `:dirconfig` | Customize file extensions per `dir/` category |
 | `:ipconfig` / `:ip` | Show detailed network info |
@@ -229,6 +281,7 @@ dir//ggl: keyword        ← no category, explicit Google
 | `:gemini` | Open Gemini website |
 | `:tags` | Override search URLs & add custom prefix shortcuts |
 | `:tour` | Replay the onboarding tour |
+| `:history` | Browse & recall command history |
 | `:help_ai_router` | Guide for `ai:` routing |
 
 ### Theme Commands
@@ -312,8 +365,12 @@ Runs an in-browser download/upload speed test and displays latency.
 
 The start page uses a 4-column layout. Customize bookmarks two ways:
 
-1. **Visual Editor** (`:bookmarks`) — grid editor that maps directly to the 4-column layout.
+1. **Visual Editor** (`:bookmarks`) — grid editor that maps directly to the 4-column layout. Switch between the **Upfront** and **Shelf** tabs to manage each set independently.
 2. **JSON Mode** — toggle "Edit as JSON" inside the bookmarks modal for bulk edits or to share your setup.
+
+### Shelf Bookmarks
+
+Open `:bookmarks` → click the **Shelf** tab. Add bookmarks here that you don't need visible all the time — they'll surface automatically when your terminal input matches their title. Short, memorable titles work best (e.g. `gpt`, `cyberchef`, `bg`).
 
 ### Search Overrides & Custom Tags
 
@@ -329,7 +386,7 @@ Run `:customize` to set the highlight color for each input type independently. C
 
 ### Backup & Restore
 
-Use **↓ Export** and **↑ Import** in `:config` to save all settings (bookmarks, colors, API keys, custom tags, dir extensions) to a single JSON file and restore them anytime.
+Use **↓ Export** and **↑ Import** in `:config` to save all settings (bookmarks, shelf bookmarks, colors, API keys, custom tags, dir extensions) to a single JSON file and restore them anytime.
 
 ---
 
@@ -342,5 +399,8 @@ All settings, including your **Gemini API Key**, are stored locally in your brow
 - **Wiktionary / Free Dictionary API** — for `pronounce:` IPA lookup (no key, no tracking)
 - **Datamuse** — for `spell:` suggestions (no key, no tracking)
 - **ipapi.co / ident.me** — for `:ipconfig` (your IP is sent by nature of the request)
+
+---
+## Star the repo ❤️
 
 [![Star History Chart](https://api.star-history.com/svg?repos=caffienerd/startpage&type=Date)](https://star-history.com/#caffienerd/startpage&Date)

@@ -2,7 +2,7 @@
   "manifest_version": 2,
   "name": "Terminal Start Page",
   "description": "A sleek, keyboard-driven terminal start page with AI routing, Gemini integration, open directory search, and 8 themes.",
-  "version": "6.9.7",
+  "version": "7.1.4",
   "browser_specific_settings": {
     "gecko": {
       "id": "terminal-startpage@caffienerd",
@@ -15,7 +15,7 @@
     }
   },
   "chrome_url_overrides": {
-    "newtab": "focus/focus.html"
+    "newtab": "index.html"
   },
   "icons": {
     "16": "icon/16.png",
@@ -24,6 +24,7 @@
   },
   "permissions": [
     "storage",
+    "tabs",
     "https://generativelanguage.googleapis.com/*",
     "https://geocoding-api.open-meteo.com/*",
     "https://api.open-meteo.com/*",
@@ -49,6 +50,7 @@
     "focus/*",
     "icon/*",
     "style.css",
-    "script/*"
+    "script/*",
+    "version/*"
   ]
 }
