@@ -44,7 +44,8 @@
         "index.html",
         "icon/*",
         "style.css",
-        "script/*"
+        "script/*",
+        "version/*"
       ],
       "matches": [
         "<all_urls>"
