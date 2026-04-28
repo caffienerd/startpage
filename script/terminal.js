@@ -596,7 +596,9 @@ function resolveUrl(rawValue, elements) {
     return null;
   }
 
-  const bookmarkMatch = findFirstBookmarkMatch(elements, rawValue);
+  const bookmarkMatch = (typeof getLastBookmarkMatch === 'function')
+    ? getLastBookmarkMatch()
+    : findFirstBookmarkMatch(elements, rawValue);
   if (bookmarkMatch) return bookmarkMatch.href;
 
   const enc = (str) => encodeURIComponent(str);
@@ -666,7 +668,12 @@ function handleEnterKey(rawValue, value, elements) {
     return;
   }
 
-  const bookmarkMatch = findFirstBookmarkMatch(document.querySelectorAll("#bookmarks a"), rawValue);
+  // Use the match already computed by filterBookmarksWithShelf during handleInput.
+  // Re-scanning #bookmarks a would return the wrong result when shelf bookmarks
+  // are swapped into upfront slots — the DOM order no longer reflects priority.
+  const bookmarkMatch = (typeof getLastBookmarkMatch === 'function')
+    ? getLastBookmarkMatch()
+    : findFirstBookmarkMatch(document.querySelectorAll("#bookmarks a"), rawValue);
   let matched = false;
   if (bookmarkMatch) {
     matched = true;

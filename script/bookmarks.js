@@ -164,6 +164,14 @@ function _swapLiBookmark(li, bm) {
 // Track original upfront bookmarks per slot for reset
 let _upfrontSlots = []; // Array of { li, bookmark }
 
+// Cache the last computed best match so handleEnterKey can reuse it
+// without re-scanning the DOM (which would pick the wrong shelf-swapped anchor).
+let _lastBookmarkMatch = null;
+
+function getLastBookmarkMatch() {
+  return _lastBookmarkMatch;
+}
+
 function generateBookmarks() {
   const container = document.getElementById('bookmarks');
   container.innerHTML = '';
@@ -191,15 +199,17 @@ function generateBookmarks() {
 }
 
 // ---- Score a bookmark against a query ----
-// Returns: 2 = startsWith title, 1 = includes title, 0 = no match
-// Match on title only — href matching causes false positives with long URLs.
-function _scoreUpfront(title, href, value) {
-  if (title.startsWith(value)) return 2;
-  if (title.includes(value)) return 1;
+// Priority (highest to lowest):
+//   upfront startsWith = 4
+//   upfront includes   = 3
+//   shelf   startsWith = 2
+//   shelf   includes   = 1
+function _scoreUpfront(title, value) {
+  if (title.startsWith(value)) return 4;
+  if (title.includes(value)) return 3;
   return 0;
 }
 
-// Shelf bookmarks match on title ONLY — URLs are often long/noisy search strings.
 function _scoreShelf(title, value) {
   if (title.startsWith(value)) return 2;
   if (title.includes(value)) return 1;
@@ -224,14 +234,15 @@ function filterBookmarksWithShelf(rawValue) {
         delete li._shelfBookmark;
       }
     });
+    _lastBookmarkMatch = null;
     return null;
   }
 
   const shelfBookmarks = getStoredShelfBookmarks();
 
-  // Score upfront slots (title + href)
+  // Score upfront slots
   const upfrontScores = _upfrontSlots.map(({ bookmark }) =>
-    _scoreUpfront(bookmark.title.toLowerCase(), bookmark.href.toLowerCase(), value)
+    _scoreUpfront(bookmark.title.toLowerCase(), value)
   );
 
   // Score + sort shelf bookmarks by title only, best first
@@ -256,10 +267,8 @@ function filterBookmarksWithShelf(rawValue) {
         li.classList.remove('shelf-swapped');
       }
       li.classList.add('bookmark-match');
-      // Upfront scores: startsWith=2, includes=1
-      const slotScore = upfrontScore; // 2 or 1
-      if (slotScore > bestMatchScore) {
-        bestMatchScore = slotScore;
+      if (upfrontScore > bestMatchScore) {
+        bestMatchScore = upfrontScore;
         bestMatchLi = li;
         bestMatch = { href: bookmark.href, title: bookmark.title };
       }
@@ -270,10 +279,8 @@ function filterBookmarksWithShelf(rawValue) {
         _swapLiBookmark(li, bm);
         li._shelfBookmark = bm;
         li.classList.add('bookmark-match', 'shelf-swapped');
-        // Shelf scores are lower priority than upfront: startsWith=1.5, includes=0.5
-        const slotScore = score === 2 ? 1.5 : 0.5;
-        if (slotScore > bestMatchScore) {
-          bestMatchScore = slotScore;
+        if (score > bestMatchScore) {
+          bestMatchScore = score;
           bestMatchLi = li;
           bestMatch = { href: bm.href, title: bm.title };
         }
@@ -292,5 +299,6 @@ function filterBookmarksWithShelf(rawValue) {
   // Best match gets primary highlight
   if (bestMatchLi) bestMatchLi.classList.add('primary-match');
 
+  _lastBookmarkMatch = bestMatch;
   return bestMatch;
 }
